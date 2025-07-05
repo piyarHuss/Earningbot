@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Tap-Tap Coin Game</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap');
+        
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        body{
+            background-color:#1a1a2e;
+            color:#fff;
+            font-family:'Poppins',sans-serif;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            user-select:none;
+            -webkit-user-select:none;
+        }
+
+        #loading-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 50%, #3a4a6b, #1a1a2e);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 9999; transition: opacity 0.5s ease-out;
+        }
+        .loading-bear { font-size: 80px; animation: run-across 3s ease-in-out infinite; }
+        .loading-text { margin-top: 20px; font-size: 24px; color: #fff; }
+        #loading-progress-bar { width: 80%; max-width: 300px; height: 20px; background-color: rgba(0,0,0,0.3); border-radius: 10px; margin-top: 30px; overflow: hidden; }
+        #loading-progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #4dff4d, #00b300); border-radius: 10px; animation: fill-progress 5s linear forwards; }
+        @keyframes run-across {
+            0% { transform: translateX(-100px) scaleX(1); } 49% { transform: translateX(100px) scaleX(1); }
+            50% { transform: translateX(100px) scaleX(-1); } 99% { transform: translateX(-100px) scaleX(-1); }
+            100% { transform: translateX(-100px) scaleX(1); }
+        }
+        @keyframes fill-progress { from { width: 0%; } to { width: 100%; } }
+        #loading-screen.hidden { opacity: 0; pointer-events: none; }
+        
+        .game-container{
+            width:100%; 
+            height:100%; 
+            display:flex; 
+            flex-direction:column; 
+            position: relative; 
+            background: radial-gradient(circle at 50% 50%, #3a4a6b, #1a1a2e); 
+            overflow: hidden;
+        }
+        
+        .screen {
+            flex-grow:1; 
+            display:flex; 
+            flex-direction:column; 
+            justify-content: center; 
+            align-items:center; 
+            width:100%; 
+            z-index: 2; 
+            padding: 20px; 
+            box-sizing: border-box; 
+            position: relative; 
+            overflow-y: auto;
+            padding-bottom: 150px;
+        }
+        .screen.hidden{display:none}
+
+        .top-bar-container { position: absolute; top: 15px; left: 15px; z-index: 10; }
+        .profile-section { display: flex; align-items: center; gap: 8px; background-color: rgba(0,0,0,0.3); padding: 6px 12px; border-radius: 50px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); transition: background-color 0.2s; }
+        .profile-section:hover { background-color: rgba(0,0,0,0.5); }
+        .profile-icon { font-size: 20px; }
+        #player-name-display { font-size: 16px; font-weight: 600; }
+        
+        .coin-container { width: 220px; height: 220px; cursor: pointer; -webkit-tap-highlight-color: transparent; display: flex; justify-content: center; align-items: center; margin: 20px 0; perspective: 1000px; }
+        #coin-css { width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(circle at 65% 35%, #fffec8, #ffc700 60%, #e0ac00 100%); box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.4), inset 0 0 20px rgba(0, 0, 0, 0.4), 0 10px 20px rgba(0, 0, 0, 0.5); position: relative; border: 10px solid #c8a443; display: flex; justify-content: center; align-items: center; text-align: center; transition: transform 0.3s ease-out; transform-style: preserve-3d; pointer-events: none; }
+        #coin-css::before { content: ''; position: absolute; width: 80%; height: 80%; border: 4px solid rgba(0,0,0,0.15); border-radius: 50%; box-shadow: inset 0 0 10px rgba(0,0,0,0.2); }
+        #coin-css::after { content: ''; position: absolute; top: 10%; left: 10%; width: 80%; height: 40%; background: linear-gradient(to bottom, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0)); border-radius: 50% / 100%; transform: rotate(45deg); }
+        .coin-text { font-size: 24px; font-weight: 700; color: #8B4513; text-shadow: 1px 1px 2px rgba(255,255,255,0.4); line-height: 1.2; z-index: 5; }
+        .stats-container { text-align: center; margin-bottom: 15px; margin-top: 20px;}
+        #score-display{font-size:48px; font-weight:700; margin: 0; text-shadow: 2px 2px 8px rgba(0,0,0,0.5);}
+        #level-display { font-size: 22px; margin-top: 0; color: #ffdd57; font-weight: 600; }
+        
+        .flipping { animation: tap-flip 0.4s ease-out; }
+        @keyframes tap-flip {
+            0% { transform: scale(1) rotateY(0deg); } 50% { transform: scale(0.9) rotateY(180deg); } 100% { transform: scale(1) rotateY(360deg); }
+        }
+
+        .energy-bar-container{width:90%;max-width: 400px; margin:0 auto;}
+        #energy-text{font-size:20px;margin-bottom:10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.7);}
+        .energy-bar-background{background-color:rgba(0,0,0,.3);border-radius:15px;height:20px;padding:4px}
+        #energy-bar-fill{background:linear-gradient(90deg,#4dff4d,#00b300);height:100%;border-radius:10px;width:100%;transition:width .2s linear}
+        .floating-text{position:absolute;font-size:24px;font-weight:700;color:#fff;pointer-events:none;animation:float-up 1s ease-out forwards; text-shadow: 2px 2px 4px rgba(0,0,0,0.7);}
+        @keyframes float-up{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-80px)}}
+
+        .nav-container{
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            display:flex;
+            justify-content:space-around;
+            background-color:rgba(0,0,0,.3);
+            padding: 10px 0;
+            padding-bottom: env(safe-area-inset-bottom, 10px);
+            z-index: 100;
+            backdrop-filter: blur(5px);
+            box-sizing: border-box;
+        }
+        .nav-button{cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;opacity:.8;transition:opacity .2s; flex: 1;}
+        .nav-button:hover,.nav-button.active{opacity:1}
+        .nav-icon{font-size:28px}
+        .nav-text{font-size:14px}
+
+        h2, h3{font-size:32px;margin-bottom:10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.7);}
+        h3 {font-size: 28px;}
+        p{font-size:18px;margin:5px 0}
+        .back-button{background-color:#4CAF50;color:#fff;border:none;padding:15px 30px;font-size:18px;border-radius:10px;cursor:pointer;font-family:'Poppins',sans-serif; margin-top: 20px;}
+        .popup{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.7);display:none;justify-content:center;align-items:center;z-index:1000}
+        .popup-content{background-color:#2c3e50;padding:30px;border-radius:15px;text-align:center;width:80%;max-width:350px;position:relative}
+        .popup-content h3{margin-top:0}
+        .popup-close{position:absolute;top:10px;right:15px;font-size:30px;cursor:pointer}
+        .withdraw-options{display:flex;flex-direction:column;gap:15px;margin-top:20px}
+        .withdraw-option{background-color:#3498db;color:#fff;border:none;padding:15px;font-size:16px;border-radius:10px;cursor:pointer}
+        #withdraw-button{background-color:#3498db;margin-top:10px}
+        .withdraw-input { width: 100%; padding: 12px; font-size: 16px; background-color: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        .withdraw-input::placeholder { color: rgba(255,255,255,0.5); }
+        .options-container { display: flex; flex-direction: column; gap: 20px; width: 90%; max-width: 400px; }
+        .option-card { background-color: rgba(0,0,0,0.2); border: 2px solid #8e44ad; padding: 20px; border-radius: 15px; }
+        .option-card h3 { margin: 0 0 10px 0; color: #9b59b6; }
+        .option-card p { margin: 0 0 15px 0; font-size: 16px; }
+        .action-button { background-color: #9b59b6; color: white; border: none; padding: 10px 20px; font-size: 18px; border-radius: 10px; cursor: pointer; font-family: 'Poppins',sans-serif; transition: background-color 0.2s;}
+        .action-button:disabled { background-color: #7f8c8d; cursor: not-allowed; }
+        .coin-flip-container { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        .bet-selection-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        .bet-button { background-color: rgba(255,255,255,0.1); color: white; border: 2px solid #9b59b6; padding: 8px 16px; font-size: 16px; border-radius: 10px; cursor: pointer; transition: all 0.2s; }
+        .bet-button.active { background-color: #9b59b6; box-shadow: 0 0 10px #9b59b6; }
+        .coin-flip-buttons { display: flex; gap: 20px; }
+        .coin-flip-button { padding: 15px 30px; font-size: 20px; }
+        #flip-result { font-size: 24px; font-weight: bold; min-height: 30px; margin-top: 15px; }
+        #flip-result.win { color: #2ecc71; }
+        #flip-result.loss { color: #e74c3c; }
+        .history-container { margin-top: 30px; width: 90%; max-width: 400px; background-color: rgba(0,0,0,0.2); padding: 15px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); }
+        .history-container h3 { font-size: 22px; margin-bottom: 15px; text-align: center; }
+        #withdrawal-history-list { max-height: 150px; overflow-y: auto; padding-right: 10px; }
+        .history-item { display: flex; justify-content: space-between; align-items: center; background-color: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; margin-bottom: 10px; font-size: 16px; }
+        .history-item-details { text-align: left; }
+        .history-item-meta { text-align: right; font-size: 12px; opacity: 0.8; display: flex; flex-direction: column; align-items: flex-end; }
+        .history-item-meta .status { font-weight: bold; margin-top: 4px; }
+        .status-processing { color: #f1c40f; }
+
+        #ad-scripts-container {
+            position: fixed;
+            bottom: 80px;
+            left: 0;
+            width: 100%;
+            z-index: 101;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #1a1a2e;
+            padding: 5px 0;
+            pointer-events: all;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="loading-screen">
+        <div class="loading-bear">🐻</div>
+        <div class="loading-text">Loading Game...</div>
+        <div id="loading-progress-bar">
+            <div id="loading-progress-fill"></div>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <div id="game-screen" class="screen">
+            <div class="top-bar-container">
+                <div id="profile-section" class="profile-section">
+                    <span class="profile-icon">👤</span>
+                    <span id="player-name-display">Abe.sutiye</span> 
+                </div>
+            </div>
+            <div class="stats-container">
+                <h1 id="score-display">0</h1>
+                <div id="level-display">Level 1</div>
+            </div>
+            <div class="coin-container" id="coin-container">
+                <div id="coin-css">
+                    <div class="coin-text">TAP TO<br>EARN</div>
+                </div>
+            </div>
+            <div class="energy-bar-container">
+                <div id="energy-text">⚡️ 1000 / 1000</div>
+                <div class="energy-bar-background"><div id="energy-bar-fill"></div></div>
+            </div>
+        </div>
+
+        <div id="games-screen" class="screen hidden">
+            <h2>🎲 Coin Flip Game 🎲</h2>
+            <div class="coin-flip-container">
+                <p>Select your bet amount:</p>
+                <div class="bet-selection-container" id="bet-selection-container">
+                    <button class="bet-button active" data-bet="100">100 🪙</button>
+                    <button class="bet-button" data-bet="200">200 🪙</button>
+                    <button class="bet-button" data-bet="1000">1K 🪙</button>
+                    <button class="bet-button" data-bet="3000">3K 🪙</button>
+                    <button class="bet-button" data-bet="5000">5K 🪙</button>
+                </div>
+                <p>Guess the outcome!</p>
+                <div class="coin-flip-buttons">
+                    <button id="heads-button" class="action-button coin-flip-button">Heads</button>
+                    <button id="tails-button" class="action-button coin-flip-button">Tails</button>
+                </div>
+                <div id="flip-result">Choose your side!</div>
+            </div>
+            <button class="back-button" data-screen="game-screen">Back to Game</button>
+        </div>
+
+        <div id="boost-screen" class="screen hidden">
+            <h2>🚀 Boosts 🚀</h2>
+            <div class="options-container">
+                <div class="option-card">
+                    <h3>Tap Power x2</h3>
+                    <p>Get 2 coins for every tap.</p>
+                    <button id="boost-tap-1" class="action-button">Cost: 1,000 🪙</button>
+                </div>
+                <div class="option-card">
+                    <h3>Tap Power x3</h3>
+                    <p>Get 3 coins for every tap.</p>
+                    <button id="boost-tap-2" class="action-button">Cost: 5,000 🪙</button>
+                </div>
+                <div class="option-card">
+                    <h3>Tap Power x10</h3>
+                    <p>Get 10 coins for every tap.</p>
+                    <button id="boost-tap-3" class="action-button">Cost: 100,000 🪙</button>
+                </div>
+            </div>
+            <button class="back-button" data-screen="game-screen">Back to Game</button>
+        </div>
+
+        <div id="tasks-screen" class="screen hidden">
+            <h2>📝 Tasks & Community 📝</h2><div class="options-container"><div class="option-card"><h3>💬 Join Community Chat</h3><p>Talk to other players and get updates.</p><button id="community-button" class="action-button">Join Now</button></div><div class="option-card"><h3>📺 Watch Ad & Earn</h3><p>Get 2 coins per tap for 10 seconds.</p><button id="watch-ad-button" class="action-button">Watch Ad</button></div></div>
+            <button class="back-button" data-screen="game-screen">Back to Game</button>
+        </div>
+        <div id="wallet-screen" class="screen hidden">
+            <h2>👛 My Wallet 👛</h2>
+            <p>Your current balance is:</p>
+            <h1 id="wallet-score">0</h1>
+            <p id="rupee-value">Value: ₹0.00 INR</p>
+            <button id="withdraw-button" class="back-button">Withdraw All Coins</button>
+            <button class="back-button" data-screen="game-screen">Back to Game</button>
+            <div class="history-container">
+                <h3>Withdrawal History</h3>
+                <div id="withdrawal-history-list">
+                    <p style="text-align: center; font-size: 16px; opacity: 0.7;">No withdrawal history found.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="nav-container">
+            <div class="nav-button active" data-screen="game-screen"><span class="nav-icon">🏠</span><span class="nav-text">Home</span></div>
+            <div class="nav-button" data-screen="games-screen"><span class="nav-icon">🎮</span><span class="nav-text">Games</span></div>
+            <div class="nav-button" data-screen="boost-screen"><span class="nav-icon">🚀</span><span class="nav-text">Boost</span></div>
+            <div class="nav-button" data-screen="tasks-screen"><span class="nav-icon">📝</span><span class="nav-text">Tasks</span></div>
+            <div class="nav-button" data-screen="wallet-screen"><span class="nav-icon">👛</span><span class="nav-text">Wallet</span></div>
+        </div>
+    </div>
+    
+    <div id="withdraw-popup" class="popup">
+        <div class="popup-content">
+            <span class="popup-close" id="popup-close-button">×</span>
+            <h3>Withdraw All Coins</h3>
+            <p>You are about to withdraw your entire balance:</p>
+            <h3 id="popup-withdrawal-amount" style="color: #ffdd57; margin-top: 10px;"></h3>
+            <p id="popup-withdrawal-value-inr" style="margin-bottom: 20px;"></p>
+            <div class="withdraw-options">
+                <input type="text" id="withdrawal-name-input" class="withdraw-input" placeholder="Enter your full name">
+                <input type="text" id="withdrawal-upi-input" class="withdraw-input" placeholder="Enter your UPI ID">
+                <button id="upi-withdraw-button" class="withdraw-option">Proceed with UPI</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="name-change-popup" class="popup">
+        <div class="popup-content">
+            <h3>Enter your name:</h3>
+            <input type="text" id="new-name-input" class="withdraw-input" placeholder="Enter new name" style="margin-top: 15px;">
+            <div style="display: flex; justify-content: space-around; margin-top: 25px; gap: 15px;">
+                <button id="cancel-name-button" class="action-button" style="background-color: #e74c3c; flex: 1;">CANCEL</button>
+                <button id="confirm-name-button" class="action-button" style="background-color: #2ecc71; flex: 1;">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="tap-sound" src="assets/tap-sound.mp3" preload="auto"></audio>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <script>
+        // === FIREBASE CONFIGURATION START ===
+        const firebaseConfig = {
+          apiKey: "AIzaSyBJrCE4w_QfBqfF3g4O_RuCK4DbjmL9TRg",
+          authDomain: "telegram-69052.firebaseapp.com",
+          databaseURL: "https://telegram-69052-default-rtdb.firebaseio.com",
+          projectId: "telegram-69052",
+          storageBucket: "telegram-69052.firebasestorage.app",
+          messagingSenderId: "824247387361",
+          appId: "1:824247387361:web:f4e6c22abb4b503871a3a0",
+          measurementId: "G-GB3LP113V6"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        // === FIREBASE CONFIGURATION END ===
+
+        function getOrCreateUserId() {
+            let userId = localStorage.getItem('tapGameUserId');
+            if (!userId) {
+                userId = 'user_' + Date.now().toString(36) + Math.random().toString(36).substring(2);
+                localStorage.setItem('tapGameUserId', userId);
+            }
+            return userId;
+        }
+        const userId = getOrCreateUserId();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                document.getElementById('loading-screen').classList.add('hidden');
+            }, 5000);
+
+            const elements = {
+                gameScreen: document.getElementById('game-screen'),
+                profileSection: document.getElementById('profile-section'),
+                playerNameDisplay: document.getElementById('player-name-display'),
+                coinContainer: document.getElementById('coin-container'),
+                coinCss: document.getElementById('coin-css'),
+                scoreDisplay: document.getElementById('score-display'),
+                energyText: document.getElementById('energy-text'),
+                energyBarFill: document.getElementById('energy-bar-fill'),
+                screens: document.querySelectorAll('.screen'),
+                navButtons: document.querySelectorAll('.nav-button'),
+                walletScore: document.getElementById('wallet-score'),
+                levelDisplay: document.getElementById('level-display'),
+                rupeeValue: document.getElementById('rupee-value'),
+                withdrawButton: document.getElementById('withdraw-button'),
+                withdrawPopup: document.getElementById('withdraw-popup'),
+                popupCloseButton: document.getElementById('popup-close-button'),
+                upiWithdrawButton: document.getElementById('upi-withdraw-button'),
+                popupWithdrawalAmount: document.getElementById('popup-withdrawal-amount'),
+                popupWithdrawalValueInr: document.getElementById('popup-withdrawal-value-inr'),
+                withdrawalNameInput: document.getElementById('withdrawal-name-input'),
+                withdrawalUpiInput: document.getElementById('withdrawal-upi-input'),
+                boostTap1Button: document.getElementById('boost-tap-1'),
+                boostTap2Button: document.getElementById('boost-tap-2'),
+                boostTap3Button: document.getElementById('boost-tap-3'),
+                communityButton: document.getElementById('community-button'),
+                watchAdButton: document.getElementById('watch-ad-button'),
+                headsButton: document.getElementById('heads-button'),
+                tailsButton: document.getElementById('tails-button'),
+                flipResult: document.getElementById('flip-result'),
+                betSelectionContainer: document.getElementById('bet-selection-container'),
+                tapSound: document.getElementById('tap-sound'),
+                withdrawalHistoryList: document.getElementById('withdrawal-history-list'),
+                nameChangePopup: document.getElementById('name-change-popup'),
+                newNameInput: document.getElementById('new-name-input'),
+                confirmNameButton: document.getElementById('confirm-name-button'),
+                cancelNameButton: document.getElementById('cancel-name-button'),
+            };
+
+            let state = {
+                score: 0,
+                playerName: 'Player',
+                currentLevel: 1,
+                tapPower: 1,
+                tapUpgradeLevel: 0,
+                maxEnergy: 1000,
+                currentEnergy: 1000,
+                energyRegenRate: 1
+            };
+            
+            let currentBetAmount = 100;
+            let isAdBoostActive = false;
+
+            function renderWithdrawalHistory() {
+                const historyList = elements.withdrawalHistoryList;
+                historyList.innerHTML = '<p style="text-align: center; font-size: 16px; opacity: 0.7;">Loading history...</p>';
+                const historyRef = database.ref(`withdrawals/${userId}`);
+                historyRef.once('value', (snapshot) => {
+                    historyList.innerHTML = '';
+                    if (!snapshot.exists()) {
+                        historyList.innerHTML = '<p style="text-align: center; font-size: 16px; opacity: 0.7;">No withdrawal history found.</p>';
+                        return;
+                    }
+                    snapshot.forEach((childSnapshot) => {
+                        const item = childSnapshot.val();
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = 'history-item';
+                        const amountInRupees = (item.amount / 1000).toFixed(2);
+                        const recipientInfo = item.name ? `${item.name} (${item.upiId})` : item.upiId;
+                        itemDiv.innerHTML = `
+                            <div class="history-item-details">
+                                <strong>${item.amount.toLocaleString()} 🪙</strong> (₹${amountInRupees})<br>
+                                <span style="font-size:14px; opacity: 0.8;">To: ${recipientInfo}</span>
+                            </div>
+                            <div class="history-item-meta">
+                                <span>${item.date}</span>
+                                <span class="status status-${item.status.toLowerCase()}">${item.status}</span>
+                            </div>`;
+                        historyList.prepend(itemDiv);
+                    });
+                });
+            }
+
+            function showScreen(screenId) {
+                elements.screens.forEach(s => s.classList.add('hidden'));
+                elements.navButtons.forEach(b => b.classList.remove('active'));
+                document.getElementById(screenId).classList.remove('hidden');
+                const button = document.querySelector(`.nav-button[data-screen='${screenId}']`);
+                if (button) button.classList.add('active');
+                if (screenId === 'wallet-screen') {
+                    elements.walletScore.innerText = state.score.toLocaleString();
+                    const rupeeValue = (state.score / 1000).toFixed(2);
+                    elements.rupeeValue.innerText = `Value: ₹${rupeeValue} INR`;
+                    renderWithdrawalHistory();
+                } else if (screenId === 'boost-screen') {
+                    updateBoostButtons();
+                }
+            }
+            
+            function loadGame() {
+                const userRef = database.ref(`users/${userId}`);
+                userRef.once('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if (data) {
+                        state.score = data.score || 0;
+                        state.playerName = data.playerName || 'Player';
+                        state.currentEnergy = data.currentEnergy !== undefined ? data.currentEnergy : state.maxEnergy;
+                        state.tapPower = data.tapPower || 1;
+                        state.tapUpgradeLevel = data.tapUpgradeLevel || 0;
+                    } else {
+                        saveGame(null, true);
+                    }
+                    updateDisplay();
+                    updatePlayerNameDisplay();
+                }).catch(error => {
+                    console.error("Error loading game data:", error);
+                    alert("Could not load your progress.");
+                });
+            }
+
+            function saveGame(dataToSave, fullSave = false) {
+                if (!userId) {
+                    console.error("User ID nahi mili, game save nahi ho sakta.");
+                    return;
+                }
+                if (fullSave) {
+                    const fullData = {
+                        score: state.score,
+                        playerName: state.playerName,
+                        currentEnergy: state.currentEnergy,
+                        tapPower: state.tapPower,
+                        tapUpgradeLevel: state.tapUpgradeLevel,
+                        lastSeen: firebase.database.ServerValue.TIMESTAMP
+                    };
+                    database.ref(`users/${userId}`).set(fullData)
+                        .catch(error => console.error("Poora game save karne mein error:", error));
+                } 
+                else if (dataToSave) {
+                    database.ref(`users/${userId}`).update(dataToSave)
+                        .catch(error => console.error("Specific data save karne mein error:", error));
+                }
+            }
+            
+            function updateDisplay() {
+                elements.scoreDisplay.innerText = state.score.toLocaleString();
+                elements.energyText.innerText = `⚡️ ${Math.floor(state.currentEnergy)} / ${state.maxEnergy}`;
+                elements.energyBarFill.style.width = `${(state.currentEnergy / state.maxEnergy) * 100}%`;
+                
+                if (state.score >= 1000000) { state.currentLevel = 10; } 
+                else if (state.score >= 60000) { state.currentLevel = 5; } 
+                else if (state.score >= 40000) { state.currentLevel = 4; } 
+                else if (state.score >= 30000) { state.currentLevel = 3; } 
+                else if (state.score >= 10000) { state.currentLevel = 2; } 
+                else { state.currentLevel = 1; }
+                elements.levelDisplay.innerText = `Level ${state.currentLevel}`;
+
+                if (!document.getElementById('wallet-screen').classList.contains('hidden')) {
+                    elements.walletScore.innerText = state.score.toLocaleString();
+                    const rupeeValue = (state.score / 1000).toFixed(2);
+                    elements.rupeeValue.innerText = `Value: ₹${rupeeValue} INR`;
+                }
+            }
+
+            function updatePlayerNameDisplay() {
+                elements.playerNameDisplay.innerText = state.playerName;
+            }
+
+            function updateBoostButtons() {
+                elements.boostTap1Button.disabled = state.tapUpgradeLevel >= 1;
+                elements.boostTap1Button.innerText = state.tapUpgradeLevel >= 1 ? 'Bought ✅' : 'Cost: 1,000 🪙';
+                elements.boostTap2Button.disabled = state.tapUpgradeLevel < 1 || state.tapUpgradeLevel >= 2;
+                elements.boostTap2Button.innerText = state.tapUpgradeLevel >= 2 ? 'Bought ✅' : 'Cost: 5,000 🪙';
+                elements.boostTap3Button.disabled = state.tapUpgradeLevel < 2 || state.tapUpgradeLevel >= 3;
+                elements.boostTap3Button.innerText = state.tapUpgradeLevel >= 3 ? 'Bought ✅' : 'Cost: 100,000 🪙';
+            }
+            
+            function showFloatingText(event) {
+                const floatingText = document.createElement('div');
+                const powerToShow = isAdBoostActive ? 2 : state.tapPower;
+                floatingText.innerText = `+${powerToShow}`;
+                floatingText.className = 'floating-text';
+                const x = event.clientX || event.touches[0].clientX;
+                const y = event.clientY || event.touches[0].clientY;
+                floatingText.style.left = `${x}px`;
+                floatingText.style.top = `${y}px`;
+                document.body.appendChild(floatingText);
+                setTimeout(() => floatingText.remove(), 1000);
+            }
+
+            elements.coinContainer.addEventListener('pointerdown', (event) => {
+                if (state.currentEnergy < state.tapPower) return;
+                if (!elements.coinCss.classList.contains('flipping')) {
+                    elements.coinCss.classList.add('flipping');
+                }
+                const power = isAdBoostActive ? 2 : state.tapPower;
+                if (state.currentEnergy >= power) {
+                    state.currentEnergy -= power;
+                    state.score += power;
+                    updateDisplay(); 
+                    showFloatingText(event);
+                    if (elements.tapSound) { 
+                        elements.tapSound.currentTime = 0; 
+                        elements.tapSound.play().catch(e => {}); 
+                    }
+                    saveGame({
+                        score: state.score,
+                        currentEnergy: state.currentEnergy
+                    });
+                }
+            });
+
+            elements.coinCss.addEventListener('animationend', () => { elements.coinCss.classList.remove('flipping'); });
+            
+            setInterval(() => {
+                if (state.currentEnergy < state.maxEnergy) {
+                    state.currentEnergy = Math.min(state.maxEnergy, state.currentEnergy + state.energyRegenRate);
+                    updateDisplay();
+                }
+            }, 1000);
+            
+            setInterval(() => {
+                saveGame(null, true); 
+                console.log("Backup save completed.");
+            }, 10000); 
+            
+            elements.navButtons.forEach(b => b.addEventListener('click', () => showScreen(b.dataset.screen)));
+            document.querySelectorAll('.back-button').forEach(b => b.addEventListener('click', () => showScreen(b.dataset.screen)));
+            
+            elements.profileSection.addEventListener('click', () => {
+                elements.newNameInput.value = state.playerName;
+                elements.nameChangePopup.style.display = 'flex';
+            });
+            
+            elements.confirmNameButton.addEventListener('click', () => {
+                const newName = elements.newNameInput.value.trim();
+                if (newName && newName !== "") {
+                    state.playerName = newName;
+                    updatePlayerNameDisplay();
+                    saveGame({ playerName: state.playerName });
+                    elements.nameChangePopup.style.display = 'none';
+                } else {
+                    alert("Name cannot be empty!");
+                }
+            });
+
+            elements.cancelNameButton.addEventListener('click', () => {
+                elements.nameChangePopup.style.display = 'none';
+            });
+
+            elements.upiWithdrawButton.addEventListener('click', () => {
+                const amountToWithdraw = state.score;
+                const name = elements.withdrawalNameInput.value.trim();
+                const upiId = elements.withdrawalUpiInput.value.trim();
+                if (!name || !upiId) { alert("Please enter both your name and UPI ID."); return; }
+                const newWithdrawal = { amount: amountToWithdraw, name: name, upiId: upiId, date: new Date().toLocaleString(), status: 'Processing' };
+                database.ref(`withdrawals/${userId}`).push(newWithdrawal);
+                const amountInRupees = (amountToWithdraw / 1000).toFixed(2);
+                alert(`Withdrawal request for ${amountToWithdraw.toLocaleString()} coins (₹${amountInRupees}) has been sent to ${name} at ${upiId}. It may take some time to process.`);
+                state.score = 0;
+                saveGame({ score: 0 });
+                updateDisplay();
+                elements.withdrawPopup.style.display = 'none';
+                elements.withdrawalNameInput.value = '';
+                elements.withdrawalUpiInput.value = '';
+                showScreen('wallet-screen');
+            });
+            
+            // === BADLAV: MINIMUM WITHDRAWAL CHECK ===
+            elements.withdrawButton.addEventListener('click', () => {
+                if (state.score >= 2000) {
+                    const amountToWithdraw = state.score;
+                    const amountInRupees = (amountToWithdraw / 1000).toFixed(2);
+                    elements.popupWithdrawalAmount.innerText = `${amountToWithdraw.toLocaleString()} 🪙`;
+                    elements.popupWithdrawalValueInr.innerText = `Value: ₹${amountInRupees} INR`;
+                    elements.withdrawPopup.style.display = 'flex';
+                } else {
+                    alert(`You need at least 2000 coins (₹2) to make a withdrawal.`);
+                }
+            });
+
+            elements.popupCloseButton.addEventListener('click', () => elements.withdrawPopup.style.display = 'none');
+            elements.communityButton.addEventListener('click', () => window.open('https://wa.me/6913929065', '_blank'));
+            elements.watchAdButton.addEventListener('click', () => {
+                if (isAdBoostActive) { alert("A boost is already active! Please wait."); return; }
+                isAdBoostActive = true;
+                elements.watchAdButton.disabled = true;
+                let countdown = 10;
+                elements.watchAdButton.innerText = `Boost Active! (${countdown}s)`;
+                const countdownInterval = setInterval(() => {
+                    countdown--;
+                    elements.watchAdButton.innerText = `Boost Active! (${countdown}s)`;
+                    if (countdown <= 0) {
+                        clearInterval(countdownInterval);
+                        isAdBoostActive = false;
+                        elements.watchAdButton.disabled = false;
+                        elements.watchAdButton.innerText = 'Watch Ad';
+                        alert("Ad boost has ended!");
+                    }
+                }, 1000);
+            });
+            
+            function buyBoost(cost, newTapPower, requiredLevel, newUpgradeLevel) {
+                 if (state.tapUpgradeLevel === requiredLevel && state.score >= cost) {
+                    state.score -= cost;
+                    state.tapPower = newTapPower;
+                    state.tapUpgradeLevel = newUpgradeLevel;
+                    alert('Upgrade Successful!');
+                    saveGame({
+                        score: state.score,
+                        tapPower: state.tapPower,
+                        tapUpgradeLevel: state.tapUpgradeLevel
+                    });
+                    updateDisplay();
+                    updateBoostButtons();
+                } else if (state.tapUpgradeLevel !== requiredLevel) {
+                    alert('You must purchase the previous upgrades first!');
+                } else {
+                    alert('Not enough coins!');
+                }
+            }
+            elements.boostTap1Button.addEventListener('click', () => buyBoost(1000, 2, 0, 1));
+            elements.boostTap2Button.addEventListener('click', () => buyBoost(5000, 3, 1, 2));
+            elements.boostTap3Button.addEventListener('click', () => buyBoost(100000, 10, 2, 3));
+
+            elements.betSelectionContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('bet-button')) {
+                    elements.betSelectionContainer.querySelectorAll('.bet-button').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                    currentBetAmount = parseInt(e.target.dataset.bet, 10);
+                }
+            });
+
+            function playCoinFlip(playerChoice) {
+                if (state.score < currentBetAmount) { alert(`You need at least ${currentBetAmount} coins to play!`); return; }
+                state.score -= currentBetAmount;
+                updateDisplay();
+                saveGame({ score: state.score });
+                
+                elements.flipResult.innerText = "Flipping...";
+                elements.flipResult.className = '';
+                elements.headsButton.disabled = true;
+                elements.tailsButton.disabled = true;
+
+                setTimeout(() => {
+                    const result = Math.random() < 0.5 ? 'Heads' : 'Tails';
+                    let finalScore = state.score;
+                    if (playerChoice === result) {
+                        const winnings = currentBetAmount * 2;
+                        finalScore += winnings;
+                        elements.flipResult.innerText = `It was ${result}! You won ${winnings} coins! 🎉`;
+                        elements.flipResult.classList.add('win');
+                    } else {
+                        elements.flipResult.innerText = `It was ${result}. You lost ${currentBetAmount} coins. 😔`;
+                        elements.flipResult.classList.add('loss');
+                    }
+                    state.score = finalScore;
+                    updateDisplay(); 
+                    saveGame({ score: state.score });
+                    elements.headsButton.disabled = false;
+                    elements.tailsButton.disabled = false;
+                }, 1500);
+            }
+            elements.headsButton.addEventListener('click', () => playCoinFlip('Heads'));
+            elements.tailsButton.addEventListener('click', () => playCoinFlip('Tails'));
+            
+            // Initial load
+            loadGame();
+            showScreen('game-screen');
+            elements.withdrawPopup.style.display = 'none'; 
+            elements.nameChangePopup.style.display = 'none';
+        });
+    </script>
+    
+    <div id="ad-scripts-container">
+        <!-- Pehla Ad Code -->
+        <script type="text/javascript">
+            atOptions = {
+                'key' : 'b13f2e7a20381ad1ee3ff734ef978275',
+                'format' : 'iframe',
+                'height' : 60,
+                'width' : 468,
+                'params' : {}
+            };
+        </script>
+        <script type="text/javascript" src="//www.highperformanceformat.com/b13f2e7a20381ad1ee3ff734ef978275/invoke.js"></script>
+
+        <!-- Doosra Ad Code (Naya wala) -->
+        <script type="text/javascript">
+            atOptions = {
+                'key' : '1485dc1bd0b2b924939f0941a1bfb10f',
+                'format' : 'iframe',
+                'height' : 50,
+                'width' : 320,
+                'params' : {}
+            };
+        </script>
+        <script type="text/javascript" src="//www.highperformanceformat.com/1485dc1bd0b2b924939f0941a1bfb10f/invoke.js"></script>
+    </div>
+
+</body>
+</html>
