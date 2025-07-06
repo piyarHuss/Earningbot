@@ -172,6 +172,7 @@
     </style>
 </head>
 <body>
+    <!-- Baaki ka HTML code same rahega -->
     <div id="loading-screen">
         <div class="loading-bear">🐻</div>
         <div class="loading-text">Loading Game...</div>
@@ -326,6 +327,33 @@
         const database = firebase.database();
         // === FIREBASE CONFIGURATION END ===
 
+        // === PRESENCE SYSTEM START ===
+        // Yeh function user ka online status update karega
+        function updateUserPresence(userId) {
+            if (!userId) {
+                console.error("User ID is not available for presence update.");
+                return;
+            }
+            const userPresenceRef = database.ref('/users/' + userId + '/presence');
+            const connectedRef = database.ref('.info/connected');
+
+            connectedRef.on('value', (snap) => {
+                if (snap.val() === true) {
+                    console.log("Presence status is being set for user:", userId);
+                    // User ke connect hone par lastSeen set karo
+                    userPresenceRef.set({
+                        lastSeen: firebase.database.ServerValue.TIMESTAMP
+                    });
+                    // User ke disconnect hone par bhi lastSeen set karo
+                    userPresenceRef.onDisconnect().set({
+                        lastSeen: firebase.database.ServerValue.TIMESTAMP
+                    });
+                }
+            });
+        }
+        // === PRESENCE SYSTEM END ===
+
+
         function getOrCreateUserId() {
             let userId = localStorage.getItem('tapGameUserId');
             if (!userId) {
@@ -337,6 +365,11 @@
         const userId = getOrCreateUserId();
 
         document.addEventListener('DOMContentLoaded', () => {
+            
+            // <<< YAHAN PAR PRESENCE FUNCTION KO CALL KIYA GAYA HAI >>>
+            // Jaise hi page load hoga aur user ID milegi, uska presence update ho jayega.
+            updateUserPresence(userId);
+
             setTimeout(() => {
                 document.getElementById('loading-screen').classList.add('hidden');
             }, 5000);
