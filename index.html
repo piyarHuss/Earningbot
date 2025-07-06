@@ -115,7 +115,7 @@
         .nav-button:hover,.nav-button.active{opacity:1}
         .nav-icon{font-size:28px}
         .nav-text{font-size:14px}
-
+        
         h2, h3{font-size:32px;margin-bottom:10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.7);}
         h3 {font-size: 28px;}
         p{font-size:18px;margin:5px 0}
@@ -130,9 +130,11 @@
         .withdraw-input { width: 100%; padding: 12px; font-size: 16px; background-color: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         .withdraw-input::placeholder { color: rgba(255,255,255,0.5); }
         .options-container { display: flex; flex-direction: column; gap: 20px; width: 90%; max-width: 400px; }
-        .option-card { background-color: rgba(0,0,0,0.2); border: 2px solid #8e44ad; padding: 20px; border-radius: 15px; }
+        .option-card { background-color: rgba(0,0,0,0.2); border: 2px solid #8e44ad; padding: 20px; border-radius: 15px; text-align: center; cursor: pointer; transition: background-color 0.2s; }
+        .option-card:hover { background-color: rgba(0,0,0,0.4); }
         .option-card h3 { margin: 0 0 10px 0; color: #9b59b6; }
         .option-card p { margin: 0 0 15px 0; font-size: 16px; }
+        .option-card img { max-width: 60px; max-height: 60px; margin-top: 10px; border-radius: 8px;}
         .action-button { background-color: #9b59b6; color: white; border: none; padding: 10px 20px; font-size: 18px; border-radius: 10px; cursor: pointer; font-family: 'Poppins',sans-serif; transition: background-color 0.2s;}
         .action-button:disabled { background-color: #7f8c8d; cursor: not-allowed; }
         .coin-flip-container { display: flex; flex-direction: column; align-items: center; gap: 20px; }
@@ -183,7 +185,7 @@
             <div class="top-bar-container">
                 <div id="profile-section" class="profile-section">
                     <span class="profile-icon">👤</span>
-                    <span id="player-name-display">Abe.sutiye</span> 
+                    <span id="player-name-display">Player</span> 
                 </div>
             </div>
             <div class="stats-container">
@@ -225,17 +227,17 @@
         <div id="boost-screen" class="screen hidden">
             <h2>🚀 Boosts 🚀</h2>
             <div class="options-container">
-                <div class="option-card">
+                <div class="option-card" style="cursor: default;">
                     <h3>Tap Power x2</h3>
                     <p>Get 2 coins for every tap.</p>
                     <button id="boost-tap-1" class="action-button">Cost: 1,000 🪙</button>
                 </div>
-                <div class="option-card">
+                <div class="option-card" style="cursor: default;">
                     <h3>Tap Power x3</h3>
                     <p>Get 3 coins for every tap.</p>
                     <button id="boost-tap-2" class="action-button">Cost: 5,000 🪙</button>
                 </div>
-                <div class="option-card">
+                <div class="option-card" style="cursor: default;">
                     <h3>Tap Power x10</h3>
                     <p>Get 10 coins for every tap.</p>
                     <button id="boost-tap-3" class="action-button">Cost: 100,000 🪙</button>
@@ -244,10 +246,15 @@
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
 
+        <!-- === TASKS SCREEN ME SARE OFFERS DIKHENGE === -->
         <div id="tasks-screen" class="screen hidden">
-            <h2>📝 Tasks & Community 📝</h2><div class="options-container"><div class="option-card"><h3>💬 Join Community Chat</h3><p>Talk to other players and get updates.</p><button id="community-button" class="action-button">Join Now</button></div><div class="option-card"><h3>📺 Watch Ad & Earn</h3><p>Get 2 coins per tap for 10 seconds.</p><button id="watch-ad-button" class="action-button">Watch Ad</button></div></div>
+            <h2>📝 Offers & Tasks 📝</h2>
+            <div id="tasks-options-container" class="options-container">
+                <!-- Firebase se saare active offers yahan load honge -->
+            </div>
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
+        
         <div id="wallet-screen" class="screen hidden">
             <h2>👛 My Wallet 👛</h2>
             <p>Your current balance is:</p>
@@ -359,8 +366,6 @@
                 boostTap1Button: document.getElementById('boost-tap-1'),
                 boostTap2Button: document.getElementById('boost-tap-2'),
                 boostTap3Button: document.getElementById('boost-tap-3'),
-                communityButton: document.getElementById('community-button'),
-                watchAdButton: document.getElementById('watch-ad-button'),
                 headsButton: document.getElementById('heads-button'),
                 tailsButton: document.getElementById('tails-button'),
                 flipResult: document.getElementById('flip-result'),
@@ -371,6 +376,8 @@
                 newNameInput: document.getElementById('new-name-input'),
                 confirmNameButton: document.getElementById('confirm-name-button'),
                 cancelNameButton: document.getElementById('cancel-name-button'),
+                // Naya Element
+                tasksOptionsContainer: document.getElementById('tasks-options-container'),
             };
 
             let state = {
@@ -386,6 +393,74 @@
             
             let currentBetAmount = 100;
             let isAdBoostActive = false;
+
+            // === NAYA FUNCTION: Saare active offers ko Firebase se load karke dikhane ke liye ===
+            function loadAndDisplayOffers() {
+                const offersRef = database.ref('promotions');
+                elements.tasksOptionsContainer.innerHTML = ''; // Pehle se jo hai use saaf karo
+
+                offersRef.once('value').then(snapshot => {
+                    if (snapshot.exists()) {
+                        snapshot.forEach(childSnapshot => {
+                            const promo = childSnapshot.val();
+                            if (promo.isActive) {
+                                const card = document.createElement('div');
+                                card.className = 'option-card';
+                                card.innerHTML = `
+                                    <h3>${promo.title}</h3>
+                                    <p>${promo.text}</p>
+                                    ${promo.imageUrl ? `<img src="${promo.imageUrl}" alt="Offer Image">` : ''}
+                                `;
+                                
+                                // Event listener add karna
+                                card.addEventListener('click', (e) => {
+                                    e.preventDefault(); // Default link behavior roko
+                                    
+                                    // Agar special action hai to use chalao
+                                    if (promo.action === 'watchAd') {
+                                        triggerWatchAd(card); // Ad function ko call karo
+                                    } 
+                                    // Nahi to link ko naye tab me kholo
+                                    else if (promo.linkUrl && promo.linkUrl !== '#') {
+                                        window.open(promo.linkUrl, '_blank');
+                                    }
+                                });
+
+                                elements.tasksOptionsContainer.appendChild(card);
+                            }
+                        });
+                    } else {
+                        elements.tasksOptionsContainer.innerHTML = '<p>No active offers right now. Check back later!</p>';
+                    }
+                }).catch(error => {
+                    console.error("Error loading offers:", error);
+                    elements.tasksOptionsContainer.innerHTML = '<p>Could not load offers. Please try again.</p>';
+                });
+            }
+
+            function triggerWatchAd(cardElement) {
+                if (isAdBoostActive) { alert("A boost is already active! Please wait."); return; }
+                isAdBoostActive = true;
+                
+                const originalText = cardElement.querySelector('p').innerText;
+                const button = cardElement; // Poora card hi button jaisa kaam karega
+                button.style.pointerEvents = 'none'; // Click disable karo
+
+                let countdown = 10;
+                cardElement.querySelector('p').innerText = `Boost Active! (${countdown}s)`;
+                
+                const countdownInterval = setInterval(() => {
+                    countdown--;
+                    cardElement.querySelector('p').innerText = `Boost Active! (${countdown}s)`;
+                    if (countdown <= 0) {
+                        clearInterval(countdownInterval);
+                        isAdBoostActive = false;
+                        button.style.pointerEvents = 'auto'; // Click re-enable karo
+                        cardElement.querySelector('p').innerText = originalText;
+                        alert("Ad boost has ended!");
+                    }
+                }, 1000);
+            }
 
             function renderWithdrawalHistory() {
                 const historyList = elements.withdrawalHistoryList;
@@ -419,10 +494,11 @@
 
             function showScreen(screenId) {
                 elements.screens.forEach(s => s.classList.add('hidden'));
-                elements.navButtons.forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.nav-button[data-screen]').forEach(b => b.classList.remove('active'));
                 document.getElementById(screenId).classList.remove('hidden');
                 const button = document.querySelector(`.nav-button[data-screen='${screenId}']`);
                 if (button) button.classList.add('active');
+
                 if (screenId === 'wallet-screen') {
                     elements.walletScore.innerText = state.score.toLocaleString();
                     const rupeeValue = (state.score / 1000).toFixed(2);
@@ -430,6 +506,8 @@
                     renderWithdrawalHistory();
                 } else if (screenId === 'boost-screen') {
                     updateBoostButtons();
+                } else if (screenId === 'tasks-screen') {
+                    loadAndDisplayOffers(); // Jab bhi tasks screen khule, offers ko reload karo
                 }
             }
             
@@ -512,7 +590,7 @@
             
             function showFloatingText(event) {
                 const floatingText = document.createElement('div');
-                const powerToShow = isAdBoostActive ? 2 : state.tapPower;
+                const powerToShow = isAdBoostActive ? state.tapPower * 2 : state.tapPower; // Ad boost me double power
                 floatingText.innerText = `+${powerToShow}`;
                 floatingText.className = 'floating-text';
                 const x = event.clientX || event.touches[0].clientX;
@@ -524,11 +602,10 @@
             }
 
             elements.coinContainer.addEventListener('pointerdown', (event) => {
-                if (state.currentEnergy < state.tapPower) return;
                 if (!elements.coinCss.classList.contains('flipping')) {
                     elements.coinCss.classList.add('flipping');
                 }
-                const power = isAdBoostActive ? 2 : state.tapPower;
+                const power = isAdBoostActive ? state.tapPower * 2 : state.tapPower;
                 if (state.currentEnergy >= power) {
                     state.currentEnergy -= power;
                     state.score += power;
@@ -556,10 +633,13 @@
             
             setInterval(() => {
                 saveGame(null, true); 
-                console.log("Backup save completed.");
             }, 10000); 
             
-            elements.navButtons.forEach(b => b.addEventListener('click', () => showScreen(b.dataset.screen)));
+            elements.navButtons.forEach(b => {
+                if(b.dataset.screen){
+                    b.addEventListener('click', () => showScreen(b.dataset.screen))
+                }
+            });
             document.querySelectorAll('.back-button').forEach(b => b.addEventListener('click', () => showScreen(b.dataset.screen)));
             
             elements.profileSection.addEventListener('click', () => {
@@ -601,7 +681,6 @@
                 showScreen('wallet-screen');
             });
             
-            // === BADLAV: MINIMUM WITHDRAWAL CHECK ===
             elements.withdrawButton.addEventListener('click', () => {
                 if (state.score >= 2000) {
                     const amountToWithdraw = state.score;
@@ -615,25 +694,6 @@
             });
 
             elements.popupCloseButton.addEventListener('click', () => elements.withdrawPopup.style.display = 'none');
-            elements.communityButton.addEventListener('click', () => window.open('https://wa.me/6913929065', '_blank'));
-            elements.watchAdButton.addEventListener('click', () => {
-                if (isAdBoostActive) { alert("A boost is already active! Please wait."); return; }
-                isAdBoostActive = true;
-                elements.watchAdButton.disabled = true;
-                let countdown = 10;
-                elements.watchAdButton.innerText = `Boost Active! (${countdown}s)`;
-                const countdownInterval = setInterval(() => {
-                    countdown--;
-                    elements.watchAdButton.innerText = `Boost Active! (${countdown}s)`;
-                    if (countdown <= 0) {
-                        clearInterval(countdownInterval);
-                        isAdBoostActive = false;
-                        elements.watchAdButton.disabled = false;
-                        elements.watchAdButton.innerText = 'Watch Ad';
-                        alert("Ad boost has ended!");
-                    }
-                }, 1000);
-            });
             
             function buyBoost(cost, newTapPower, requiredLevel, newUpgradeLevel) {
                  if (state.tapUpgradeLevel === requiredLevel && state.score >= cost) {
@@ -708,27 +768,13 @@
     </script>
     
     <div id="ad-scripts-container">
-        <!-- Pehla Ad Code -->
+        <!-- Ad Codes -->
         <script type="text/javascript">
-            atOptions = {
-                'key' : 'b13f2e7a20381ad1ee3ff734ef978275',
-                'format' : 'iframe',
-                'height' : 60,
-                'width' : 468,
-                'params' : {}
-            };
+            atOptions = { 'key' : 'b13f2e7a20381ad1ee3ff734ef978275', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {} };
         </script>
         <script type="text/javascript" src="//www.highperformanceformat.com/b13f2e7a20381ad1ee3ff734ef978275/invoke.js"></script>
-
-        <!-- Doosra Ad Code (Naya wala) -->
         <script type="text/javascript">
-            atOptions = {
-                'key' : '1485dc1bd0b2b924939f0941a1bfb10f',
-                'format' : 'iframe',
-                'height' : 50,
-                'width' : 320,
-                'params' : {}
-            };
+            atOptions = { 'key' : '1485dc1bd0b2b924939f0941a1bfb10f', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
         </script>
         <script type="text/javascript" src="//www.highperformanceformat.com/1485dc1bd0b2b924939f0941a1bfb10f/invoke.js"></script>
     </div>
