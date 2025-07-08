@@ -6,6 +6,7 @@
     <title>Tap-Tap Coin Game</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
         
         html, body {
             height: 100%;
@@ -69,6 +70,11 @@
         }
         .screen.hidden{display:none}
 
+        .scrollable-screen {
+            justify-content: flex-start;
+            padding-top: 30px;
+        }
+
         .top-bar-container { position: absolute; top: 15px; left: 15px; z-index: 10; }
         .profile-section { display: flex; align-items: center; gap: 8px; background-color: rgba(0,0,0,0.3); padding: 6px 12px; border-radius: 50px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); transition: background-color 0.2s; }
         .profile-section:hover { background-color: rgba(0,0,0,0.5); }
@@ -130,14 +136,15 @@
         .withdraw-input { width: 100%; padding: 12px; font-size: 16px; background-color: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         .withdraw-input::placeholder { color: rgba(255,255,255,0.5); }
         .options-container { display: flex; flex-direction: column; gap: 20px; width: 90%; max-width: 400px; }
-        .option-card { background-color: rgba(0,0,0,0.2); border: 2px solid #8e44ad; padding: 20px; border-radius: 15px; text-align: center; cursor: pointer; transition: background-color 0.2s; }
-        .option-card:hover { background-color: rgba(0,0,0,0.4); }
+        .option-card { background-color: rgba(0,0,0,0.2); border: 2px solid #8e44ad; padding: 20px; border-radius: 15px; text-align: center; cursor: default; transition: background-color 0.2s; }
+        .option-card.clickable:hover { background-color: rgba(0,0,0,0.4); cursor: pointer; }
         .option-card h3 { margin: 0 0 10px 0; color: #9b59b6; }
         .option-card p { margin: 0 0 15px 0; font-size: 16px; }
         .option-card img { max-width: 60px; max-height: 60px; margin-top: 10px; border-radius: 8px;}
         .action-button { background-color: #9b59b6; color: white; border: none; padding: 10px 20px; font-size: 18px; border-radius: 10px; cursor: pointer; font-family: 'Poppins',sans-serif; transition: background-color 0.2s;}
         .action-button:disabled { background-color: #7f8c8d; cursor: not-allowed; }
-        .coin-flip-container { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        
+        .coin-flip-container { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 15px; box-sizing: border-box; }
         .bet-selection-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 20px; }
         .bet-button { background-color: rgba(255,255,255,0.1); color: white; border: 2px solid #9b59b6; padding: 8px 16px; font-size: 16px; border-radius: 10px; cursor: pointer; transition: all 0.2s; }
         .bet-button.active { background-color: #9b59b6; box-shadow: 0 0 10px #9b59b6; }
@@ -146,6 +153,7 @@
         #flip-result { font-size: 24px; font-weight: bold; min-height: 30px; margin-top: 15px; }
         #flip-result.win { color: #2ecc71; }
         #flip-result.loss { color: #e74c3c; }
+        
         .history-container { margin-top: 30px; width: 90%; max-width: 400px; background-color: rgba(0,0,0,0.2); padding: 15px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); }
         .history-container h3 { font-size: 22px; margin-bottom: 15px; text-align: center; }
         #withdrawal-history-list { max-height: 150px; overflow-y: auto; padding-right: 10px; }
@@ -169,10 +177,37 @@
             pointer-events: all;
         }
 
+        .flappy-game-container {
+            border-radius: 20px;
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            text-align: center;
+            width: 100%;
+            box-sizing: border-box;
+            margin-top: 30px;
+        }
+        .flappy-game-container h1 { margin-top: 0; font-size: 2em; text-shadow: 3px 3px 0px rgba(0,0,0,0.2); }
+        .flappy-game-container canvas { background: linear-gradient(to bottom, #87CEEB, #a2dff0); border-radius: 10px; border: 3px solid rgba(255, 255, 255, 0.2); cursor: pointer; box-shadow: inset 0 0 15px rgba(0,0,0,0.2); }
+        .flappy-score-container { font-size: 1.2em; font-weight: 600; margin: 10px 0; }
+        .flappy-score-value { font-family: 'Press Start 2P', cursive; color: #ffeb3b; font-size: 1.5em; margin-left: 10px; }
+        .flappy-score-pulse { animation: flappy-score-pulse 0.3s ease-out; }
+        @keyframes flappy-score-pulse { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+        .flappy-action-button { padding: 15px 35px; font-size: 1.2em; font-family: 'Poppins', sans-serif; font-weight: 700; color: white; background: linear-gradient(45deg, #f857a6, #ff5858); border: none; border-radius: 50px; cursor: pointer; margin-top: 15px; transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(248, 87, 166, 0.4); text-transform: uppercase; }
+        .flappy-action-button:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 25px rgba(248, 87, 166, 0.6); }
+        .flappy-action-button:active { transform: translateY(0px) scale(1); }
+        #flappy-gameOverPopup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); justify-content: center; align-items: center; z-index: 1001; animation: flappy-fadeIn 0.3s ease-out forwards; }
+        @keyframes flappy-fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .flappy-popup-content { background: linear-gradient(135deg, #3c4a6c, #5c3c6b); padding: 30px 40px; border-radius: 15px; text-align: center; border: 2px solid rgba(255, 255, 255, 0.1); box-shadow: 0 0 30px rgba(0,0,0,0.5); animation: flappy-popIn 0.4s ease-out forwards; transform: scale(0.7); opacity: 0; }
+        @keyframes flappy-popIn { 0% { transform: scale(0.7); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .flappy-popup-content h2 { margin-top: 0; color: #ff5858; font-size: 2.5em; }
+        .flappy-popup-content p { font-size: 1.3em; }
+        .flappy-reward-message { font-size: 1.2em; color: #ffeb3b; font-weight: bold; margin: 15px 0; }
+
     </style>
 </head>
 <body>
-    <!-- Baaki ka HTML code same rahega -->
     <div id="loading-screen">
         <div class="loading-bear">🐻</div>
         <div class="loading-text">Loading Game...</div>
@@ -204,9 +239,9 @@
             </div>
         </div>
 
-        <div id="games-screen" class="screen hidden">
-            <h2>🎲 Coin Flip Game 🎲</h2>
+        <div id="games-screen" class="screen scrollable-screen hidden">
             <div class="coin-flip-container">
+                <h2>🎲 Coin Flip Game 🎲</h2>
                 <p>Select your bet amount:</p>
                 <div class="bet-selection-container" id="bet-selection-container">
                     <button class="bet-button active" data-bet="100">100 🪙</button>
@@ -222,23 +257,33 @@
                 </div>
                 <div id="flip-result">Choose your side!</div>
             </div>
+
+            <div class="flappy-game-container">
+                <h1>🐏 Flappy Ram 🐏</h1>
+                <p style="font-size: 16px; margin-bottom: 10px;">Survive and earn 50 🪙 every 10 seconds!</p>
+                <p class="flappy-score-container">Pipes Passed: <span id="flappy-score-value-display" class="flappy-score-value">0</span></p>
+                <canvas id="flappyCanvas" width="320" height="480"></canvas>
+                <p style="font-size: 16px; margin-top: 10px;">Click the canvas to Jump!</p>
+                <button id="flappy-start-button" class="flappy-action-button">Start Game</button>
+            </div>
+
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
 
         <div id="boost-screen" class="screen hidden">
             <h2>🚀 Boosts 🚀</h2>
             <div class="options-container">
-                <div class="option-card" style="cursor: default;">
+                <div class="option-card">
                     <h3>Tap Power x2</h3>
                     <p>Get 2 coins for every tap.</p>
                     <button id="boost-tap-1" class="action-button">Cost: 1,000 🪙</button>
                 </div>
-                <div class="option-card" style="cursor: default;">
+                <div class="option-card">
                     <h3>Tap Power x3</h3>
                     <p>Get 3 coins for every tap.</p>
                     <button id="boost-tap-2" class="action-button">Cost: 5,000 🪙</button>
                 </div>
-                <div class="option-card" style="cursor: default;">
+                <div class="option-card">
                     <h3>Tap Power x10</h3>
                     <p>Get 10 coins for every tap.</p>
                     <button id="boost-tap-3" class="action-button">Cost: 100,000 🪙</button>
@@ -247,21 +292,31 @@
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
 
-        <!-- === TASKS SCREEN ME SARE OFFERS DIKHENGE === -->
         <div id="tasks-screen" class="screen hidden">
             <h2>📝 Offers & Tasks 📝</h2>
             <div id="tasks-options-container" class="options-container">
-                <!-- Firebase se saare active offers yahan load honge -->
             </div>
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
         
+        <div id="video-screen" class="screen scrollable-screen hidden">
+            <h2>🎥 Watch Videos 🎥</h2>
+            <div id="video-tasks-container" class="options-container">
+            </div>
+            <button class="back-button" data-screen="game-screen">Back to Game</button>
+        </div>
+
         <div id="wallet-screen" class="screen hidden">
             <h2>👛 My Wallet 👛</h2>
             <p>Your current balance is:</p>
             <h1 id="wallet-score">0</h1>
             <p id="rupee-value">Value: ₹0.00 INR</p>
-            <button id="withdraw-button" class="back-button">Withdraw All Coins</button>
+            
+            <div id="withdrawal-ad-task-container" class="options-container" style="width: 100%; margin-top: 20px;">
+            </div>
+
+            <button id="withdraw-button" class="back-button" style="display: none;">Withdraw All Coins</button>
+            
             <button class="back-button" data-screen="game-screen">Back to Game</button>
             <div class="history-container">
                 <h3>Withdrawal History</h3>
@@ -276,10 +331,12 @@
             <div class="nav-button" data-screen="games-screen"><span class="nav-icon">🎮</span><span class="nav-text">Games</span></div>
             <div class="nav-button" data-screen="boost-screen"><span class="nav-icon">🚀</span><span class="nav-text">Boost</span></div>
             <div class="nav-button" data-screen="tasks-screen"><span class="nav-icon">📝</span><span class="nav-text">Tasks</span></div>
+            <div class="nav-button" data-screen="video-screen"><span class="nav-icon">🎥</span><span class="nav-text">Video</span></div>
             <div class="nav-button" data-screen="wallet-screen"><span class="nav-icon">👛</span><span class="nav-text">Wallet</span></div>
         </div>
     </div>
     
+    <!-- Popups -->
     <div id="withdraw-popup" class="popup">
         <div class="popup-content">
             <span class="popup-close" id="popup-close-button">×</span>
@@ -294,7 +351,6 @@
             </div>
         </div>
     </div>
-
     <div id="name-change-popup" class="popup">
         <div class="popup-content">
             <h3>Enter your name:</h3>
@@ -306,13 +362,21 @@
         </div>
     </div>
 
-    <audio id="tap-sound" src="assets/tap-sound.mp3" preload="auto"></audio>
+    <div id="flappy-gameOverPopup">
+        <div class="flappy-popup-content">
+            <h2>Game Over!</h2>
+            <p>Pipes Passed: <span id="flappy-finalScore" class="flappy-score-value">0</span></p>
+            <button id="flappy-restart-button" class="flappy-action-button">Play Again</button>
+        </div>
+    </div>
+
+
+    <audio id="tap-sound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_2b4065a46d.mp3" preload="auto"></audio>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // === FIREBASE CONFIGURATION START ===
         const firebaseConfig = {
           apiKey: "AIzaSyBJrCE4w_QfBqfF3g4O_RuCK4DbjmL9TRg",
           authDomain: "telegram-69052.firebaseapp.com",
@@ -325,34 +389,19 @@
         };
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
-        // === FIREBASE CONFIGURATION END ===
 
-        // === PRESENCE SYSTEM START ===
-        // Yeh function user ka online status update karega
         function updateUserPresence(userId) {
-            if (!userId) {
-                console.error("User ID is not available for presence update.");
-                return;
-            }
+            if (!userId) return;
             const userPresenceRef = database.ref('/users/' + userId + '/presence');
             const connectedRef = database.ref('.info/connected');
 
             connectedRef.on('value', (snap) => {
                 if (snap.val() === true) {
-                    console.log("Presence status is being set for user:", userId);
-                    // User ke connect hone par lastSeen set karo
-                    userPresenceRef.set({
-                        lastSeen: firebase.database.ServerValue.TIMESTAMP
-                    });
-                    // User ke disconnect hone par bhi lastSeen set karo
-                    userPresenceRef.onDisconnect().set({
-                        lastSeen: firebase.database.ServerValue.TIMESTAMP
-                    });
+                    userPresenceRef.set({ lastSeen: firebase.database.ServerValue.TIMESTAMP });
+                    userPresenceRef.onDisconnect().set({ lastSeen: firebase.database.ServerValue.TIMESTAMP });
                 }
             });
         }
-        // === PRESENCE SYSTEM END ===
-
 
         function getOrCreateUserId() {
             let userId = localStorage.getItem('tapGameUserId');
@@ -363,132 +412,186 @@
             return userId;
         }
         const userId = getOrCreateUserId();
+        
+        const flappyGame = {
+            canvas: null, ctx: null, scoreValueDisplay: null, startButton: null,
+            gameOverPopup: null, popupContent: null, finalScoreDisplay: null, restartButton: null,
+            gameRunning: false, score: 0, pipes: [], frameCount: 0, gameLoop: null,
+            rewardInterval: null,
+            bird: { x: 60, y: 200, radius: 20, gravity: 0.3, lift: -6, velocity: 0 },
+            pipe: { width: 55, gap: 160, speed: 2.5 },
+            init() { this.canvas = document.getElementById('flappyCanvas'); if (!this.canvas) return; this.ctx = this.canvas.getContext('2d'); this.scoreValueDisplay = document.getElementById('flappy-score-value-display'); this.startButton = document.getElementById('flappy-start-button'); this.gameOverPopup = document.getElementById('flappy-gameOverPopup'); this.popupContent = this.gameOverPopup.querySelector('.flappy-popup-content'); this.finalScoreDisplay = document.getElementById('flappy-finalScore'); this.restartButton = document.getElementById('flappy-restart-button'); this.canvas.addEventListener('click', () => this.jump()); this.startButton.addEventListener('click', () => this.startGame()); this.restartButton.addEventListener('click', () => this.startGame()); this.resetGame(); },
+            drawBird() { if(!this.ctx) return; this.ctx.font = '40px sans-serif'; this.ctx.textAlign = 'center'; this.ctx.textBaseline = 'middle'; this.ctx.shadowColor = 'rgba(0, 0, 0, 0.3)'; this.ctx.shadowBlur = 5; this.ctx.shadowOffsetX = 3; this.ctx.shadowOffsetY = 3; this.ctx.fillText('🐏', this.bird.x, this.bird.y); this.ctx.shadowColor = 'transparent'; },
+            drawPipes() { if(!this.ctx) return; this.pipes.forEach(p => { const pipeGradient = this.ctx.createLinearGradient(p.x, 0, p.x + this.pipe.width, 0); pipeGradient.addColorStop(0, '#73C74B'); pipeGradient.addColorStop(1, '#539E31'); this.ctx.fillStyle = pipeGradient; this.ctx.fillRect(p.x, 0, this.pipe.width, p.topHeight); this.ctx.fillRect(p.x, this.canvas.height - p.bottomHeight, this.pipe.width, p.bottomHeight); this.ctx.fillStyle = '#98D972'; this.ctx.fillRect(p.x, p.topHeight - 15, this.pipe.width, 15); this.ctx.fillRect(p.x, this.canvas.height - p.bottomHeight, this.pipe.width, 15); }); },
+            updateGame() { this.bird.velocity += this.bird.gravity; this.bird.y += this.bird.velocity; if (this.bird.y + this.bird.radius > this.canvas.height || this.bird.y - this.bird.radius < 0) { this.endGame(); return; } if (this.frameCount % 90 === 0) { const topHeight = Math.random() * (this.canvas.height - this.pipe.gap - 100) + 50; this.pipes.push({ x: this.canvas.width, topHeight: topHeight, bottomHeight: this.canvas.height - topHeight - this.pipe.gap, passed: false }); } for (let i = this.pipes.length - 1; i >= 0; i--) { this.pipes[i].x -= this.pipe.speed; if (this.bird.x + this.bird.radius > this.pipes[i].x && this.bird.x - this.bird.radius < this.pipes[i].x + this.pipe.width) { if (this.bird.y - this.bird.radius < this.pipes[i].topHeight || this.bird.y + this.bird.radius > this.canvas.height - this.pipes[i].bottomHeight) { this.endGame(); return; } } if (this.pipes[i].x + this.pipe.width < this.bird.x && !this.pipes[i].passed) { this.score++; this.scoreValueDisplay.innerText = this.score; this.scoreValueDisplay.classList.add('flappy-score-pulse'); setTimeout(() => this.scoreValueDisplay.classList.remove('flappy-score-pulse'), 300); this.pipes[i].passed = true; } if (this.pipes[i].x + this.pipe.width < 0) { this.pipes.splice(i, 1); } } this.frameCount++; },
+            loop() { if (!this.gameRunning) return; this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); this.updateGame(); this.drawPipes(); this.drawBird(); this.gameLoop = requestAnimationFrame(() => this.loop()); },
+            resetGame() { this.score = 0; this.bird.y = 200; this.bird.velocity = 0; this.pipes = []; this.frameCount = 0; if (this.scoreValueDisplay) this.scoreValueDisplay.innerText = `0`; if (this.ctx) { this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); this.drawBird(); } if (this.gameOverPopup) this.gameOverPopup.style.display = 'none'; },
+            startGame() { if (this.gameRunning) return; this.resetGame(); this.gameRunning = true; this.startButton.style.display = 'none'; this.rewardInterval = setInterval(() => { if (this.gameRunning) { state.score += 50; updateDisplay(); saveGame({ score: state.score }); } }, 10000); this.loop(); },
+            endGame() {
+                if (!this.gameRunning) return;
+                window.open('https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315', '_blank');
+                this.gameRunning = false;
+                cancelAnimationFrame(this.gameLoop);
+                if (this.rewardInterval) { clearInterval(this.rewardInterval); this.rewardInterval = null; }
+                this.finalScoreDisplay.innerText = this.score;
+                this.gameOverPopup.style.display = 'flex';
+                this.startButton.style.display = 'block';
+                this.startButton.innerText = 'Play Again';
+            },
+            jump() { if (this.gameRunning) { this.bird.velocity = this.bird.lift; } else if (!this.gameOverPopup.style.display || this.gameOverPopup.style.display === 'none') { this.startGame(); } }
+        };
+
+        const videoAdTasks = [
+            { id: 'videoTask1', title: 'Starter Video Pack', description: 'Watch 20 videos to earn 4,000 coins.', goal: 20, reward: 4000, url: 'https://www.profitableratecpm.com/qshhszvnad?key=4761223a00e52bd9f2e24d515e6be228' },
+            { id: 'videoTask2', title: 'Video Marathon', description: 'Watch 40 videos to earn 7,000 coins.', goal: 40, reward: 7000, url: 'https://www.profitableratecpm.com/vibjgr90?key=2731d0788209fe1d948dd17fd0e0831f' },
+            { id: 'videoTask3', title: 'Ultimate Video Challenge', description: 'Watch 100 videos to earn 50,000 coins.', goal: 100, reward: 50000, url: 'https://www.profitableratecpm.com/u745rvnfy?key=f5ec06ad491fd1ceab3af658fd2d3010' }
+        ];
 
         document.addEventListener('DOMContentLoaded', () => {
-            
-            // <<< YAHAN PAR PRESENCE FUNCTION KO CALL KIYA GAYA HAI >>>
-            // Jaise hi page load hoga aur user ID milegi, uska presence update ho jayega.
             updateUserPresence(userId);
 
             setTimeout(() => {
                 document.getElementById('loading-screen').classList.add('hidden');
-            }, 5000);
+            }, 3000);
 
             const elements = {
-                gameScreen: document.getElementById('game-screen'),
-                profileSection: document.getElementById('profile-section'),
-                playerNameDisplay: document.getElementById('player-name-display'),
-                coinContainer: document.getElementById('coin-container'),
-                coinCss: document.getElementById('coin-css'),
-                scoreDisplay: document.getElementById('score-display'),
-                energyText: document.getElementById('energy-text'),
-                energyBarFill: document.getElementById('energy-bar-fill'),
-                screens: document.querySelectorAll('.screen'),
-                navButtons: document.querySelectorAll('.nav-button'),
-                walletScore: document.getElementById('wallet-score'),
-                levelDisplay: document.getElementById('level-display'),
-                rupeeValue: document.getElementById('rupee-value'),
-                withdrawButton: document.getElementById('withdraw-button'),
-                withdrawPopup: document.getElementById('withdraw-popup'),
-                popupCloseButton: document.getElementById('popup-close-button'),
-                upiWithdrawButton: document.getElementById('upi-withdraw-button'),
-                popupWithdrawalAmount: document.getElementById('popup-withdrawal-amount'),
-                popupWithdrawalValueInr: document.getElementById('popup-withdrawal-value-inr'),
-                withdrawalNameInput: document.getElementById('withdrawal-name-input'),
-                withdrawalUpiInput: document.getElementById('withdrawal-upi-input'),
-                boostTap1Button: document.getElementById('boost-tap-1'),
-                boostTap2Button: document.getElementById('boost-tap-2'),
-                boostTap3Button: document.getElementById('boost-tap-3'),
-                headsButton: document.getElementById('heads-button'),
-                tailsButton: document.getElementById('tails-button'),
-                flipResult: document.getElementById('flip-result'),
-                betSelectionContainer: document.getElementById('bet-selection-container'),
-                tapSound: document.getElementById('tap-sound'),
-                withdrawalHistoryList: document.getElementById('withdrawal-history-list'),
-                nameChangePopup: document.getElementById('name-change-popup'),
-                newNameInput: document.getElementById('new-name-input'),
-                confirmNameButton: document.getElementById('confirm-name-button'),
-                cancelNameButton: document.getElementById('cancel-name-button'),
-                // Naya Element
-                tasksOptionsContainer: document.getElementById('tasks-options-container'),
+                gameScreen: document.getElementById('game-screen'), profileSection: document.getElementById('profile-section'), playerNameDisplay: document.getElementById('player-name-display'),
+                coinContainer: document.getElementById('coin-container'), coinCss: document.getElementById('coin-css'), scoreDisplay: document.getElementById('score-display'),
+                energyText: document.getElementById('energy-text'), energyBarFill: document.getElementById('energy-bar-fill'), screens: document.querySelectorAll('.screen'),
+                navButtons: document.querySelectorAll('.nav-button'), walletScore: document.getElementById('wallet-score'), levelDisplay: document.getElementById('level-display'),
+                rupeeValue: document.getElementById('rupee-value'), withdrawButton: document.getElementById('withdraw-button'), withdrawPopup: document.getElementById('withdraw-popup'),
+                popupCloseButton: document.getElementById('popup-close-button'), upiWithdrawButton: document.getElementById('upi-withdraw-button'),
+                popupWithdrawalAmount: document.getElementById('popup-withdrawal-amount'), popupWithdrawalValueInr: document.getElementById('popup-withdrawal-value-inr'),
+                withdrawalNameInput: document.getElementById('withdrawal-name-input'), withdrawalUpiInput: document.getElementById('withdrawal-upi-input'),
+                boostTap1Button: document.getElementById('boost-tap-1'), boostTap2Button: document.getElementById('boost-tap-2'), boostTap3Button: document.getElementById('boost-tap-3'),
+                headsButton: document.getElementById('heads-button'), tailsButton: document.getElementById('tails-button'), flipResult: document.getElementById('flip-result'),
+                betSelectionContainer: document.getElementById('bet-selection-container'), tapSound: document.getElementById('tap-sound'), withdrawalHistoryList: document.getElementById('withdrawal-history-list'),
+                nameChangePopup: document.getElementById('name-change-popup'), newNameInput: document.getElementById('new-name-input'),
+                confirmNameButton: document.getElementById('confirm-name-button'), cancelNameButton: document.getElementById('cancel-name-button'),
+                tasksOptionsContainer: document.getElementById('tasks-options-container'), videoTasksContainer: document.getElementById('video-tasks-container'),
+                withdrawalAdTaskContainer: document.getElementById('withdrawal-ad-task-container'),
             };
 
             let state = {
-                score: 0,
-                playerName: 'Player',
-                currentLevel: 1,
-                tapPower: 1,
-                tapUpgradeLevel: 0,
-                maxEnergy: 1000,
-                currentEnergy: 1000,
-                energyRegenRate: 1
+                score: 0, playerName: 'Player', currentLevel: 1, tapPower: 1, tapUpgradeLevel: 0,
+                maxEnergy: 1000, currentEnergy: 1000, energyRegenRate: 1,
+                videoTask1Progress: 0, videoTask2Progress: 0, videoTask3Progress: 0,
+                videoTask1Claimed: false, videoTask2Claimed: false, videoTask3Claimed: false,
+                withdrawalAdClicks: 0,
+                isAdTimerActive: false, // Global flag to prevent multiple ad timers
             };
             
             let currentBetAmount = 100;
             let isAdBoostActive = false;
 
-            // === NAYA FUNCTION: Saare active offers ko Firebase se load karke dikhane ke liye ===
+            function renderVideoTasks() {
+                const container = elements.videoTasksContainer;
+                container.innerHTML = '';
+                videoAdTasks.forEach(task => {
+                    const progress = state[task.id + 'Progress'] || 0;
+                    const isClaimed = state[task.id + 'Claimed'] || false;
+                    const isComplete = progress >= task.goal;
+                    const card = document.createElement('div');
+                    card.className = 'option-card';
+                    let buttonHtml;
+                    if (isClaimed) {
+                         buttonHtml = `<button class="action-button" disabled>Claimed ✅</button>`;
+                    } else if (isComplete) {
+                        buttonHtml = `<button class="action-button claim-video-reward-button" data-task-id="${task.id}" style="background-color: #2ecc71;">Claim ${task.reward.toLocaleString()} 🪙</button>`;
+                    } else {
+                        buttonHtml = `<button class="action-button video-task-button" data-task-id="${task.id}">Watch Video</button>`;
+                    }
+                    card.innerHTML = `<h3>${task.title}</h3><p>${task.description}</p><p><strong>Progress: ${progress} / ${task.goal}</strong></p>${buttonHtml}`;
+                    container.appendChild(card);
+                });
+            }
+
+            elements.videoTasksContainer.addEventListener('click', (e) => {
+                const button = e.target;
+                if (button.classList.contains('video-task-button')) {
+                    // NEW: Check if another timer is already running
+                    if (state.isAdTimerActive) {
+                        alert("Please wait for the current ad timer to finish.");
+                        return;
+                    }
+                    
+                    const taskId = button.dataset.taskId;
+                    const task = videoAdTasks.find(t => t.id === taskId);
+                    if (!task) return;
+
+                    state.isAdTimerActive = true;
+                    window.open(task.url, '_blank');
+                    
+                    // Start countdown
+                    button.disabled = true;
+                    let countdown = 10;
+                    button.innerText = `Wait (${countdown}s)`;
+
+                    const countdownInterval = setInterval(() => {
+                        countdown--;
+                        button.innerText = `Wait (${countdown}s)`;
+                        if (countdown <= 0) {
+                            clearInterval(countdownInterval);
+                            state[taskId + 'Progress']++;
+                            saveGame({ [taskId + 'Progress']: state[taskId + 'Progress'] });
+                            renderVideoTasks(); // Re-render to show original button
+                            state.isAdTimerActive = false; // Release the lock
+                        }
+                    }, 1000);
+                }
+
+                if (button.classList.contains('claim-video-reward-button')) {
+                    const taskId = button.dataset.taskId;
+                    const task = videoAdTasks.find(t => t.id === taskId);
+                    if (!task || state[taskId + 'Claimed']) return;
+                    state.score += task.reward;
+                    state[taskId + 'Claimed'] = true;
+                    alert(`Congratulations! You have claimed ${task.reward.toLocaleString()} coins! 🎉`);
+                    saveGame({ score: state.score, [taskId + 'Claimed']: true });
+                    updateDisplay();
+                    renderVideoTasks();
+                }
+            });
+
             function loadAndDisplayOffers() {
                 const offersRef = database.ref('promotions');
-                elements.tasksOptionsContainer.innerHTML = ''; // Pehle se jo hai use saaf karo
-
+                elements.tasksOptionsContainer.innerHTML = '';
                 offersRef.once('value').then(snapshot => {
                     if (snapshot.exists()) {
                         snapshot.forEach(childSnapshot => {
                             const promo = childSnapshot.val();
                             if (promo.isActive) {
                                 const card = document.createElement('div');
-                                card.className = 'option-card';
-                                card.innerHTML = `
-                                    <h3>${promo.title}</h3>
-                                    <p>${promo.text}</p>
-                                    ${promo.imageUrl ? `<img src="${promo.imageUrl}" alt="Offer Image">` : ''}
-                                `;
-                                
-                                // Event listener add karna
+                                card.className = 'option-card clickable';
+                                card.innerHTML = `<h3>${promo.title}</h3><p>${promo.text}</p>${promo.imageUrl ? `<img src="${promo.imageUrl}" alt="Offer Image">` : ''}`;
                                 card.addEventListener('click', (e) => {
-                                    e.preventDefault(); // Default link behavior roko
-                                    
-                                    // Agar special action hai to use chalao
-                                    if (promo.action === 'watchAd') {
-                                        triggerWatchAd(card); // Ad function ko call karo
-                                    } 
-                                    // Nahi to link ko naye tab me kholo
-                                    else if (promo.linkUrl && promo.linkUrl !== '#') {
-                                        window.open(promo.linkUrl, '_blank');
-                                    }
+                                    e.preventDefault();
+                                    if (promo.action === 'watchAd') { triggerWatchAd(card); } 
+                                    else if (promo.linkUrl && promo.linkUrl !== '#') { window.open(promo.linkUrl, '_blank'); }
                                 });
-
                                 elements.tasksOptionsContainer.appendChild(card);
                             }
                         });
                     } else {
                         elements.tasksOptionsContainer.innerHTML = '<p>No active offers right now. Check back later!</p>';
                     }
-                }).catch(error => {
-                    console.error("Error loading offers:", error);
-                    elements.tasksOptionsContainer.innerHTML = '<p>Could not load offers. Please try again.</p>';
-                });
+                }).catch(error => { console.error("Error loading offers:", error); elements.tasksOptionsContainer.innerHTML = '<p>Could not load offers. Please try again.</p>'; });
             }
 
             function triggerWatchAd(cardElement) {
                 if (isAdBoostActive) { alert("A boost is already active! Please wait."); return; }
                 isAdBoostActive = true;
-                
                 const originalText = cardElement.querySelector('p').innerText;
-                const button = cardElement; // Poora card hi button jaisa kaam karega
-                button.style.pointerEvents = 'none'; // Click disable karo
-
+                cardElement.style.pointerEvents = 'none';
                 let countdown = 10;
                 cardElement.querySelector('p').innerText = `Boost Active! (${countdown}s)`;
-                
                 const countdownInterval = setInterval(() => {
                     countdown--;
                     cardElement.querySelector('p').innerText = `Boost Active! (${countdown}s)`;
                     if (countdown <= 0) {
                         clearInterval(countdownInterval);
                         isAdBoostActive = false;
-                        button.style.pointerEvents = 'auto'; // Click re-enable karo
+                        cardElement.style.pointerEvents = 'auto';
                         cardElement.querySelector('p').innerText = originalText;
                         alert("Ad boost has ended!");
                     }
@@ -511,21 +614,73 @@
                         itemDiv.className = 'history-item';
                         const amountInRupees = (item.amount / 1000).toFixed(2);
                         const recipientInfo = item.name ? `${item.name} (${item.upiId})` : item.upiId;
-                        itemDiv.innerHTML = `
-                            <div class="history-item-details">
-                                <strong>${item.amount.toLocaleString()} 🪙</strong> (₹${amountInRupees})<br>
-                                <span style="font-size:14px; opacity: 0.8;">To: ${recipientInfo}</span>
-                            </div>
-                            <div class="history-item-meta">
-                                <span>${item.date}</span>
-                                <span class="status status-${item.status.toLowerCase()}">${item.status}</span>
-                            </div>`;
+                        itemDiv.innerHTML = `<div class="history-item-details"><strong>${item.amount.toLocaleString()} 🪙</strong> (₹${amountInRupees})<br><span style="font-size:14px; opacity: 0.8;">To: ${recipientInfo}</span></div><div class="history-item-meta"><span>${item.date}</span><span class="status status-${item.status.toLowerCase()}">${item.status}</span></div>`;
                         historyList.prepend(itemDiv);
                     });
                 });
             }
 
+            function renderWalletScreen() {
+                elements.walletScore.innerText = state.score.toLocaleString();
+                const rupeeValue = (state.score / 1000).toFixed(2);
+                elements.rupeeValue.innerText = `Value: ₹${rupeeValue} INR`;
+
+                const goal = 10;
+                if (state.withdrawalAdClicks >= goal) {
+                    elements.withdrawalAdTaskContainer.style.display = 'none';
+                    elements.withdrawButton.style.display = 'block';
+                } else {
+                    elements.withdrawalAdTaskContainer.style.display = 'flex';
+                    elements.withdrawButton.style.display = 'none';
+                    elements.withdrawalAdTaskContainer.innerHTML = `
+                        <div class="option-card">
+                            <h3>Unlock Withdrawals</h3>
+                            <p>Watch 10 ads to enable the withdrawal button.</p>
+                            <p><strong>Progress: ${state.withdrawalAdClicks} / ${goal}</strong></p>
+                            <button id="watch-ad-for-withdrawal" class="action-button">Watch Ad</button>
+                        </div>
+                    `;
+                }
+                renderWithdrawalHistory();
+            }
+
+            elements.withdrawalAdTaskContainer.addEventListener('click', (e) => {
+                if(e.target.id === 'watch-ad-for-withdrawal') {
+                    // NEW: Check if another timer is already running
+                    if (state.isAdTimerActive) {
+                        alert("Please wait for the current ad timer to finish.");
+                        return;
+                    }
+                    
+                    state.isAdTimerActive = true;
+                    window.open('https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315', '_blank');
+
+                    // Start countdown
+                    const button = e.target;
+                    button.disabled = true;
+                    let countdown = 10;
+                    button.innerText = `Wait (${countdown}s)`;
+
+                    const countdownInterval = setInterval(() => {
+                        countdown--;
+                        button.innerText = `Wait (${countdown}s)`;
+                        if (countdown <= 0) {
+                            clearInterval(countdownInterval);
+                            state.withdrawalAdClicks++;
+                            saveGame({ withdrawalAdClicks: state.withdrawalAdClicks });
+                            renderWalletScreen(); // Re-render to show original button and update progress
+                            state.isAdTimerActive = false; // Release the lock
+                        }
+                    }, 1000);
+                }
+            });
+
+
             function showScreen(screenId) {
+                const previouslyActiveScreen = document.querySelector('.screen:not(.hidden)');
+                if (previouslyActiveScreen && previouslyActiveScreen.id === 'games-screen' && screenId !== 'games-screen') {
+                    if (flappyGame.gameRunning) { flappyGame.endGame(); }
+                }
                 elements.screens.forEach(s => s.classList.add('hidden'));
                 document.querySelectorAll('.nav-button[data-screen]').forEach(b => b.classList.remove('active'));
                 document.getElementById(screenId).classList.remove('hidden');
@@ -533,14 +688,13 @@
                 if (button) button.classList.add('active');
 
                 if (screenId === 'wallet-screen') {
-                    elements.walletScore.innerText = state.score.toLocaleString();
-                    const rupeeValue = (state.score / 1000).toFixed(2);
-                    elements.rupeeValue.innerText = `Value: ₹${rupeeValue} INR`;
-                    renderWithdrawalHistory();
+                    renderWalletScreen();
                 } else if (screenId === 'boost-screen') {
                     updateBoostButtons();
                 } else if (screenId === 'tasks-screen') {
-                    loadAndDisplayOffers(); // Jab bhi tasks screen khule, offers ko reload karo
+                    loadAndDisplayOffers();
+                } else if (screenId === 'video-screen') {
+                    renderVideoTasks();
                 }
             }
             
@@ -554,37 +708,27 @@
                         state.currentEnergy = data.currentEnergy !== undefined ? data.currentEnergy : state.maxEnergy;
                         state.tapPower = data.tapPower || 1;
                         state.tapUpgradeLevel = data.tapUpgradeLevel || 0;
+                        videoAdTasks.forEach(task => {
+                            state[task.id + 'Progress'] = data[task.id + 'Progress'] || 0;
+                            state[task.id + 'Claimed'] = data[task.id + 'Claimed'] || false;
+                        });
+                        state.withdrawalAdClicks = data.withdrawalAdClicks || 0;
+
                     } else {
                         saveGame(null, true);
                     }
                     updateDisplay();
                     updatePlayerNameDisplay();
-                }).catch(error => {
-                    console.error("Error loading game data:", error);
-                    alert("Could not load your progress.");
-                });
+                }).catch(error => { console.error("Error loading game data:", error); alert("Could not load your progress."); });
             }
 
             function saveGame(dataToSave, fullSave = false) {
-                if (!userId) {
-                    console.error("User ID nahi mili, game save nahi ho sakta.");
-                    return;
-                }
+                if (!userId) return;
                 if (fullSave) {
-                    const fullData = {
-                        score: state.score,
-                        playerName: state.playerName,
-                        currentEnergy: state.currentEnergy,
-                        tapPower: state.tapPower,
-                        tapUpgradeLevel: state.tapUpgradeLevel,
-                        lastSeen: firebase.database.ServerValue.TIMESTAMP
-                    };
-                    database.ref(`users/${userId}`).set(fullData)
-                        .catch(error => console.error("Poora game save karne mein error:", error));
+                    database.ref(`users/${userId}`).set({ ...state, lastSeen: firebase.database.ServerValue.TIMESTAMP }).catch(error => console.error("Full game save error:", error));
                 } 
                 else if (dataToSave) {
-                    database.ref(`users/${userId}`).update(dataToSave)
-                        .catch(error => console.error("Specific data save karne mein error:", error));
+                    database.ref(`users/${userId}`).update(dataToSave).catch(error => console.error("Partial game save error:", error));
                 }
             }
             
@@ -593,24 +737,23 @@
                 elements.energyText.innerText = `⚡️ ${Math.floor(state.currentEnergy)} / ${state.maxEnergy}`;
                 elements.energyBarFill.style.width = `${(state.currentEnergy / state.maxEnergy) * 100}%`;
                 
-                if (state.score >= 1000000) { state.currentLevel = 10; } 
-                else if (state.score >= 60000) { state.currentLevel = 5; } 
-                else if (state.score >= 40000) { state.currentLevel = 4; } 
-                else if (state.score >= 30000) { state.currentLevel = 3; } 
-                else if (state.score >= 10000) { state.currentLevel = 2; } 
-                else { state.currentLevel = 1; }
+                if (state.score >= 1000000) state.currentLevel = 10;
+                else if (state.score >= 60000) state.currentLevel = 5;
+                else if (state.score >= 40000) state.currentLevel = 4;
+                else if (state.score >= 30000) state.currentLevel = 3;
+                else if (state.score >= 10000) state.currentLevel = 2;
+                else state.currentLevel = 1;
                 elements.levelDisplay.innerText = `Level ${state.currentLevel}`;
 
-                if (!document.getElementById('wallet-screen').classList.contains('hidden')) {
+                if (document.getElementById('wallet-screen').classList.contains('hidden')) {
+                } else {
                     elements.walletScore.innerText = state.score.toLocaleString();
                     const rupeeValue = (state.score / 1000).toFixed(2);
                     elements.rupeeValue.innerText = `Value: ₹${rupeeValue} INR`;
                 }
             }
 
-            function updatePlayerNameDisplay() {
-                elements.playerNameDisplay.innerText = state.playerName;
-            }
+            function updatePlayerNameDisplay() { elements.playerNameDisplay.innerText = state.playerName; }
 
             function updateBoostButtons() {
                 elements.boostTap1Button.disabled = state.tapUpgradeLevel >= 1;
@@ -623,7 +766,7 @@
             
             function showFloatingText(event) {
                 const floatingText = document.createElement('div');
-                const powerToShow = isAdBoostActive ? state.tapPower * 2 : state.tapPower; // Ad boost me double power
+                const powerToShow = isAdBoostActive ? state.tapPower * 2 : state.tapPower;
                 floatingText.innerText = `+${powerToShow}`;
                 floatingText.className = 'floating-text';
                 const x = event.clientX || event.touches[0].clientX;
@@ -634,167 +777,31 @@
                 setTimeout(() => floatingText.remove(), 1000);
             }
 
-            elements.coinContainer.addEventListener('pointerdown', (event) => {
-                if (!elements.coinCss.classList.contains('flipping')) {
-                    elements.coinCss.classList.add('flipping');
-                }
-                const power = isAdBoostActive ? state.tapPower * 2 : state.tapPower;
-                if (state.currentEnergy >= power) {
-                    state.currentEnergy -= power;
-                    state.score += power;
-                    updateDisplay(); 
-                    showFloatingText(event);
-                    if (elements.tapSound) { 
-                        elements.tapSound.currentTime = 0; 
-                        elements.tapSound.play().catch(e => {}); 
-                    }
-                    saveGame({
-                        score: state.score,
-                        currentEnergy: state.currentEnergy
-                    });
-                }
-            });
-
-            elements.coinCss.addEventListener('animationend', () => { elements.coinCss.classList.remove('flipping'); });
-            
-            setInterval(() => {
-                if (state.currentEnergy < state.maxEnergy) {
-                    state.currentEnergy = Math.min(state.maxEnergy, state.currentEnergy + state.energyRegenRate);
-                    updateDisplay();
-                }
-            }, 1000);
-            
-            setInterval(() => {
-                saveGame(null, true); 
-            }, 10000); 
-            
-            elements.navButtons.forEach(b => {
-                if(b.dataset.screen){
-                    b.addEventListener('click', () => showScreen(b.dataset.screen))
-                }
-            });
+            elements.coinContainer.addEventListener('pointerdown', (event) => { if (!elements.coinCss.classList.contains('flipping')) { elements.coinCss.classList.add('flipping'); } const power = isAdBoostActive ? state.tapPower * 2 : state.tapPower; if (state.currentEnergy >= power) { state.currentEnergy -= power; state.score += power; updateDisplay(); showFloatingText(event); if (elements.tapSound) { elements.tapSound.currentTime = 0; elements.tapSound.play().catch(e => {}); } saveGame({ score: state.score, currentEnergy: state.currentEnergy }); } });
+            elements.coinCss.addEventListener('animationend', () => elements.coinCss.classList.remove('flipping'));
+            setInterval(() => { if (state.currentEnergy < state.maxEnergy) { state.currentEnergy = Math.min(state.maxEnergy, state.currentEnergy + state.energyRegenRate); updateDisplay(); } }, 1000);
+            setInterval(() => saveGame(null, true), 10000); 
+            elements.navButtons.forEach(b => { if(b.dataset.screen){ b.addEventListener('click', () => showScreen(b.dataset.screen)) } });
             document.querySelectorAll('.back-button').forEach(b => b.addEventListener('click', () => showScreen(b.dataset.screen)));
-            
-            elements.profileSection.addEventListener('click', () => {
-                elements.newNameInput.value = state.playerName;
-                elements.nameChangePopup.style.display = 'flex';
-            });
-            
-            elements.confirmNameButton.addEventListener('click', () => {
-                const newName = elements.newNameInput.value.trim();
-                if (newName && newName !== "") {
-                    state.playerName = newName;
-                    updatePlayerNameDisplay();
-                    saveGame({ playerName: state.playerName });
-                    elements.nameChangePopup.style.display = 'none';
-                } else {
-                    alert("Name cannot be empty!");
-                }
-            });
-
-            elements.cancelNameButton.addEventListener('click', () => {
-                elements.nameChangePopup.style.display = 'none';
-            });
-
-            elements.upiWithdrawButton.addEventListener('click', () => {
-                const amountToWithdraw = state.score;
-                const name = elements.withdrawalNameInput.value.trim();
-                const upiId = elements.withdrawalUpiInput.value.trim();
-                if (!name || !upiId) { alert("Please enter both your name and UPI ID."); return; }
-                const newWithdrawal = { amount: amountToWithdraw, name: name, upiId: upiId, date: new Date().toLocaleString(), status: 'Processing' };
-                database.ref(`withdrawals/${userId}`).push(newWithdrawal);
-                const amountInRupees = (amountToWithdraw / 1000).toFixed(2);
-                alert(`Withdrawal request for ${amountToWithdraw.toLocaleString()} coins (₹${amountInRupees}) has been sent to ${name} at ${upiId}. It may take some time to process.`);
-                state.score = 0;
-                saveGame({ score: 0 });
-                updateDisplay();
-                elements.withdrawPopup.style.display = 'none';
-                elements.withdrawalNameInput.value = '';
-                elements.withdrawalUpiInput.value = '';
-                showScreen('wallet-screen');
-            });
-            
-            elements.withdrawButton.addEventListener('click', () => {
-                if (state.score >= 2000) {
-                    const amountToWithdraw = state.score;
-                    const amountInRupees = (amountToWithdraw / 1000).toFixed(2);
-                    elements.popupWithdrawalAmount.innerText = `${amountToWithdraw.toLocaleString()} 🪙`;
-                    elements.popupWithdrawalValueInr.innerText = `Value: ₹${amountInRupees} INR`;
-                    elements.withdrawPopup.style.display = 'flex';
-                } else {
-                    alert(`You need at least 2000 coins (₹2) to make a withdrawal.`);
-                }
-            });
-
+            elements.profileSection.addEventListener('click', () => { elements.newNameInput.value = state.playerName; elements.nameChangePopup.style.display = 'flex'; });
+            elements.confirmNameButton.addEventListener('click', () => { const newName = elements.newNameInput.value.trim(); if (newName && newName !== "") { state.playerName = newName; updatePlayerNameDisplay(); saveGame({ playerName: state.playerName }); elements.nameChangePopup.style.display = 'none'; } else { alert("Name cannot be empty!"); } });
+            elements.cancelNameButton.addEventListener('click', () => elements.nameChangePopup.style.display = 'none');
+            elements.upiWithdrawButton.addEventListener('click', () => { const amountToWithdraw = state.score; const name = elements.withdrawalNameInput.value.trim(); const upiId = elements.withdrawalUpiInput.value.trim(); if (!name || !upiId) { alert("Please enter both your name and UPI ID."); return; } const newWithdrawal = { amount: amountToWithdraw, name: name, upiId: upiId, date: new Date().toLocaleString(), status: 'Processing' }; database.ref(`withdrawals/${userId}`).push(newWithdrawal); const amountInRupees = (amountToWithdraw / 1000).toFixed(2); alert(`Withdrawal request for ${amountToWithdraw.toLocaleString()} coins (₹${amountInRupees}) has been sent to ${name} at ${upiId}. It may take some time to process.`); state.score = 0; state.withdrawalAdClicks = 0; saveGame({ score: 0, withdrawalAdClicks: 0 }); updateDisplay(); elements.withdrawPopup.style.display = 'none'; elements.withdrawalNameInput.value = ''; elements.withdrawalUpiInput.value = ''; showScreen('wallet-screen'); });
+            elements.withdrawButton.addEventListener('click', () => { if (state.score >= 2000) { const amountToWithdraw = state.score; const amountInRupees = (amountToWithdraw / 1000).toFixed(2); elements.popupWithdrawalAmount.innerText = `${amountToWithdraw.toLocaleString()} 🪙`; elements.popupWithdrawalValueInr.innerText = `Value: ₹${amountInRupees} INR`; elements.withdrawPopup.style.display = 'flex'; } else { alert(`You need at least 2000 coins (₹2) to make a withdrawal.`); } });
             elements.popupCloseButton.addEventListener('click', () => elements.withdrawPopup.style.display = 'none');
-            
-            function buyBoost(cost, newTapPower, requiredLevel, newUpgradeLevel) {
-                 if (state.tapUpgradeLevel === requiredLevel && state.score >= cost) {
-                    state.score -= cost;
-                    state.tapPower = newTapPower;
-                    state.tapUpgradeLevel = newUpgradeLevel;
-                    alert('Upgrade Successful!');
-                    saveGame({
-                        score: state.score,
-                        tapPower: state.tapPower,
-                        tapUpgradeLevel: state.tapUpgradeLevel
-                    });
-                    updateDisplay();
-                    updateBoostButtons();
-                } else if (state.tapUpgradeLevel !== requiredLevel) {
-                    alert('You must purchase the previous upgrades first!');
-                } else {
-                    alert('Not enough coins!');
-                }
-            }
+            function buyBoost(cost, newTapPower, requiredLevel, newUpgradeLevel) { if (state.tapUpgradeLevel === requiredLevel && state.score >= cost) { state.score -= cost; state.tapPower = newTapPower; state.tapUpgradeLevel = newUpgradeLevel; alert('Upgrade Successful!'); saveGame({ score: state.score, tapPower: state.tapPower, tapUpgradeLevel: state.tapUpgradeLevel }); updateDisplay(); updateBoostButtons(); } else if (state.tapUpgradeLevel !== requiredLevel) { alert('You must purchase the previous upgrades first!'); } else { alert('Not enough coins!'); } }
             elements.boostTap1Button.addEventListener('click', () => buyBoost(1000, 2, 0, 1));
             elements.boostTap2Button.addEventListener('click', () => buyBoost(5000, 3, 1, 2));
             elements.boostTap3Button.addEventListener('click', () => buyBoost(100000, 10, 2, 3));
-
-            elements.betSelectionContainer.addEventListener('click', (e) => {
-                if (e.target.classList.contains('bet-button')) {
-                    elements.betSelectionContainer.querySelectorAll('.bet-button').forEach(btn => btn.classList.remove('active'));
-                    e.target.classList.add('active');
-                    currentBetAmount = parseInt(e.target.dataset.bet, 10);
-                }
-            });
-
-            function playCoinFlip(playerChoice) {
-                if (state.score < currentBetAmount) { alert(`You need at least ${currentBetAmount} coins to play!`); return; }
-                state.score -= currentBetAmount;
-                updateDisplay();
-                saveGame({ score: state.score });
-                
-                elements.flipResult.innerText = "Flipping...";
-                elements.flipResult.className = '';
-                elements.headsButton.disabled = true;
-                elements.tailsButton.disabled = true;
-
-                setTimeout(() => {
-                    const result = Math.random() < 0.5 ? 'Heads' : 'Tails';
-                    let finalScore = state.score;
-                    if (playerChoice === result) {
-                        const winnings = currentBetAmount * 2;
-                        finalScore += winnings;
-                        elements.flipResult.innerText = `It was ${result}! You won ${winnings} coins! 🎉`;
-                        elements.flipResult.classList.add('win');
-                    } else {
-                        elements.flipResult.innerText = `It was ${result}. You lost ${currentBetAmount} coins. 😔`;
-                        elements.flipResult.classList.add('loss');
-                    }
-                    state.score = finalScore;
-                    updateDisplay(); 
-                    saveGame({ score: state.score });
-                    elements.headsButton.disabled = false;
-                    elements.tailsButton.disabled = false;
-                }, 1500);
-            }
+            elements.betSelectionContainer.addEventListener('click', (e) => { if (e.target.classList.contains('bet-button')) { elements.betSelectionContainer.querySelectorAll('.bet-button').forEach(btn => btn.classList.remove('active')); e.target.classList.add('active'); currentBetAmount = parseInt(e.target.dataset.bet, 10); } });
+            function playCoinFlip(playerChoice) { if (state.score < currentBetAmount) { alert(`You need at least ${currentBetAmount} coins to play!`); return; } state.score -= currentBetAmount; updateDisplay(); saveGame({ score: state.score }); elements.flipResult.innerText = "Flipping..."; elements.flipResult.className = ''; elements.headsButton.disabled = true; elements.tailsButton.disabled = true; setTimeout(() => { const result = Math.random() < 0.5 ? 'Heads' : 'Tails'; let finalScore = state.score; if (playerChoice === result) { const winnings = currentBetAmount * 2; finalScore += winnings; elements.flipResult.innerText = `It was ${result}! You won ${winnings} coins! 🎉`; elements.flipResult.classList.add('win'); } else { elements.flipResult.innerText = `It was ${result}. You lost ${currentBetAmount} coins. 😔`; elements.flipResult.classList.add('loss'); } state.score = finalScore; updateDisplay(); saveGame({ score: state.score }); elements.headsButton.disabled = false; elements.tailsButton.disabled = false; }, 1500); }
             elements.headsButton.addEventListener('click', () => playCoinFlip('Heads'));
             elements.tailsButton.addEventListener('click', () => playCoinFlip('Tails'));
             
             // Initial load
             loadGame();
             showScreen('game-screen');
+            flappyGame.init();
             elements.withdrawPopup.style.display = 'none'; 
             elements.nameChangePopup.style.display = 'none';
         });
