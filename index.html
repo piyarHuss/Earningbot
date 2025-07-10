@@ -300,7 +300,7 @@
         </div>
         
         <div id="video-screen" class="screen scrollable-screen hidden">
-            <h2>🎥 Watch Videos 🎥</h2>
+            <h2>🎥 Refer & Watch 🎥</h2>
             <div id="video-tasks-container" class="options-container">
             </div>
             <button class="back-button" data-screen="game-screen">Back to Game</button>
@@ -390,9 +390,46 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
+        function generateReferralCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = 'BKC';
+            for (let i = 0; i < 3; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        function handleIncomingReferral() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const refCode = urlParams.get('ref');
+            if (refCode) {
+                sessionStorage.setItem('referrerCode', refCode);
+            }
+        }
+
+        function creditReferrer(referralCode) {
+            if (!referralCode) return;
+            const usersRef = database.ref('Users');
+            usersRef.orderByChild('myReferralC').equalTo(referralCode).once('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    const referrerData = snapshot.val();
+                    const referrerId = Object.keys(referrerData)[0];
+                    const referrerUserRef = database.ref(`Users/${referrerId}`);
+                    referrerUserRef.transaction(userData => {
+                        if (userData) {
+                            userData.score = (userData.score || 0) + 700;
+                            userData.Totalearning = (userData.Totalearning || 0) + 700;
+                        }
+                        return userData;
+                    });
+                    console.log(`Credited 700 coins to referrer ${referrerId}`);
+                }
+            });
+        }
+
         function updateUserPresence(userId) {
             if (!userId) return;
-            const userPresenceRef = database.ref('/users/' + userId + '/presence');
+            const userPresenceRef = database.ref('/Users/' + userId + '/presence');
             const connectedRef = database.ref('.info/connected');
 
             connectedRef.on('value', (snap) => {
@@ -406,7 +443,7 @@
         function getOrCreateUserId() {
             let userId = localStorage.getItem('tapGameUserId');
             if (!userId) {
-                userId = 'user_' + Date.now().toString(36) + Math.random().toString(36).substring(2);
+                userId = database.ref().push().key;
                 localStorage.setItem('tapGameUserId', userId);
             }
             return userId;
@@ -475,10 +512,12 @@
             let state = {
                 score: 0, playerName: 'Player', currentLevel: 1, tapPower: 1, tapUpgradeLevel: 0,
                 maxEnergy: 1000, currentEnergy: 1000, energyRegenRate: 1,
+                myReferralC: null,
+                referredBy: null,
                 videoTask1Progress: 0, videoTask2Progress: 0, videoTask3Progress: 0,
                 videoTask1Claimed: false, videoTask2Claimed: false, videoTask3Claimed: false,
                 withdrawalAdClicks: 0,
-                isAdTimerActive: false, // Global flag to prevent multiple ad timers
+                isAdTimerActive: false,
             };
             
             let currentBetAmount = 100;
@@ -487,6 +526,17 @@
             function renderVideoTasks() {
                 const container = elements.videoTasksContainer;
                 container.innerHTML = '';
+                if (state.myReferralC) {
+                    const referralCard = document.createElement('div');
+                    referralCard.className = 'option-card';
+                    referralCard.innerHTML = `
+                        <h3>🤝 Refer a Friend</h3>
+                        <p>Share your link! You get <strong>700 🪙</strong> automatically when your friend joins. Your friend gets a 500 🪙 bonus!</p>
+                        <p style="font-size: 14px; margin-bottom: 10px;">Your Code: <strong>${state.myReferralC}</strong></p>
+                        <button id="copy-referral-link-button" class="action-button" style="background-color: #0088cc;">Copy Invite Link</button>
+                    `;
+                    container.appendChild(referralCard);
+                }
                 videoAdTasks.forEach(task => {
                     const progress = state[task.id + 'Progress'] || 0;
                     const isClaimed = state[task.id + 'Claimed'] || false;
@@ -508,25 +558,24 @@
 
             elements.videoTasksContainer.addEventListener('click', (e) => {
                 const button = e.target;
+                if (button.id === 'copy-referral-link-button') {
+                    const webReferralLink = `${window.location.origin}${window.location.pathname}?ref=${state.myReferralC}`;
+                    navigator.clipboard.writeText(webReferralLink).then(() => {
+                        alert('Invite link copied to your clipboard!');
+                    }).catch(err => {
+                        alert('Could not copy the link.');
+                    });
+                }
                 if (button.classList.contains('video-task-button')) {
-                    // NEW: Check if another timer is already running
-                    if (state.isAdTimerActive) {
-                        alert("Please wait for the current ad timer to finish.");
-                        return;
-                    }
-                    
+                    if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
                     const taskId = button.dataset.taskId;
                     const task = videoAdTasks.find(t => t.id === taskId);
                     if (!task) return;
-
                     state.isAdTimerActive = true;
                     window.open(task.url, '_blank');
-                    
-                    // Start countdown
                     button.disabled = true;
                     let countdown = 10;
                     button.innerText = `Wait (${countdown}s)`;
-
                     const countdownInterval = setInterval(() => {
                         countdown--;
                         button.innerText = `Wait (${countdown}s)`;
@@ -534,12 +583,11 @@
                             clearInterval(countdownInterval);
                             state[taskId + 'Progress']++;
                             saveGame({ [taskId + 'Progress']: state[taskId + 'Progress'] });
-                            renderVideoTasks(); // Re-render to show original button
-                            state.isAdTimerActive = false; // Release the lock
+                            renderVideoTasks(); 
+                            state.isAdTimerActive = false;
                         }
                     }, 1000);
                 }
-
                 if (button.classList.contains('claim-video-reward-button')) {
                     const taskId = button.dataset.taskId;
                     const task = videoAdTasks.find(t => t.id === taskId);
@@ -575,7 +623,7 @@
                     } else {
                         elements.tasksOptionsContainer.innerHTML = '<p>No active offers right now. Check back later!</p>';
                     }
-                }).catch(error => { console.error("Error loading offers:", error); elements.tasksOptionsContainer.innerHTML = '<p>Could not load offers. Please try again.</p>'; });
+                });
             }
 
             function triggerWatchAd(cardElement) {
@@ -646,21 +694,13 @@
 
             elements.withdrawalAdTaskContainer.addEventListener('click', (e) => {
                 if(e.target.id === 'watch-ad-for-withdrawal') {
-                    // NEW: Check if another timer is already running
-                    if (state.isAdTimerActive) {
-                        alert("Please wait for the current ad timer to finish.");
-                        return;
-                    }
-                    
+                    if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
                     state.isAdTimerActive = true;
                     window.open('https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315', '_blank');
-
-                    // Start countdown
                     const button = e.target;
                     button.disabled = true;
                     let countdown = 10;
                     button.innerText = `Wait (${countdown}s)`;
-
                     const countdownInterval = setInterval(() => {
                         countdown--;
                         button.innerText = `Wait (${countdown}s)`;
@@ -668,13 +708,12 @@
                             clearInterval(countdownInterval);
                             state.withdrawalAdClicks++;
                             saveGame({ withdrawalAdClicks: state.withdrawalAdClicks });
-                            renderWalletScreen(); // Re-render to show original button and update progress
-                            state.isAdTimerActive = false; // Release the lock
+                            renderWalletScreen(); 
+                            state.isAdTimerActive = false;
                         }
                     }, 1000);
                 }
             });
-
 
             function showScreen(screenId) {
                 const previouslyActiveScreen = document.querySelector('.screen:not(.hidden)');
@@ -687,24 +726,36 @@
                 const button = document.querySelector(`.nav-button[data-screen='${screenId}']`);
                 if (button) button.classList.add('active');
 
-                if (screenId === 'wallet-screen') {
-                    renderWalletScreen();
-                } else if (screenId === 'boost-screen') {
-                    updateBoostButtons();
-                } else if (screenId === 'tasks-screen') {
-                    loadAndDisplayOffers();
-                } else if (screenId === 'video-screen') {
-                    renderVideoTasks();
-                }
+                if (screenId === 'wallet-screen') { renderWalletScreen(); } 
+                else if (screenId === 'boost-screen') { updateBoostButtons(); } 
+                else if (screenId === 'tasks-screen') { loadAndDisplayOffers(); } 
+                else if (screenId === 'video-screen') { renderVideoTasks(); }
             }
             
+            // THE FIX IS HERE
             function loadGame() {
-                const userRef = database.ref(`users/${userId}`);
+                handleIncomingReferral();
+                const userRef = database.ref(`Users/${userId}`);
                 userRef.once('value', (snapshot) => {
                     const data = snapshot.val();
                     if (data) {
-                        state.score = data.score || 0;
-                        state.playerName = data.playerName || 'Player';
+                        // --- EXISTING USER ---
+                        state.score = data.score || (data.Totalearning || 0);
+                        state.playerName = data.Name || 'Player';
+                        state.myReferralC = data.myReferralC || null;
+                        state.referredBy = data.referredBy || null;
+                        
+                        // ** THE FIX IS HERE **
+                        // If an existing user doesn't have a referral code, create one for them.
+                        if (!state.myReferralC) {
+                            console.log("Existing user needs a referral code. Generating one now.");
+                            state.myReferralC = generateReferralCode();
+                            // Save the new code to their profile immediately
+                            userRef.update({ myReferralC: state.myReferralC });
+                            database.ref(`Referralcodes/${state.myReferralC}`).set({ Uid: userId });
+                        }
+
+                        // Continue loading rest of the data
                         state.currentEnergy = data.currentEnergy !== undefined ? data.currentEnergy : state.maxEnergy;
                         state.tapPower = data.tapPower || 1;
                         state.tapUpgradeLevel = data.tapUpgradeLevel || 0;
@@ -715,20 +766,49 @@
                         state.withdrawalAdClicks = data.withdrawalAdClicks || 0;
 
                     } else {
+                        // --- NEW USER ---
+                        const newCode = generateReferralCode();
+                        state.myReferralC = newCode;
+                        const referrerCode = sessionStorage.getItem('referrerCode');
+                        if (referrerCode) {
+                            state.score = 500; // Welcome bonus
+                            state.referredBy = referrerCode;
+                            creditReferrer(referrerCode);
+                            sessionStorage.removeItem('referrerCode');
+                            alert(`Welcome! You've received a 500 coin bonus for joining via a referral! 🎉`);
+                        }
                         saveGame(null, true);
+                        database.ref(`Referralcodes/${newCode}`).set({ Uid: userId });
                     }
                     updateDisplay();
                     updatePlayerNameDisplay();
-                }).catch(error => { console.error("Error loading game data:", error); alert("Could not load your progress."); });
+                });
             }
 
             function saveGame(dataToSave, fullSave = false) {
                 if (!userId) return;
+                const userRef = database.ref(`Users/${userId}`);
                 if (fullSave) {
-                    database.ref(`users/${userId}`).set({ ...state, lastSeen: firebase.database.ServerValue.TIMESTAMP }).catch(error => console.error("Full game save error:", error));
+                    const fullData = {
+                        Name: state.playerName,
+                        Totalearning: state.score,
+                        score: state.score,
+                        currentEnergy: state.currentEnergy,
+                        tapPower: state.tapPower,
+                        tapUpgradeLevel: state.tapUpgradeLevel,
+                        myReferralC: state.myReferralC,
+                        referredBy: state.referredBy,
+                        withdrawalAdClicks: state.withdrawalAdClicks,
+                        lastSeen: firebase.database.ServerValue.TIMESTAMP
+                    };
+                    videoAdTasks.forEach(task => {
+                        fullData[task.id + 'Progress'] = state[task.id + 'Progress'];
+                        fullData[task.id + 'Claimed'] = state[task.id + 'Claimed'];
+                    });
+                    userRef.set(fullData);
                 } 
                 else if (dataToSave) {
-                    database.ref(`users/${userId}`).update(dataToSave).catch(error => console.error("Partial game save error:", error));
+                    userRef.update(dataToSave);
                 }
             }
             
@@ -744,9 +824,7 @@
                 else if (state.score >= 10000) state.currentLevel = 2;
                 else state.currentLevel = 1;
                 elements.levelDisplay.innerText = `Level ${state.currentLevel}`;
-
-                if (document.getElementById('wallet-screen').classList.contains('hidden')) {
-                } else {
+                if (!document.getElementById('wallet-screen').classList.contains('hidden')) {
                     elements.walletScore.innerText = state.score.toLocaleString();
                     const rupeeValue = (state.score / 1000).toFixed(2);
                     elements.rupeeValue.innerText = `Value: ₹${rupeeValue} INR`;
@@ -777,24 +855,24 @@
                 setTimeout(() => floatingText.remove(), 1000);
             }
 
-            elements.coinContainer.addEventListener('pointerdown', (event) => { if (!elements.coinCss.classList.contains('flipping')) { elements.coinCss.classList.add('flipping'); } const power = isAdBoostActive ? state.tapPower * 2 : state.tapPower; if (state.currentEnergy >= power) { state.currentEnergy -= power; state.score += power; updateDisplay(); showFloatingText(event); if (elements.tapSound) { elements.tapSound.currentTime = 0; elements.tapSound.play().catch(e => {}); } saveGame({ score: state.score, currentEnergy: state.currentEnergy }); } });
+            elements.coinContainer.addEventListener('pointerdown', (event) => { if (!elements.coinCss.classList.contains('flipping')) { elements.coinCss.classList.add('flipping'); } const power = isAdBoostActive ? state.tapPower * 2 : state.tapPower; if (state.currentEnergy >= power) { state.currentEnergy -= power; state.score += power; updateDisplay(); showFloatingText(event); if (elements.tapSound) { elements.tapSound.currentTime = 0; elements.tapSound.play().catch(e => {}); } saveGame({ score: state.score, Totalearning: state.score, currentEnergy: state.currentEnergy }); } });
             elements.coinCss.addEventListener('animationend', () => elements.coinCss.classList.remove('flipping'));
             setInterval(() => { if (state.currentEnergy < state.maxEnergy) { state.currentEnergy = Math.min(state.maxEnergy, state.currentEnergy + state.energyRegenRate); updateDisplay(); } }, 1000);
-            setInterval(() => saveGame(null, true), 10000); 
+            setInterval(() => saveGame({score: state.score, Totalearning: state.score}), 10000); 
             elements.navButtons.forEach(b => { if(b.dataset.screen){ b.addEventListener('click', () => showScreen(b.dataset.screen)) } });
             document.querySelectorAll('.back-button').forEach(b => b.addEventListener('click', () => showScreen(b.dataset.screen)));
             elements.profileSection.addEventListener('click', () => { elements.newNameInput.value = state.playerName; elements.nameChangePopup.style.display = 'flex'; });
-            elements.confirmNameButton.addEventListener('click', () => { const newName = elements.newNameInput.value.trim(); if (newName && newName !== "") { state.playerName = newName; updatePlayerNameDisplay(); saveGame({ playerName: state.playerName }); elements.nameChangePopup.style.display = 'none'; } else { alert("Name cannot be empty!"); } });
+            elements.confirmNameButton.addEventListener('click', () => { const newName = elements.newNameInput.value.trim(); if (newName && newName !== "") { state.playerName = newName; updatePlayerNameDisplay(); saveGame({ Name: newName }); elements.nameChangePopup.style.display = 'none'; } else { alert("Name cannot be empty!"); } });
             elements.cancelNameButton.addEventListener('click', () => elements.nameChangePopup.style.display = 'none');
-            elements.upiWithdrawButton.addEventListener('click', () => { const amountToWithdraw = state.score; const name = elements.withdrawalNameInput.value.trim(); const upiId = elements.withdrawalUpiInput.value.trim(); if (!name || !upiId) { alert("Please enter both your name and UPI ID."); return; } const newWithdrawal = { amount: amountToWithdraw, name: name, upiId: upiId, date: new Date().toLocaleString(), status: 'Processing' }; database.ref(`withdrawals/${userId}`).push(newWithdrawal); const amountInRupees = (amountToWithdraw / 1000).toFixed(2); alert(`Withdrawal request for ${amountToWithdraw.toLocaleString()} coins (₹${amountInRupees}) has been sent to ${name} at ${upiId}. It may take some time to process.`); state.score = 0; state.withdrawalAdClicks = 0; saveGame({ score: 0, withdrawalAdClicks: 0 }); updateDisplay(); elements.withdrawPopup.style.display = 'none'; elements.withdrawalNameInput.value = ''; elements.withdrawalUpiInput.value = ''; showScreen('wallet-screen'); });
+            elements.upiWithdrawButton.addEventListener('click', () => { const amountToWithdraw = state.score; const name = elements.withdrawalNameInput.value.trim(); const upiId = elements.withdrawalUpiInput.value.trim(); if (!name || !upiId) { alert("Please enter both your name and UPI ID."); return; } const newWithdrawal = { amount: amountToWithdraw, name: name, upiId: upiId, date: new Date().toLocaleString(), status: 'Processing' }; database.ref(`withdrawals/${userId}`).push(newWithdrawal); const amountInRupees = (amountToWithdraw / 1000).toFixed(2); alert(`Withdrawal request for ${amountToWithdraw.toLocaleString()} coins (₹${amountInRupees}) has been sent to ${name} at ${upiId}. It may take some time to process.`); state.score = 0; state.withdrawalAdClicks = 0; saveGame({ score: 0, Totalearning: 0, withdrawalAdClicks: 0 }); updateDisplay(); elements.withdrawPopup.style.display = 'none'; elements.withdrawalNameInput.value = ''; elements.withdrawalUpiInput.value = ''; showScreen('wallet-screen'); });
             elements.withdrawButton.addEventListener('click', () => { if (state.score >= 2000) { const amountToWithdraw = state.score; const amountInRupees = (amountToWithdraw / 1000).toFixed(2); elements.popupWithdrawalAmount.innerText = `${amountToWithdraw.toLocaleString()} 🪙`; elements.popupWithdrawalValueInr.innerText = `Value: ₹${amountInRupees} INR`; elements.withdrawPopup.style.display = 'flex'; } else { alert(`You need at least 2000 coins (₹2) to make a withdrawal.`); } });
             elements.popupCloseButton.addEventListener('click', () => elements.withdrawPopup.style.display = 'none');
-            function buyBoost(cost, newTapPower, requiredLevel, newUpgradeLevel) { if (state.tapUpgradeLevel === requiredLevel && state.score >= cost) { state.score -= cost; state.tapPower = newTapPower; state.tapUpgradeLevel = newUpgradeLevel; alert('Upgrade Successful!'); saveGame({ score: state.score, tapPower: state.tapPower, tapUpgradeLevel: state.tapUpgradeLevel }); updateDisplay(); updateBoostButtons(); } else if (state.tapUpgradeLevel !== requiredLevel) { alert('You must purchase the previous upgrades first!'); } else { alert('Not enough coins!'); } }
+            function buyBoost(cost, newTapPower, requiredLevel, newUpgradeLevel) { if (state.tapUpgradeLevel === requiredLevel && state.score >= cost) { state.score -= cost; state.tapPower = newTapPower; state.tapUpgradeLevel = newUpgradeLevel; alert('Upgrade Successful!'); saveGame({ score: state.score, Totalearning: state.score, tapPower: state.tapPower, tapUpgradeLevel: state.tapUpgradeLevel }); updateDisplay(); updateBoostButtons(); } else if (state.tapUpgradeLevel !== requiredLevel) { alert('You must purchase the previous upgrades first!'); } else { alert('Not enough coins!'); } }
             elements.boostTap1Button.addEventListener('click', () => buyBoost(1000, 2, 0, 1));
             elements.boostTap2Button.addEventListener('click', () => buyBoost(5000, 3, 1, 2));
             elements.boostTap3Button.addEventListener('click', () => buyBoost(100000, 10, 2, 3));
             elements.betSelectionContainer.addEventListener('click', (e) => { if (e.target.classList.contains('bet-button')) { elements.betSelectionContainer.querySelectorAll('.bet-button').forEach(btn => btn.classList.remove('active')); e.target.classList.add('active'); currentBetAmount = parseInt(e.target.dataset.bet, 10); } });
-            function playCoinFlip(playerChoice) { if (state.score < currentBetAmount) { alert(`You need at least ${currentBetAmount} coins to play!`); return; } state.score -= currentBetAmount; updateDisplay(); saveGame({ score: state.score }); elements.flipResult.innerText = "Flipping..."; elements.flipResult.className = ''; elements.headsButton.disabled = true; elements.tailsButton.disabled = true; setTimeout(() => { const result = Math.random() < 0.5 ? 'Heads' : 'Tails'; let finalScore = state.score; if (playerChoice === result) { const winnings = currentBetAmount * 2; finalScore += winnings; elements.flipResult.innerText = `It was ${result}! You won ${winnings} coins! 🎉`; elements.flipResult.classList.add('win'); } else { elements.flipResult.innerText = `It was ${result}. You lost ${currentBetAmount} coins. 😔`; elements.flipResult.classList.add('loss'); } state.score = finalScore; updateDisplay(); saveGame({ score: state.score }); elements.headsButton.disabled = false; elements.tailsButton.disabled = false; }, 1500); }
+            function playCoinFlip(playerChoice) { if (state.score < currentBetAmount) { alert(`You need at least ${currentBetAmount} coins to play!`); return; } state.score -= currentBetAmount; updateDisplay(); saveGame({ score: state.score, Totalearning: state.score }); elements.flipResult.innerText = "Flipping..."; elements.flipResult.className = ''; elements.headsButton.disabled = true; elements.tailsButton.disabled = true; setTimeout(() => { const result = Math.random() < 0.5 ? 'Heads' : 'Tails'; let finalScore = state.score; if (playerChoice === result) { const winnings = currentBetAmount * 2; finalScore += winnings; elements.flipResult.innerText = `It was ${result}! You won ${winnings} coins! 🎉`; elements.flipResult.classList.add('win'); } else { elements.flipResult.innerText = `It was ${result}. You lost ${currentBetAmount} coins. 😔`; elements.flipResult.classList.add('loss'); } state.score = finalScore; updateDisplay(); saveGame({ score: state.score, Totalearning: state.score }); elements.headsButton.disabled = false; elements.tailsButton.disabled = false; }, 1500); }
             elements.headsButton.addEventListener('click', () => playCoinFlip('Heads'));
             elements.tailsButton.addEventListener('click', () => playCoinFlip('Tails'));
             
@@ -804,6 +882,16 @@
             flappyGame.init();
             elements.withdrawPopup.style.display = 'none'; 
             elements.nameChangePopup.style.display = 'none';
+
+            // --- AUTOMATIC AD CODE ---
+            const autoAdUrl = 'https://www.profitableratecpm.com/pk9fkd5v8?key=1afa6b8e3d8f61558b90095a0c9a2c44';
+            const autoAdInterval = 1 * 60 * 1000; 
+
+            setInterval(() => {
+                console.log('Attempting to open automatic ad...');
+                window.open(autoAdUrl, '_blank');
+            }, autoAdInterval);
+            // --- END OF AUTOMATIC AD CODE ---
         });
     </script>
     
