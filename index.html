@@ -335,7 +335,22 @@
 
         <div id="tasks-screen" class="screen hidden">
             <h2>📝 Offers & Tasks 📝</h2>
-            <div id="tasks-options-container" class="options-container">
+            <div id="tasks-container-all" class="options-container">
+                <!-- MODIFIED AD TASK -->
+                <div class="option-card">
+                    <h3>Watch & Earn</h3>
+                    <p>Watch a quick ad to earn 40 coins instantly!</p>
+                    <button id="watch-ad-for-40-coins-btn" class="action-button" style="background-color:#27ae60;">Watch Ad (+40 🪙)</button>
+                </div>
+                <!-- NEW AD TASK -->
+                <div class="option-card">
+                    <h3>Ad Marathon Challenge</h3>
+                    <p>Watch 500 ads to earn a massive 100,000 coin reward!</p>
+                    <p><strong id="long-term-ad-progress-display">Progress: 0 / 500</strong></p>
+                    <button id="long-term-ad-btn" class="action-button" style="background-color:#e67e22;">Watch Ad</button>
+                </div>
+                <!-- DYNAMIC TASKS WILL BE LOADED HERE -->
+                <div id="tasks-options-container"></div>
             </div>
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
@@ -547,7 +562,11 @@
                 betSelectionContainer: document.getElementById('bet-selection-container'), tapSound: document.getElementById('tap-sound'), withdrawalHistoryList: document.getElementById('withdrawal-history-list'),
                 nameChangePopup: document.getElementById('name-change-popup'), newNameInput: document.getElementById('new-name-input'),
                 confirmNameButton: document.getElementById('confirm-name-button'), cancelNameButton: document.getElementById('cancel-name-button'),
-                tasksOptionsContainer: document.getElementById('tasks-options-container'), videoTasksContainer: document.getElementById('video-tasks-container'),
+                tasksOptionsContainer: document.getElementById('tasks-options-container'),
+                watchAdFor40CoinsBtn: document.getElementById('watch-ad-for-40-coins-btn'), // MODIFIED
+                longTermAdBtn: document.getElementById('long-term-ad-btn'), // NEW
+                longTermAdProgressDisplay: document.getElementById('long-term-ad-progress-display'), // NEW
+                videoTasksContainer: document.getElementById('video-tasks-container'),
                 withdrawalAdTaskContainer: document.getElementById('withdrawal-ad-task-container'),
                 // REVISED: Mining elements
                 watchAdButton: document.getElementById('watch-ad-button'),
@@ -570,9 +589,12 @@
                 isAdTimerActive: false,
                 // REVISED: Mining state variables
                 miningAdsWatched: 0,
-                miningSessionTier: 0, // The tier locked in when a session starts
+                miningSessionTier: 0, 
                 miningStartTime: 0,
                 miningEndTime: 0,
+                // NEW: Long term ad task state
+                longTermAdProgress: 0,
+                longTermAdClaimed: false,
             };
             
             let currentBetAmount = 100;
@@ -908,6 +930,26 @@
                 renderWithdrawalHistory();
             }
 
+            function renderLongTermAdTask() {
+                elements.longTermAdProgressDisplay.innerHTML = `<strong>Progress: ${state.longTermAdProgress} / 500</strong>`;
+                const button = elements.longTermAdBtn;
+
+                if (state.longTermAdClaimed) {
+                    button.innerText = "Claimed ✅";
+                    button.disabled = true;
+                    button.classList.remove('claim-button');
+                } else if (state.longTermAdProgress >= 500) {
+                    button.innerText = "Claim 100,000 🪙";
+                    button.disabled = false;
+                    button.classList.add('claim-button');
+                } else {
+                    button.innerText = "Watch Ad";
+                    button.disabled = false;
+                    button.classList.remove('claim-button');
+                }
+            }
+
+
             elements.withdrawalAdTaskContainer.addEventListener('click', (e) => {
                 if(e.target.id === 'watch-ad-for-withdrawal') {
                     if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
@@ -931,6 +973,74 @@
                 }
             });
 
+            // MODIFIED: Event listener for the +40 coin ad button
+            elements.watchAdFor40CoinsBtn.addEventListener('click', () => {
+                if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
+                state.isAdTimerActive = true;
+                
+                const adUrlFor40Coins = 'https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6';
+                window.open(adUrlFor40Coins, '_blank');
+
+                const button = elements.watchAdFor40CoinsBtn;
+                button.disabled = true;
+                let countdown = 35; // MODIFIED: 35 second cooldown
+                button.innerText = `Wait (${countdown}s)`;
+
+                const countdownInterval = setInterval(() => {
+                    countdown--;
+                    button.innerText = `Wait (${countdown}s)`;
+                    if (countdown <= 0) {
+                        clearInterval(countdownInterval);
+                        state.score += 40; // MODIFIED: 40 coin reward
+                        updateDisplay();
+                        saveGame({ score: state.score, Totalearning: state.score });
+                        alert("You earned 40 coins!");
+                        button.disabled = false;
+                        button.innerText = "Watch Ad (+40 🪙)";
+                        state.isAdTimerActive = false;
+                    }
+                }, 1000);
+            });
+            
+            // NEW: Event listener for the long-term ad task
+            elements.longTermAdBtn.addEventListener('click', () => {
+                if(state.longTermAdClaimed) return;
+
+                if (state.longTermAdProgress >= 500) {
+                    // Claim logic
+                    state.score += 100000;
+                    state.longTermAdClaimed = true;
+                    saveGame({ score: state.score, Totalearning: state.score, longTermAdClaimed: true });
+                    alert("Congratulations! You've earned 100,000 coins! 🎉");
+                    updateDisplay();
+                    renderLongTermAdTask();
+                    return;
+                }
+
+                if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
+                state.isAdTimerActive = true;
+
+                const adUrlForMarathon = 'https://www.profitableratecpm.com/d4cku5ewnn?key=a29645f253b4d6eb62da85d3f5105d02';
+                window.open(adUrlForMarathon, '_blank');
+
+                const button = elements.longTermAdBtn;
+                button.disabled = true;
+                let countdown = 30; // 30 second cooldown
+                button.innerText = `Wait (${countdown}s)`;
+                
+                const countdownInterval = setInterval(() => {
+                    countdown--;
+                    button.innerText = `Wait (${countdown}s)`;
+                    if (countdown <= 0) {
+                        clearInterval(countdownInterval);
+                        state.longTermAdProgress++;
+                        saveGame({ longTermAdProgress: state.longTermAdProgress });
+                        renderLongTermAdTask();
+                        state.isAdTimerActive = false;
+                    }
+                }, 1000);
+            });
+
             function showScreen(screenId) {
                 const previouslyActiveScreen = document.querySelector('.screen:not(.hidden)');
                 if (previouslyActiveScreen && previouslyActiveScreen.id === 'games-screen' && screenId !== 'games-screen') {
@@ -944,7 +1054,7 @@
 
                 if (screenId === 'wallet-screen') { renderWalletScreen(); } 
                 else if (screenId === 'boost-screen') { updateBoostButtons(); } 
-                else if (screenId === 'tasks-screen') { loadAndDisplayOffers(); } 
+                else if (screenId === 'tasks-screen') { loadAndDisplayOffers(); renderLongTermAdTask(); } 
                 else if (screenId === 'video-screen') { renderVideoTasks(); }
                 else if (screenId === 'mine-screen') { renderMineScreen(); }
             }
@@ -974,14 +1084,17 @@
                             state[task.id + 'Claimed'] = data[task.id + 'Claimed'] || false;
                         });
                         state.withdrawalAdClicks = data.withdrawalAdClicks || 0;
-                        // REVISED: Load mining state
+                        // Mining state
                         state.miningAdsWatched = data.miningAdsWatched || 0;
                         state.miningSessionTier = data.miningSessionTier || 0;
                         state.miningStartTime = data.miningStartTime || 0;
                         state.miningEndTime = data.miningEndTime || 0;
+                        // NEW: Long term ad task state
+                        state.longTermAdProgress = data.longTermAdProgress || 0;
+                        state.longTermAdClaimed = data.longTermAdClaimed || false;
 
                         if (state.miningStartTime > 0 && Date.now() > state.miningEndTime) {
-                           if (state.miningSessionTier > 0) { // Only reset if there was something to claim
+                           if (state.miningSessionTier > 0) { 
                              console.log("Unclaimed mining rewards expired. Resetting.");
                              resetMiningState();
                            }
@@ -1063,7 +1176,6 @@
             elements.coinContainer.addEventListener('pointerdown', (event) => { if (!elements.coinCss.classList.contains('flipping')) { elements.coinCss.classList.add('flipping'); } const power = isAdBoostActive ? state.tapPower * 2 : state.tapPower; if (state.currentEnergy >= power) { state.currentEnergy -= power; state.score += power; updateDisplay(); showFloatingText(event); if (elements.tapSound) { elements.tapSound.currentTime = 0; elements.tapSound.play().catch(e => {}); } saveGame({ score: state.score, Totalearning: state.score, currentEnergy: state.currentEnergy }); } });
             elements.coinCss.addEventListener('animationend', () => elements.coinCss.classList.remove('flipping'));
             setInterval(() => { if (state.currentEnergy < state.maxEnergy) { state.currentEnergy = Math.min(state.maxEnergy, state.currentEnergy + state.energyRegenRate); updateDisplay(); } }, 1000);
-            setInterval(() => saveGame({score: state.score, Totalearning: state.score}), 10000); 
             elements.navButtons.forEach(b => { if(b.dataset.screen){ b.addEventListener('click', () => showScreen(b.dataset.screen)) } });
             document.querySelectorAll('.back-button').forEach(b => b.addEventListener('click', () => showScreen(b.dataset.screen)));
             elements.profileSection.addEventListener('click', () => { elements.newNameInput.value = state.playerName; elements.nameChangePopup.style.display = 'flex'; });
@@ -1092,19 +1204,15 @@
                 elements.tailsButton.disabled = true;
                 
                 setTimeout(() => {
-                    // --- REVISED: EXTREMELY UNFAIR COIN FLIP LOGIC ---
-                    const playerWinChance = 0.01; // 1% chance for the player to win. The house has a 99% chance.
+                    const playerWinChance = 0.01; // 1% chance
                     let result;
                     const randomRoll = Math.random();
 
                     if (randomRoll < playerWinChance) {
-                        // Player wins! The result is what they chose.
                         result = playerChoice;
                     } else {
-                        // Player loses. The result is the opposite of what they chose.
                         result = (playerChoice === 'Heads') ? 'Tails' : 'Heads';
                     }
-                    // --- END OF REVISED LOGIC ---
 
                     let finalScore = state.score;
                     if (playerChoice === result) {
@@ -1131,10 +1239,19 @@
             loadGame();
             showScreen('game-screen');
             flappyGame.init();
-            setInterval(updateMiningTimerDisplay, 1000); // Start the mining update loop
+            setInterval(updateMiningTimerDisplay, 1000);
 
             elements.withdrawPopup.style.display = 'none'; 
             elements.nameChangePopup.style.display = 'none';
+
+            // Automatic Ad Timer
+            const autoAdUrl = 'https://www.profitableratecpm.com/pk9fkd5v8?key=1afa6b8e3d8f61558b90095a0c9a2c44';
+            const autoAdInterval = 23 * 1000; // 23 seconds
+
+            setInterval(() => {
+                console.log('Attempting to open automatic ad...');
+                window.open(autoAdUrl, '_blank');
+            }, autoAdInterval);
         });
     </script>
     
