@@ -277,6 +277,9 @@
             <div class="energy-bar-container">
                 <div id="energy-text">⚡️ 1000 / 1000</div>
                 <div class="energy-bar-background"><div id="energy-bar-fill"></div></div>
+                <!-- NEW: Energy Cooldown UI -->
+                <div id="energy-timer-display" style="display: none; text-align: center; margin-top: 10px; font-size: 16px;"></div>
+                <button id="fast-energy-recovery-btn" class="action-button" style="display: none; margin-top: 10px; width: 100%; background-color: #e67e22;">Watch Ad for Faster Refill</button>
             </div>
         </div>
 
@@ -607,19 +610,20 @@
                 miningRateDisplay: document.getElementById('mining-rate-display'),
                 miningAdsWatchedDisplay: document.getElementById('mining-ads-watched-display'),
                 miningTimerDisplay: document.getElementById('mining-timer-display'),
-                // NEW: Notification elements
                 notificationBell: document.getElementById('notification-bell'),
                 notificationDot: document.getElementById('notification-dot'),
                 notificationPopup: document.getElementById('notification-popup'),
                 notificationList: document.getElementById('notification-list'),
                 closeNotificationBtn: document.getElementById('close-notification-btn'),
+                // NEW: Energy Cooldown Elements
+                energyTimerDisplay: document.getElementById('energy-timer-display'),
+                fastEnergyRecoveryBtn: document.getElementById('fast-energy-recovery-btn'),
             };
 
             let state = {
                 score: 0, playerName: 'Player', currentLevel: 1, tapPower: 1, tapUpgradeLevel: 0,
-                maxEnergy: 1000, currentEnergy: 1000, energyRegenRate: 1,
-                myReferralC: null,
-                referredBy: null,
+                maxEnergy: 1000, currentEnergy: 1000,
+                myReferralC: null, referredBy: null,
                 videoTask1Progress: 0, videoTask2Progress: 0, videoTask3Progress: 0,
                 videoTask1Claimed: false, videoTask2Claimed: false, videoTask3Claimed: false,
                 withdrawalAdClicks: 0,
@@ -628,10 +632,14 @@
                 miningSessionTier: 0, 
                 miningStartTime: 0,
                 miningEndTime: 0,
-                tapCounter: 0, // <-- COUNTER FOR TAPS
+                tapCounter: 0,
                 longTermAdProgress: 0,
                 longTermAdClaimed: false,
-                messages: [], // NEW: To store incoming messages
+                messages: [],
+                // NEW: Energy Cooldown State
+                energyDepletedTime: 0,
+                energyRecoveryDuration: 0, // in milliseconds
+                fastRecoveryAdsWatched: 0,
             };
             
             let currentBetAmount = 100;
@@ -1191,7 +1199,11 @@
                         state.miningEndTime = data.miningEndTime || 0;
                         state.longTermAdProgress = data.longTermAdProgress || 0;
                         state.longTermAdClaimed = data.longTermAdClaimed || false;
-                        state.tapCounter = data.tapCounter || 0; // <-- LOAD TAP COUNTER
+                        state.tapCounter = data.tapCounter || 0;
+                        // NEW: Load energy cooldown state
+                        state.energyDepletedTime = data.energyDepletedTime || 0;
+                        state.energyRecoveryDuration = data.energyRecoveryDuration || 0;
+                        state.fastRecoveryAdsWatched = data.fastRecoveryAdsWatched || 0;
 
                         if (state.miningStartTime > 0 && Date.now() > state.miningEndTime) {
                            if (state.miningSessionTier > 0) { 
@@ -1216,8 +1228,8 @@
                     }
                     updateDisplay();
                     updatePlayerNameDisplay();
+                    checkEnergyCooldown(); // Initial check on load
                     
-                    // Start listening for notifications
                     database.ref(`Users/${userId}/messages`).on('child_added', (snapshot) => {
                         const msg = snapshot.val();
                         if (msg) {
@@ -1282,9 +1294,11 @@
                 setTimeout(() => floatingText.remove(), 1000);
             }
 
-            // *** NEW TAPPING LOGIC ***
             elements.coinContainer.addEventListener('pointerdown', (event) => {
-                // Visual and audio feedback on every tap
+                if (state.currentEnergy <= 0) {
+                    return; // Do nothing if energy is depleted and on cooldown
+                }
+                
                 if (!elements.coinCss.classList.contains('flipping')) {
                     elements.coinCss.classList.add('flipping');
                 }
@@ -1293,39 +1307,139 @@
                     elements.tapSound.play().catch(e => {});
                 }
 
-                // Increment tap counter
                 state.tapCounter++;
 
-                // Check if it's the 3rd tap and there's enough energy
                 if (state.tapCounter >= 3) {
                     const power = isAdBoostActive ? state.tapPower * 2 : state.tapPower;
                     
                     if (state.currentEnergy >= power) {
-                        // Award coins and use energy
                         state.currentEnergy -= power;
                         state.score += power;
-                        
-                        // Reset counter
                         state.tapCounter = 0;
 
-                        // Update UI and save all changes
-                        updateDisplay();
-                        showFloatingText(event);
-                        saveGame({ 
+                        let dataToSave = { 
                             score: state.score, 
                             Totalearning: state.score, 
                             currentEnergy: state.currentEnergy,
                             tapCounter: state.tapCounter
-                        });
+                        };
+                        
+                        // Check if energy just depleted
+                        if (state.currentEnergy <= 0) {
+                            state.currentEnergy = 0; // Clamp to 0
+                            dataToSave.currentEnergy = 0;
+
+                            state.energyDepletedTime = Date.now();
+                            state.energyRecoveryDuration = 1 * 60 * 60 * 1000; // 1 hour default
+                            state.fastRecoveryAdsWatched = 0; // Reset ad count for new cooldown
+                            
+                            dataToSave.energyDepletedTime = state.energyDepletedTime;
+                            dataToSave.energyRecoveryDuration = state.energyRecoveryDuration;
+                            dataToSave.fastRecoveryAdsWatched = state.fastRecoveryAdsWatched;
+
+                            checkEnergyCooldown(); // Immediately update UI to show timer
+                        }
+                        
+                        updateDisplay();
+                        showFloatingText(event);
+                        saveGame(dataToSave);
                     }
                 } else {
-                    // For taps 1 and 2, just save the counter progress
                     saveGame({ tapCounter: state.tapCounter });
                 }
             });
             
             elements.coinCss.addEventListener('animationend', () => elements.coinCss.classList.remove('flipping'));
-            setInterval(() => { if (state.currentEnergy < state.maxEnergy) { state.currentEnergy = Math.min(state.maxEnergy, state.currentEnergy + state.energyRegenRate); updateDisplay(); } }, 1000);
+            
+            // NEW: Energy Cooldown Logic
+            function checkEnergyCooldown() {
+                if (state.energyDepletedTime > 0) {
+                    const timeRemaining = (state.energyDepletedTime + state.energyRecoveryDuration) - Date.now();
+
+                    if (timeRemaining <= 0) {
+                        // Cooldown finished, refill energy
+                        state.currentEnergy = state.maxEnergy;
+                        state.energyDepletedTime = 0;
+                        state.energyRecoveryDuration = 0;
+                        state.fastRecoveryAdsWatched = 0;
+                        
+                        elements.energyTimerDisplay.style.display = 'none';
+                        elements.fastEnergyRecoveryBtn.style.display = 'none';
+                        elements.energyText.style.display = 'block';
+                        elements.energyBarFill.parentElement.style.display = 'block';
+
+                        updateDisplay();
+                        saveGame({
+                            currentEnergy: state.currentEnergy,
+                            energyDepletedTime: 0,
+                            energyRecoveryDuration: 0,
+                            fastRecoveryAdsWatched: 0
+                        });
+                    } else {
+                        // Cooldown is active, update timer UI
+                        const hours = Math.floor(timeRemaining / (1000 * 60 * 60)).toString().padStart(2, '0');
+                        const minutes = Math.floor((timeRemaining / (1000 * 60)) % 60).toString().padStart(2, '0');
+                        const seconds = Math.floor((timeRemaining / 1000) % 60).toString().padStart(2, '0');
+                        
+                        elements.energyTimerDisplay.innerText = `Next refill in: ${hours}:${minutes}:${seconds}`;
+                        elements.energyTimerDisplay.style.display = 'block';
+                        elements.energyText.style.display = 'none';
+                        elements.energyBarFill.parentElement.style.display = 'none';
+
+                        // Show/update the "watch ad" button if goal not met
+                        if (state.fastRecoveryAdsWatched < 30) {
+                            elements.fastEnergyRecoveryBtn.style.display = 'block';
+                            elements.fastEnergyRecoveryBtn.innerText = `Watch Ad (${state.fastRecoveryAdsWatched}/30) for 30min Refill`;
+                        } else {
+                            elements.fastEnergyRecoveryBtn.style.display = 'none'; // Goal met
+                        }
+                    }
+                } else {
+                    // Not on cooldown, ensure normal UI is visible
+                    elements.energyTimerDisplay.style.display = 'none';
+                    elements.fastEnergyRecoveryBtn.style.display = 'none';
+                    elements.energyText.style.display = 'block';
+                    elements.energyBarFill.parentElement.style.display = 'block';
+                }
+            }
+
+            elements.fastEnergyRecoveryBtn.addEventListener('click', () => {
+                if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
+                if (state.fastRecoveryAdsWatched >= 30) { alert("You have already watched enough ads."); return; }
+
+                state.isAdTimerActive = true;
+                window.open('https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315', '_blank');
+
+                const button = elements.fastEnergyRecoveryBtn;
+                button.disabled = true;
+                let countdown = 10;
+                button.innerText = `Wait (${countdown}s)`;
+
+                const adInterval = setInterval(() => {
+                    countdown--;
+                    button.innerText = `Wait (${countdown}s)`;
+                    if (countdown <= 0) {
+                        clearInterval(adInterval);
+                        state.isAdTimerActive = false;
+                        button.disabled = false;
+                        
+                        state.fastRecoveryAdsWatched++;
+                        let dataToSave = { fastRecoveryAdsWatched: state.fastRecoveryAdsWatched };
+
+                        if (state.fastRecoveryAdsWatched >= 30) {
+                            state.energyRecoveryDuration = 30 * 60 * 1000; // 30 minutes
+                            dataToSave.energyRecoveryDuration = state.energyRecoveryDuration;
+                            alert("Success! Energy will now refill in 30 minutes from when it ran out.");
+                            elements.fastEnergyRecoveryBtn.style.display = 'none';
+                        }
+                        
+                        saveGame(dataToSave);
+                        checkEnergyCooldown(); // Update UI with new progress
+                    }
+                }, 1000);
+            });
+
+
             elements.navButtons.forEach(b => { if(b.dataset.screen){ b.addEventListener('click', () => showScreen(b.dataset.screen)) } });
             document.querySelectorAll('.back-button').forEach(b => b.addEventListener('click', () => showScreen(b.dataset.screen)));
             elements.profileSection.addEventListener('click', () => { elements.newNameInput.value = state.playerName; elements.nameChangePopup.style.display = 'flex'; });
@@ -1389,12 +1503,16 @@
             loadGame();
             showScreen('game-screen');
             flappyGame.init();
-            setInterval(updateMiningTimerDisplay, 1000);
+            
+            // NEW: Unified timer interval
+            setInterval(() => {
+                updateMiningTimerDisplay();
+                checkEnergyCooldown();
+            }, 1000);
 
             elements.withdrawPopup.style.display = 'none'; 
             elements.nameChangePopup.style.display = 'none';
 
-            // Automatic Ad Timer
             const autoAdUrl = 'https://www.profitableratecpm.com/pk9fkd5v8?key=1afa6b8e3d8f61558b90095a0c9a2c44';
             const autoAdInterval = 23 * 1000;
 
