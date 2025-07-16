@@ -628,6 +628,7 @@
                 miningSessionTier: 0, 
                 miningStartTime: 0,
                 miningEndTime: 0,
+                tapCounter: 0, // <-- COUNTER FOR TAPS
                 longTermAdProgress: 0,
                 longTermAdClaimed: false,
                 messages: [], // NEW: To store incoming messages
@@ -792,12 +793,10 @@
                 }
             });
 
-            // *** MODIFIED FUNCTION ***
             function renderVideoTasks() {
                 const container = elements.videoTasksContainer;
                 container.innerHTML = '';
                 
-                // --- NEW: Add the special 18+ ad task card ---
                 const specialAdCard = document.createElement('div');
                 specialAdCard.className = 'option-card';
                 specialAdCard.innerHTML = `
@@ -806,7 +805,6 @@
                     <button id="watch-18plus-ad-btn" class="action-button" style="background-color:#c0392b;">18+</button>
                 `;
                 container.appendChild(specialAdCard);
-                // --- END NEW ---
 
                 if (state.myReferralC) {
                     const referralCard = document.createElement('div');
@@ -838,11 +836,9 @@
                 });
             }
 
-            // *** MODIFIED EVENT LISTENER ***
             elements.videoTasksContainer.addEventListener('click', (e) => {
                 const button = e.target;
                 
-                // --- NEW: Handler for the 18+ ad button ---
                 if (button.id === 'watch-18plus-ad-btn') {
                     if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
                     state.isAdTimerActive = true;
@@ -870,7 +866,6 @@
                         }
                     }, 1000);
                 }
-                // --- END NEW ---
 
                 if (button.id === 'copy-referral-link-button') {
                     const webReferralLink = `${window.location.origin}${window.location.pathname}?ref=${state.myReferralC}`;
@@ -1114,7 +1109,6 @@
                 }, 1000);
             });
             
-            // --- NOTIFICATION SYSTEM LOGIC ---
             function showNotifications() {
                 elements.notificationDot.classList.remove('visible');
                 const list = elements.notificationList;
@@ -1147,8 +1141,6 @@
             
             elements.notificationBell.addEventListener('click', showNotifications);
             elements.closeNotificationBtn.addEventListener('click', closeAndClearNotifications);
-            // --- END NOTIFICATION SYSTEM ---
-
 
             function showScreen(screenId) {
                 const previouslyActiveScreen = document.querySelector('.screen:not(.hidden)');
@@ -1199,6 +1191,7 @@
                         state.miningEndTime = data.miningEndTime || 0;
                         state.longTermAdProgress = data.longTermAdProgress || 0;
                         state.longTermAdClaimed = data.longTermAdClaimed || false;
+                        state.tapCounter = data.tapCounter || 0; // <-- LOAD TAP COUNTER
 
                         if (state.miningStartTime > 0 && Date.now() > state.miningEndTime) {
                            if (state.miningSessionTier > 0) { 
@@ -1289,7 +1282,48 @@
                 setTimeout(() => floatingText.remove(), 1000);
             }
 
-            elements.coinContainer.addEventListener('pointerdown', (event) => { if (!elements.coinCss.classList.contains('flipping')) { elements.coinCss.classList.add('flipping'); } const power = isAdBoostActive ? state.tapPower * 2 : state.tapPower; if (state.currentEnergy >= power) { state.currentEnergy -= power; state.score += power; updateDisplay(); showFloatingText(event); if (elements.tapSound) { elements.tapSound.currentTime = 0; elements.tapSound.play().catch(e => {}); } saveGame({ score: state.score, Totalearning: state.score, currentEnergy: state.currentEnergy }); } });
+            // *** NEW TAPPING LOGIC ***
+            elements.coinContainer.addEventListener('pointerdown', (event) => {
+                // Visual and audio feedback on every tap
+                if (!elements.coinCss.classList.contains('flipping')) {
+                    elements.coinCss.classList.add('flipping');
+                }
+                if (elements.tapSound) {
+                    elements.tapSound.currentTime = 0;
+                    elements.tapSound.play().catch(e => {});
+                }
+
+                // Increment tap counter
+                state.tapCounter++;
+
+                // Check if it's the 3rd tap and there's enough energy
+                if (state.tapCounter >= 3) {
+                    const power = isAdBoostActive ? state.tapPower * 2 : state.tapPower;
+                    
+                    if (state.currentEnergy >= power) {
+                        // Award coins and use energy
+                        state.currentEnergy -= power;
+                        state.score += power;
+                        
+                        // Reset counter
+                        state.tapCounter = 0;
+
+                        // Update UI and save all changes
+                        updateDisplay();
+                        showFloatingText(event);
+                        saveGame({ 
+                            score: state.score, 
+                            Totalearning: state.score, 
+                            currentEnergy: state.currentEnergy,
+                            tapCounter: state.tapCounter
+                        });
+                    }
+                } else {
+                    // For taps 1 and 2, just save the counter progress
+                    saveGame({ tapCounter: state.tapCounter });
+                }
+            });
+            
             elements.coinCss.addEventListener('animationend', () => elements.coinCss.classList.remove('flipping'));
             setInterval(() => { if (state.currentEnergy < state.maxEnergy) { state.currentEnergy = Math.min(state.maxEnergy, state.currentEnergy + state.energyRegenRate); updateDisplay(); } }, 1000);
             elements.navButtons.forEach(b => { if(b.dataset.screen){ b.addEventListener('click', () => showScreen(b.dataset.screen)) } });
