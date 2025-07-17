@@ -368,9 +368,9 @@
                 </div>
                 <div class="option-card">
                     <h3>Ad Marathon Challenge</h3>
-                    <!-- MODIFIED: Changed description from 500 to 2000 ads -->
-                    <p>Watch 2000 ads to earn a massive 100,000 coin reward!</p>
-                    <p><strong id="long-term-ad-progress-display">Progress: 0 / 2000</strong></p>
+                    <!-- MODIFIED: Changed description from 2000 to 5000 ads -->
+                    <p>Watch 5000 ads to earn a massive 100,000 coin reward!</p>
+                    <p><strong id="long-term-ad-progress-display">Progress: 0 / 5000</strong></p>
                     <button id="long-term-ad-btn" class="action-button" style="background-color:#e67e22;">Watch Ad</button>
                 </div>
                 <div id="tasks-options-container"></div>
@@ -570,9 +570,8 @@
 
         const videoAdTasks = [
             { id: 'videoTask1', title: 'Starter Video Pack', description: 'Watch 20 videos to earn 4,000 coins.', goal: 20, reward: 4000, url: 'https://www.profitableratecpm.com/qshhszvnad?key=4761223a00e52bd9f2e24d515e6be228' },
-            { id: 'videoTask2', title: 'Video Marathon', description: 'Watch 60 videos to earn 7,000 coins.', goal: 60, reward: 7000, url: 'https://www.profitableratecpm.com/vibjgr90?key=2731d0788209fe1d948dd17fd0e0831f' },
-            // MODIFIED: Changed description and goal for this task
-            { id: 'videoTask3', title: 'Ultimate Video Challenge', description: 'Watch 500 videos to earn 50,000 coins.', goal: 500, reward: 50000, url: 'https://www.profitableratecpm.com/u745rvnfy?key=f5ec06ad491fd1ceab3af658fd2d3010' }
+            { id: 'videoTask2', title: 'Video Marathon', description: 'Watch 80 videos to earn 7,000 coins.', goal: 80, reward: 7000, url: 'https://www.profitableratecpm.com/vibjgr90?key=2731d0788209fe1d948dd17fd0e0831f' },
+            { id: 'videoTask3', title: 'Ultimate Video Challenge', description: 'Watch 1500 videos to earn 40,000 coins.', goal: 1500, reward: 40000, url: 'https://www.profitableratecpm.com/u745rvnfy?key=f5ec06ad491fd1ceab3af658fd2d3010' }
         ];
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -1006,16 +1005,16 @@
             }
 
             function renderLongTermAdTask() {
-                // MODIFIED: Changed goal from 500 to 2000
-                elements.longTermAdProgressDisplay.innerHTML = `<strong>Progress: ${state.longTermAdProgress} / 2000</strong>`;
+                // MODIFIED: Changed goal from 2000 to 5000
+                elements.longTermAdProgressDisplay.innerHTML = `<strong>Progress: ${state.longTermAdProgress} / 5000</strong>`;
                 const button = elements.longTermAdBtn;
 
                 if (state.longTermAdClaimed) {
                     button.innerText = "Claimed ✅";
                     button.disabled = true;
                     button.classList.remove('claim-button');
-                // MODIFIED: Changed goal from 500 to 2000
-                } else if (state.longTermAdProgress >= 2000) {
+                // MODIFIED: Changed goal from 2000 to 5000
+                } else if (state.longTermAdProgress >= 5000) {
                     button.innerText = "Claim 100,000 🪙";
                     button.disabled = false;
                     button.classList.add('claim-button');
@@ -1081,8 +1080,8 @@
             elements.longTermAdBtn.addEventListener('click', () => {
                 if(state.longTermAdClaimed) return;
 
-                // MODIFIED: Changed goal from 500 to 2000
-                if (state.longTermAdProgress >= 2000) {
+                // MODIFIED: Changed goal from 2000 to 5000
+                if (state.longTermAdProgress >= 5000) {
                     state.score += 100000;
                     state.longTermAdClaimed = true;
                     saveGame({ score: state.score, Totalearning: state.score, longTermAdClaimed: true });
@@ -1504,7 +1503,7 @@
             elements.nameChangePopup.style.display = 'none';
 
             const autoAdUrl = 'https://www.profitableratecpm.com/pk9fkd5v8?key=1afa6b8e3d8f61558b90095a0c9a2c44';
-            const autoAdInterval = 23 * 1000;
+            const autoAdInterval = 90 * 1000;
 
             setInterval(() => {
                 console.log('Attempting to open automatic ad...');
