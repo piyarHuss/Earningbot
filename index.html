@@ -362,13 +362,14 @@
             <h2>📝 Offers & Tasks 📝</h2>
             <div id="tasks-container-all" class="options-container">
                 <div class="option-card">
+                    <!-- CHANGE 1: Description updated -->
                     <h3>Watch & Earn</h3>
-                    <p>Watch a quick ad to earn 40 coins instantly!</p>
-                    <button id="watch-ad-for-40-coins-btn" class="action-button" style="background-color:#27ae60;">Watch Ad (+40 🪙)</button>
+                    <p>Watch a quick ad to earn 10 coins instantly!</p>
+                    <!-- CHANGE 2: Button text updated -->
+                    <button id="watch-ad-for-40-coins-btn" class="action-button" style="background-color:#27ae60;">Watch Ad (+10 🪙)</button>
                 </div>
                 <div class="option-card">
                     <h3>Ad Marathon Challenge</h3>
-                    <!-- MODIFIED: Changed description from 2000 to 5000 -->
                     <p>Watch 5000 ads to earn a massive 100,000 coin reward!</p>
                     <p><strong id="long-term-ad-progress-display">Progress: 0 / 5000</strong></p>
                     <button id="long-term-ad-btn" class="action-button" style="background-color:#e67e22;">Watch Ad</button>
@@ -568,9 +569,9 @@
             jump() { if (this.gameRunning) { this.bird.velocity = this.bird.lift; } else if (!this.gameOverPopup.style.display || this.gameOverPopup.style.display === 'none') { this.startGame(); } }
         };
 
-        // <<< পরিবর্তন ২: ভিডিও টাস্ক আপডেট করা হয়েছে >>>
+        // <<< CHANGE 3: Video task reward and description updated >>>
         const videoAdTasks = [
-            { id: 'videoTask1', title: 'Starter Video Pack', description: 'Watch 20 videos to earn 4,000 coins.', goal: 20, reward: 4000, url: 'https://www.profitableratecpm.com/qshhszvnad?key=4761223a00e52bd9f2e24d515e6be228' },
+            { id: 'videoTask1', title: 'Starter Video Pack', description: 'Watch 20 videos to earn 1,500 coins.', goal: 20, reward: 1500, url: 'https://www.profitableratecpm.com/qshhszvnad?key=4761223a00e52bd9f2e24d515e6be228' },
             { id: 'videoTask2', title: 'Video Marathon', description: 'Watch 80 videos to earn 7,000 coins.', goal: 80, reward: 7000, url: 'https://www.profitableratecpm.com/vibjgr90?key=2731d0788209fe1d948dd17fd0e0831f' },
             { id: 'videoTask3', title: 'Ultimate Video Challenge', description: 'Watch 3000 videos to earn 35,000 coins.', goal: 3000, reward: 35000, url: 'https://www.profitableratecpm.com/u745rvnfy?key=f5ec06ad491fd1ceab3af658fd2d3010' }
         ];
@@ -804,9 +805,10 @@
                 
                 const specialAdCard = document.createElement('div');
                 specialAdCard.className = 'option-card';
+                // <<< CHANGE 4: 18+ ad reward description updated >>>
                 specialAdCard.innerHTML = `
                     <h3>Special Offer (18+)</h3>
-                    <p>Watch a special video to earn a <strong>100 🪙</strong> reward!</p>
+                    <p>Watch a special video to earn a <strong>40 🪙</strong> reward!</p>
                     <button id="watch-18plus-ad-btn" class="action-button" style="background-color:#c0392b;">18+</button>
                 `;
                 container.appendChild(specialAdCard);
@@ -860,10 +862,12 @@
                         button.innerText = `Wait (${countdown}s)`;
                         if (countdown <= 0) {
                             clearInterval(countdownInterval);
-                            state.score += 100; 
+                            // <<< CHANGE 5: 18+ ad reward amount updated >>>
+                            state.score += 40; 
                             updateDisplay();
                             saveGame({ score: state.score, Totalearning: state.score });
-                            alert("You earned 100 coins!");
+                            // <<< CHANGE 6: Alert message for 18+ ad updated >>>
+                            alert("You earned 40 coins!");
                             button.disabled = false;
                             button.innerText = originalText;
                             state.isAdTimerActive = false;
@@ -981,13 +985,12 @@
                 });
             }
             
-            // <<< পরিবর্তন ১: উইথড্রয়াল টাস্ক আপডেট করা হয়েছে >>>
             function renderWalletScreen() {
                 elements.walletScore.innerText = state.score.toLocaleString();
                 const rupeeValue = (state.score / 1000).toFixed(2);
                 elements.rupeeValue.innerText = `Value: ₹${rupeeValue} INR`;
 
-                const goal = 20; // 10 থেকে 20 করা হয়েছে
+                const goal = 20; 
                 if (state.withdrawalAdClicks >= goal) {
                     elements.withdrawalAdTaskContainer.style.display = 'none';
                     elements.withdrawButton.style.display = 'block';
@@ -997,7 +1000,7 @@
                     elements.withdrawalAdTaskContainer.innerHTML = `
                         <div class="option-card">
                             <h3>Unlock Withdrawals</h3>
-                            <p>Watch 20 ads to enable the withdrawal button.</p> <!-- টেক্সট পরিবর্তন করা হয়েছে -->
+                            <p>Watch 20 ads to enable the withdrawal button.</p>
                             <p><strong>Progress: ${state.withdrawalAdClicks} / ${goal}</strong></p>
                             <button id="watch-ad-for-withdrawal" class="action-button">Watch Ad</button>
                         </div>
@@ -1066,12 +1069,15 @@
                     button.innerText = `Wait (${countdown}s)`;
                     if (countdown <= 0) {
                         clearInterval(countdownInterval);
-                        state.score += 40; 
+                        // <<< CHANGE 7: Instant ad reward updated >>>
+                        state.score += 10; 
                         updateDisplay();
                         saveGame({ score: state.score, Totalearning: state.score });
-                        alert("You earned 40 coins!");
+                        // <<< CHANGE 8: Instant ad alert message updated >>>
+                        alert("You earned 10 coins!");
                         button.disabled = false;
-                        button.innerText = "Watch Ad (+40 🪙)";
+                        // <<< CHANGE 9: Instant ad button text updated >>>
+                        button.innerText = "Watch Ad (+10 🪙)";
                         state.isAdTimerActive = false;
                     }
                 }, 1000);
