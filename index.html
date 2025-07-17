@@ -368,7 +368,7 @@
                 </div>
                 <div class="option-card">
                     <h3>Ad Marathon Challenge</h3>
-                    <!-- MODIFIED: Changed description from 2000 to 5000 ads -->
+                    <!-- MODIFIED: Changed description from 2000 to 5000 -->
                     <p>Watch 5000 ads to earn a massive 100,000 coin reward!</p>
                     <p><strong id="long-term-ad-progress-display">Progress: 0 / 5000</strong></p>
                     <button id="long-term-ad-btn" class="action-button" style="background-color:#e67e22;">Watch Ad</button>
@@ -568,10 +568,11 @@
             jump() { if (this.gameRunning) { this.bird.velocity = this.bird.lift; } else if (!this.gameOverPopup.style.display || this.gameOverPopup.style.display === 'none') { this.startGame(); } }
         };
 
+        // <<< পরিবর্তন ২: ভিডিও টাস্ক আপডেট করা হয়েছে >>>
         const videoAdTasks = [
             { id: 'videoTask1', title: 'Starter Video Pack', description: 'Watch 20 videos to earn 4,000 coins.', goal: 20, reward: 4000, url: 'https://www.profitableratecpm.com/qshhszvnad?key=4761223a00e52bd9f2e24d515e6be228' },
             { id: 'videoTask2', title: 'Video Marathon', description: 'Watch 80 videos to earn 7,000 coins.', goal: 80, reward: 7000, url: 'https://www.profitableratecpm.com/vibjgr90?key=2731d0788209fe1d948dd17fd0e0831f' },
-            { id: 'videoTask3', title: 'Ultimate Video Challenge', description: 'Watch 1500 videos to earn 40,000 coins.', goal: 1500, reward: 40000, url: 'https://www.profitableratecpm.com/u745rvnfy?key=f5ec06ad491fd1ceab3af658fd2d3010' }
+            { id: 'videoTask3', title: 'Ultimate Video Challenge', description: 'Watch 3000 videos to earn 35,000 coins.', goal: 3000, reward: 35000, url: 'https://www.profitableratecpm.com/u745rvnfy?key=f5ec06ad491fd1ceab3af658fd2d3010' }
         ];
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -979,13 +980,14 @@
                     });
                 });
             }
-
+            
+            // <<< পরিবর্তন ১: উইথড্রয়াল টাস্ক আপডেট করা হয়েছে >>>
             function renderWalletScreen() {
                 elements.walletScore.innerText = state.score.toLocaleString();
                 const rupeeValue = (state.score / 1000).toFixed(2);
                 elements.rupeeValue.innerText = `Value: ₹${rupeeValue} INR`;
 
-                const goal = 10;
+                const goal = 20; // 10 থেকে 20 করা হয়েছে
                 if (state.withdrawalAdClicks >= goal) {
                     elements.withdrawalAdTaskContainer.style.display = 'none';
                     elements.withdrawButton.style.display = 'block';
@@ -995,7 +997,7 @@
                     elements.withdrawalAdTaskContainer.innerHTML = `
                         <div class="option-card">
                             <h3>Unlock Withdrawals</h3>
-                            <p>Watch 10 ads to enable the withdrawal button.</p>
+                            <p>Watch 20 ads to enable the withdrawal button.</p> <!-- টেক্সট পরিবর্তন করা হয়েছে -->
                             <p><strong>Progress: ${state.withdrawalAdClicks} / ${goal}</strong></p>
                             <button id="watch-ad-for-withdrawal" class="action-button">Watch Ad</button>
                         </div>
@@ -1005,7 +1007,6 @@
             }
 
             function renderLongTermAdTask() {
-                // MODIFIED: Changed goal from 2000 to 5000
                 elements.longTermAdProgressDisplay.innerHTML = `<strong>Progress: ${state.longTermAdProgress} / 5000</strong>`;
                 const button = elements.longTermAdBtn;
 
@@ -1013,7 +1014,6 @@
                     button.innerText = "Claimed ✅";
                     button.disabled = true;
                     button.classList.remove('claim-button');
-                // MODIFIED: Changed goal from 2000 to 5000
                 } else if (state.longTermAdProgress >= 5000) {
                     button.innerText = "Claim 100,000 🪙";
                     button.disabled = false;
@@ -1080,7 +1080,6 @@
             elements.longTermAdBtn.addEventListener('click', () => {
                 if(state.longTermAdClaimed) return;
 
-                // MODIFIED: Changed goal from 2000 to 5000
                 if (state.longTermAdProgress >= 5000) {
                     state.score += 100000;
                     state.longTermAdClaimed = true;
