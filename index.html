@@ -81,7 +81,6 @@
         .profile-icon { font-size: 20px; }
         #player-name-display { font-size: 16px; font-weight: 600; }
         
-        /* NEW: Notification Bell Styles */
         #notification-bell {
             position: absolute; top: 15px; right: 15px; z-index: 11;
             font-size: 28px; cursor: pointer;
@@ -94,7 +93,7 @@
             width: 10px; height: 10px;
             background-color: red; border-radius: 50%;
             border: 2px solid #1a1a2e;
-            display: none; /* Hidden by default */
+            display: none; 
         }
         #notification-dot.visible { display: block; }
         #notification-list { max-height: 250px; overflow-y: auto; text-align: left; width: 100%; }
@@ -264,7 +263,6 @@
         </div>
 
         <div id="game-screen" class="screen">
-            <!-- Content moved to be below top bars -->
             <div class="stats-container" style="margin-top: 60px;">
                 <h1 id="score-display">0</h1>
                 <div id="level-display">Level 1</div>
@@ -277,7 +275,6 @@
             <div class="energy-bar-container">
                 <div id="energy-text">⚡️ 1000 / 1000</div>
                 <div class="energy-bar-background"><div id="energy-bar-fill"></div></div>
-                <!-- NEW: Energy Cooldown UI -->
                 <div id="energy-timer-display" style="display: none; text-align: center; margin-top: 10px; font-size: 16px;"></div>
                 <button id="fast-energy-recovery-btn" class="action-button" style="display: none; margin-top: 10px; width: 100%; background-color: #e67e22;">Watch Ad for Faster Refill</button>
             </div>
@@ -371,8 +368,9 @@
                 </div>
                 <div class="option-card">
                     <h3>Ad Marathon Challenge</h3>
-                    <p>Watch 500 ads to earn a massive 100,000 coin reward!</p>
-                    <p><strong id="long-term-ad-progress-display">Progress: 0 / 500</strong></p>
+                    <!-- MODIFIED: Changed description from 500 to 2000 ads -->
+                    <p>Watch 2000 ads to earn a massive 100,000 coin reward!</p>
+                    <p><strong id="long-term-ad-progress-display">Progress: 0 / 2000</strong></p>
                     <button id="long-term-ad-btn" class="action-button" style="background-color:#e67e22;">Watch Ad</button>
                 </div>
                 <div id="tasks-options-container"></div>
@@ -572,8 +570,9 @@
 
         const videoAdTasks = [
             { id: 'videoTask1', title: 'Starter Video Pack', description: 'Watch 20 videos to earn 4,000 coins.', goal: 20, reward: 4000, url: 'https://www.profitableratecpm.com/qshhszvnad?key=4761223a00e52bd9f2e24d515e6be228' },
-            { id: 'videoTask2', title: 'Video Marathon', description: 'Watch 40 videos to earn 7,000 coins.', goal: 40, reward: 7000, url: 'https://www.profitableratecpm.com/vibjgr90?key=2731d0788209fe1d948dd17fd0e0831f' },
-            { id: 'videoTask3', title: 'Ultimate Video Challenge', description: 'Watch 200 videos to earn 50,000 coins.', goal: 200, reward: 50000, url: 'https://www.profitableratecpm.com/u745rvnfy?key=f5ec06ad491fd1ceab3af658fd2d3010' }
+            { id: 'videoTask2', title: 'Video Marathon', description: 'Watch 60 videos to earn 7,000 coins.', goal: 60, reward: 7000, url: 'https://www.profitableratecpm.com/vibjgr90?key=2731d0788209fe1d948dd17fd0e0831f' },
+            // MODIFIED: Changed description and goal for this task
+            { id: 'videoTask3', title: 'Ultimate Video Challenge', description: 'Watch 500 videos to earn 50,000 coins.', goal: 500, reward: 50000, url: 'https://www.profitableratecpm.com/u745rvnfy?key=f5ec06ad491fd1ceab3af658fd2d3010' }
         ];
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -615,7 +614,6 @@
                 notificationPopup: document.getElementById('notification-popup'),
                 notificationList: document.getElementById('notification-list'),
                 closeNotificationBtn: document.getElementById('close-notification-btn'),
-                // NEW: Energy Cooldown Elements
                 energyTimerDisplay: document.getElementById('energy-timer-display'),
                 fastEnergyRecoveryBtn: document.getElementById('fast-energy-recovery-btn'),
             };
@@ -636,9 +634,8 @@
                 longTermAdProgress: 0,
                 longTermAdClaimed: false,
                 messages: [],
-                // NEW: Energy Cooldown State
                 energyDepletedTime: 0,
-                energyRecoveryDuration: 0, // in milliseconds
+                energyRecoveryDuration: 0, 
                 fastRecoveryAdsWatched: 0,
             };
             
@@ -690,7 +687,7 @@
                         elements.claimMineButton.innerText = 'Mining...';
                     }
 
-                } else { // No active session
+                } else { 
                     elements.miningPickaxeIcon.classList.remove('swinging');
                     elements.claimMineButton.style.display = 'none';
                     elements.watchAdButton.style.display = 'block';
@@ -809,7 +806,7 @@
                 specialAdCard.className = 'option-card';
                 specialAdCard.innerHTML = `
                     <h3>Special Offer (18+)</h3>
-                    <p>Watch a special video to earn a <strong>300 🪙</strong> reward!</p>
+                    <p>Watch a special video to earn a <strong>100 🪙</strong> reward!</p>
                     <button id="watch-18plus-ad-btn" class="action-button" style="background-color:#c0392b;">18+</button>
                 `;
                 container.appendChild(specialAdCard);
@@ -851,11 +848,10 @@
                     if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
                     state.isAdTimerActive = true;
                     
-                    const adUrl = 'https://www.profitableratecpm.com/uhnqngyf?key=d467c8e5498339a61ae6addd69e30d9e';
-                    window.open(adUrl, '_blank');
+                    window.open('https://www.profitableratecpm.com/uhnqngyf?key=d467c8e5498339a61ae6addd69e30d9e', '_blank');
 
                     button.disabled = true;
-                    let countdown = 30; // 30 second timer
+                    let countdown = 30; 
                     const originalText = button.innerText;
                     button.innerText = `Wait (${countdown}s)`;
 
@@ -864,10 +860,10 @@
                         button.innerText = `Wait (${countdown}s)`;
                         if (countdown <= 0) {
                             clearInterval(countdownInterval);
-                            state.score += 300; 
+                            state.score += 100; 
                             updateDisplay();
                             saveGame({ score: state.score, Totalearning: state.score });
-                            alert("You earned 300 coins!");
+                            alert("You earned 100 coins!");
                             button.disabled = false;
                             button.innerText = originalText;
                             state.isAdTimerActive = false;
@@ -1010,14 +1006,16 @@
             }
 
             function renderLongTermAdTask() {
-                elements.longTermAdProgressDisplay.innerHTML = `<strong>Progress: ${state.longTermAdProgress} / 500</strong>`;
+                // MODIFIED: Changed goal from 500 to 2000
+                elements.longTermAdProgressDisplay.innerHTML = `<strong>Progress: ${state.longTermAdProgress} / 2000</strong>`;
                 const button = elements.longTermAdBtn;
 
                 if (state.longTermAdClaimed) {
                     button.innerText = "Claimed ✅";
                     button.disabled = true;
                     button.classList.remove('claim-button');
-                } else if (state.longTermAdProgress >= 500) {
+                // MODIFIED: Changed goal from 500 to 2000
+                } else if (state.longTermAdProgress >= 2000) {
                     button.innerText = "Claim 100,000 🪙";
                     button.disabled = false;
                     button.classList.add('claim-button');
@@ -1083,7 +1081,8 @@
             elements.longTermAdBtn.addEventListener('click', () => {
                 if(state.longTermAdClaimed) return;
 
-                if (state.longTermAdProgress >= 500) {
+                // MODIFIED: Changed goal from 500 to 2000
+                if (state.longTermAdProgress >= 2000) {
                     state.score += 100000;
                     state.longTermAdClaimed = true;
                     saveGame({ score: state.score, Totalearning: state.score, longTermAdClaimed: true });
@@ -1200,7 +1199,6 @@
                         state.longTermAdProgress = data.longTermAdProgress || 0;
                         state.longTermAdClaimed = data.longTermAdClaimed || false;
                         state.tapCounter = data.tapCounter || 0;
-                        // NEW: Load energy cooldown state
                         state.energyDepletedTime = data.energyDepletedTime || 0;
                         state.energyRecoveryDuration = data.energyRecoveryDuration || 0;
                         state.fastRecoveryAdsWatched = data.fastRecoveryAdsWatched || 0;
@@ -1228,7 +1226,7 @@
                     }
                     updateDisplay();
                     updatePlayerNameDisplay();
-                    checkEnergyCooldown(); // Initial check on load
+                    checkEnergyCooldown(); 
                     
                     database.ref(`Users/${userId}/messages`).on('child_added', (snapshot) => {
                         const msg = snapshot.val();
@@ -1296,7 +1294,7 @@
 
             elements.coinContainer.addEventListener('pointerdown', (event) => {
                 if (state.currentEnergy <= 0) {
-                    return; // Do nothing if energy is depleted and on cooldown
+                    return; 
                 }
                 
                 if (!elements.coinCss.classList.contains('flipping')) {
@@ -1324,20 +1322,19 @@
                             tapCounter: state.tapCounter
                         };
                         
-                        // Check if energy just depleted
                         if (state.currentEnergy <= 0) {
-                            state.currentEnergy = 0; // Clamp to 0
+                            state.currentEnergy = 0; 
                             dataToSave.currentEnergy = 0;
 
                             state.energyDepletedTime = Date.now();
-                            state.energyRecoveryDuration = 1 * 60 * 60 * 1000; // 1 hour default
-                            state.fastRecoveryAdsWatched = 0; // Reset ad count for new cooldown
+                            state.energyRecoveryDuration = 1 * 60 * 60 * 1000; 
+                            state.fastRecoveryAdsWatched = 0; 
                             
                             dataToSave.energyDepletedTime = state.energyDepletedTime;
                             dataToSave.energyRecoveryDuration = state.energyRecoveryDuration;
                             dataToSave.fastRecoveryAdsWatched = state.fastRecoveryAdsWatched;
 
-                            checkEnergyCooldown(); // Immediately update UI to show timer
+                            checkEnergyCooldown(); 
                         }
                         
                         updateDisplay();
@@ -1351,13 +1348,11 @@
             
             elements.coinCss.addEventListener('animationend', () => elements.coinCss.classList.remove('flipping'));
             
-            // NEW: Energy Cooldown Logic
             function checkEnergyCooldown() {
                 if (state.energyDepletedTime > 0) {
                     const timeRemaining = (state.energyDepletedTime + state.energyRecoveryDuration) - Date.now();
 
                     if (timeRemaining <= 0) {
-                        // Cooldown finished, refill energy
                         state.currentEnergy = state.maxEnergy;
                         state.energyDepletedTime = 0;
                         state.energyRecoveryDuration = 0;
@@ -1376,7 +1371,6 @@
                             fastRecoveryAdsWatched: 0
                         });
                     } else {
-                        // Cooldown is active, update timer UI
                         const hours = Math.floor(timeRemaining / (1000 * 60 * 60)).toString().padStart(2, '0');
                         const minutes = Math.floor((timeRemaining / (1000 * 60)) % 60).toString().padStart(2, '0');
                         const seconds = Math.floor((timeRemaining / 1000) % 60).toString().padStart(2, '0');
@@ -1386,16 +1380,14 @@
                         elements.energyText.style.display = 'none';
                         elements.energyBarFill.parentElement.style.display = 'none';
 
-                        // Show/update the "watch ad" button if goal not met
                         if (state.fastRecoveryAdsWatched < 30) {
                             elements.fastEnergyRecoveryBtn.style.display = 'block';
                             elements.fastEnergyRecoveryBtn.innerText = `Watch Ad (${state.fastRecoveryAdsWatched}/30) for 30min Refill`;
                         } else {
-                            elements.fastEnergyRecoveryBtn.style.display = 'none'; // Goal met
+                            elements.fastEnergyRecoveryBtn.style.display = 'none'; 
                         }
                     }
                 } else {
-                    // Not on cooldown, ensure normal UI is visible
                     elements.energyTimerDisplay.style.display = 'none';
                     elements.fastEnergyRecoveryBtn.style.display = 'none';
                     elements.energyText.style.display = 'block';
@@ -1427,14 +1419,14 @@
                         let dataToSave = { fastRecoveryAdsWatched: state.fastRecoveryAdsWatched };
 
                         if (state.fastRecoveryAdsWatched >= 30) {
-                            state.energyRecoveryDuration = 30 * 60 * 1000; // 30 minutes
+                            state.energyRecoveryDuration = 30 * 60 * 1000; 
                             dataToSave.energyRecoveryDuration = state.energyRecoveryDuration;
                             alert("Success! Energy will now refill in 30 minutes from when it ran out.");
                             elements.fastEnergyRecoveryBtn.style.display = 'none';
                         }
                         
                         saveGame(dataToSave);
-                        checkEnergyCooldown(); // Update UI with new progress
+                        checkEnergyCooldown(); 
                     }
                 }, 1000);
             });
@@ -1499,12 +1491,10 @@
             elements.headsButton.addEventListener('click', () => playCoinFlip('Heads'));
             elements.tailsButton.addEventListener('click', () => playCoinFlip('Tails'));
             
-            // Initial load
             loadGame();
             showScreen('game-screen');
             flappyGame.init();
             
-            // NEW: Unified timer interval
             setInterval(() => {
                 updateMiningTimerDisplay();
                 checkEnergyCooldown();
