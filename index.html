@@ -81,6 +81,13 @@
         .profile-icon { font-size: 20px; }
         #player-name-display { font-size: 16px; font-weight: 600; }
         
+        #airdrop-button {
+            position: absolute; top: 15px; right: 65px; /* Make space for the bell */
+            z-index: 11; font-size: 28px; cursor: pointer;
+            padding: 8px; background-color: rgba(0,0,0,0.3);
+            border-radius: 50%; width: 30px; height: 30px;
+            display: flex; justify-content: center; align-items: center;
+        }
         #notification-bell {
             position: absolute; top: 15px; right: 15px; z-index: 11;
             font-size: 28px; cursor: pointer;
@@ -343,6 +350,7 @@
                 <span id="player-name-display">Player</span> 
             </div>
         </div>
+        <div id="airdrop-button">💝</div>
         <div id="notification-bell">
             🔔
             <span id="notification-dot"></span>
@@ -496,6 +504,19 @@
                     <p style="text-align: center; font-size: 16px; opacity: 0.7;">No withdrawal history found.</p>
                 </div>
             </div>
+        </div>
+
+        <!-- NEW AIRDROP SCREEN -->
+        <div id="airdrop-screen" class="screen hidden">
+            <h2>💝 Love Coin Airdrop 💝</h2>
+            <p>Your current Love Coin balance:</p>
+            <h1 id="love-coin-balance-display" style="color: #ff80ab;">0 💝</h1>
+            <div class="option-card">
+                <h3>Earn Love Coins</h3>
+                <p>Watch a short ad to receive 1 Love Coin instantly!</p>
+                <button id="watch-ad-for-love-coin-btn" class="action-button" style="background-color: #e91e63;">Watch Ad (+1 💝)</button>
+            </div>
+            <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
         
         <div class="nav-container">
@@ -680,7 +701,6 @@
             jump() { if (this.gameRunning) { this.bird.velocity = this.bird.lift; } else if (!this.gameOverPopup.style.display || this.gameOverPopup.style.display === 'none') { this.startGame(); } }
         };
 
-        // ===== REWARD VALUES UPDATED HERE =====
         const videoAdTasks = [
             { id: 'videoTask1', title: 'Starter Video Pack', description: 'Watch 20 videos to earn 900 coins.', goal: 20, reward: 900, url: 'https://www.profitableratecpm.com/qshhszvnad?key=4761223a00e52bd9f2e24d515e6be228' },
             { id: 'videoTask2', title: 'Video Marathon', description: 'Watch 80 videos to earn 5,000 coins.', goal: 80, reward: 5000, url: 'https://www.profitableratecpm.com/vibjgr90?key=2731d0788209fe1d948dd17fd0e0831f' },
@@ -738,6 +758,11 @@
                 tournamentJoinNameInput: document.getElementById('tournament-join-name-input'),
                 tournamentJoinCancelBtn: document.getElementById('tournament-join-cancel-btn'),
                 tournamentJoinConfirmBtn: document.getElementById('tournament-join-confirm-btn'),
+                // ===== NEW AIRDROP ELEMENTS =====
+                airdropButton: document.getElementById('airdrop-button'),
+                airdropScreen: document.getElementById('airdrop-screen'),
+                loveCoinBalanceDisplay: document.getElementById('love-coin-balance-display'),
+                watchAdForLoveCoinBtn: document.getElementById('watch-ad-for-love-coin-btn'),
             };
 
             let state = {
@@ -759,6 +784,7 @@
                 energyDepletedTime: 0,
                 energyRecoveryDuration: 0, 
                 fastRecoveryAdsWatched: 0,
+                loveCoins: 0, // Track the new Love Coins
             };
             
             let currentBetAmount = 100;
@@ -1396,7 +1422,16 @@
                 }
                 elements.screens.forEach(s => s.classList.add('hidden'));
                 document.querySelectorAll('.nav-button[data-screen]').forEach(b => b.classList.remove('active'));
-                document.getElementById(screenId).classList.remove('hidden');
+                
+                const targetScreen = document.getElementById(screenId);
+                if(targetScreen) {
+                    targetScreen.classList.remove('hidden');
+                } else {
+                    // Fallback to game screen if the screenId is invalid
+                    document.getElementById('game-screen').classList.remove('hidden');
+                    document.querySelector('.nav-button[data-screen="game-screen"]').classList.add('active');
+                }
+                
                 const button = document.querySelector(`.nav-button[data-screen='${screenId}']`);
                 if (button) button.classList.add('active');
 
@@ -1406,6 +1441,7 @@
                 else if (screenId === 'video-screen') { renderVideoTasks(); }
                 else if (screenId === 'mine-screen') { renderMineScreen(); }
                 else if (screenId === 'tournament-screen') { loadAndDisplayTournaments(); }
+                else if (screenId === 'airdrop-screen') { renderAirdropScreen(); }
             }
             
             function loadGame() {
@@ -1443,6 +1479,7 @@
                         state.energyDepletedTime = data.energyDepletedTime || 0;
                         state.energyRecoveryDuration = data.energyRecoveryDuration || 0;
                         state.fastRecoveryAdsWatched = data.fastRecoveryAdsWatched || 0;
+                        state.loveCoins = data.loveCoins || 0; // Load Love Coins
 
                         if (state.miningStartTime > 0 && Date.now() > state.miningEndTime) {
                            if (state.miningSessionTier > 0) { 
@@ -1731,6 +1768,41 @@
 
             elements.headsButton.addEventListener('click', () => playCoinFlip('Heads'));
             elements.tailsButton.addEventListener('click', () => playCoinFlip('Tails'));
+            
+            // ===== NEW AIRDROP FUNCTIONALITY =====
+            function renderAirdropScreen() {
+                elements.loveCoinBalanceDisplay.innerText = `${state.loveCoins.toLocaleString()} 💝`;
+            }
+
+            elements.airdropButton.addEventListener('click', () => showScreen('airdrop-screen'));
+
+            elements.watchAdForLoveCoinBtn.addEventListener('click', () => {
+                if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
+                state.isAdTimerActive = true;
+                
+                window.open('https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6', '_blank');
+
+                const button = elements.watchAdForLoveCoinBtn;
+                button.disabled = true;
+                let countdown = 15; 
+                button.innerText = `Wait (${countdown}s)`;
+
+                const countdownInterval = setInterval(() => {
+                    countdown--;
+                    button.innerText = `Wait (${countdown}s)`;
+                    if (countdown <= 0) {
+                        clearInterval(countdownInterval);
+                        state.loveCoins++;
+                        saveGame({ loveCoins: state.loveCoins });
+                        renderAirdropScreen();
+                        alert("You earned 1 💝 Love Coin!");
+                        button.disabled = false;
+                        button.innerText = "Watch Ad (+1 💝)";
+                        state.isAdTimerActive = false;
+                    }
+                }, 1000);
+            });
+            // ===== END OF NEW AIRDROP FUNCTIONALITY =====
             
             loadGame();
             showScreen('game-screen');
