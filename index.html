@@ -336,6 +336,51 @@
             gap: 15px;
         }
 
+        /* ===== START: NEW TOURNAMENT PARTICIPANT STYLES (CORRECTED) ===== */
+        .participant-display-container {
+            display: none; /* Hidden by default, shown by JS if players exist */
+            justify-content: space-around;
+            align-items: flex-start;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px solid rgba(241, 196, 15, 0.3);
+            gap: 5px; /* Reduced gap */
+        }
+        .team-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex: 1;
+            text-align: center;
+            min-width: 0; /* THIS IS THE CRITICAL FIX for long names */
+        }
+        .team-list h4 {
+            margin: 0 0 8px 0;
+            color: #f39c12;
+            font-size: 16px; /* Made smaller */
+            text-transform: uppercase;
+        }
+        .participant-item {
+            padding: 5px 8px;
+            font-size: 14px; /* Made smaller */
+            font-weight: 600;
+            background-color: rgba(0,0,0,0.3);
+            border-radius: 6px;
+            margin-bottom: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .vs-separator {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 24px; /* Made smaller */
+            font-weight: bold;
+            color: #e74c3c;
+            padding: 0 5px; /* Reduced padding */
+            align-self: center;
+        }
+        /* ===== END: NEW TOURNAMENT PARTICIPANT STYLES (CORRECTED) ===== */
+
     </style>
 </head>
 <body>
@@ -821,6 +866,7 @@
                 adUrl: 'https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6'
             };
 
+            // ===== THIS IS THE FULLY REPLACED FUNCTION =====
             function loadAndDisplayTournaments() {
                 const tournamentsRef = database.ref('tournaments');
                 elements.tournamentListContainer.innerHTML = '<p>Loading events...</p>';
@@ -840,9 +886,10 @@
                                 
                                 const entryFeeText = tournament.entryFee > 0 ? `${tournament.entryFee.toLocaleString()} 🪙` : 'Free';
                                 const isJoined = state.joinedTournaments && state.joinedTournaments[tournamentId];
-                                const buttonText = isJoined ? 'Joined! Password on Telegram.' : 'Join Now';
+                                const buttonText = isJoined ? 'Joined! Good Luck!' : 'Join Now';
                                 const buttonDisabled = isJoined ? 'disabled' : '';
 
+                                // Create the card structure with a placeholder for participants
                                 card.innerHTML = `
                                     <div class="tournament-card-header">
                                         ${tournament.imageUrl ? `<img src="${tournament.imageUrl}" alt="Game Logo" class="tournament-card-logo">` : ''}
@@ -854,6 +901,12 @@
                                     <p><strong>Prize Pool:</strong> ${tournament.prizePool || 'TBA'}</p>
                                     <p><strong>Entry Fee:</strong> ${entryFeeText}</p>
                                     <p><strong>Rules:</strong> ${tournament.rules || 'Follow standard rules.'}</p>
+                                    
+                                    <!-- This is the new container for the player list -->
+                                    <div id="participants-${tournamentId}" class="participant-display-container">
+                                        <!-- Player list will be dynamically inserted here -->
+                                    </div>
+
                                     <button class="join-button" 
                                         data-id="${tournamentId}"
                                         data-title="${tournament.title || 'Tournament'}"
@@ -866,6 +919,51 @@
                                 `;
                                 
                                 elements.tournamentListContainer.appendChild(card);
+
+                                // NOW, FETCH PARTICIPANTS FOR THIS SPECIFIC TOURNAMENT
+                                // We use .on() so the list updates in real-time if someone joins!
+                                const participantsRef = database.ref(`tournaments/${tournamentId}/participants`);
+                                participantsRef.on('value', participantSnapshot => {
+                                    const participantsContainer = document.getElementById(`participants-${tournamentId}`);
+                                    if (!participantsContainer) return; // Safety check
+
+                                    if (participantSnapshot.exists()) {
+                                        const participantsData = participantSnapshot.val();
+                                        const participantNames = Object.values(participantsData).map(p => p.name);
+
+                                        let teamA = [];
+                                        let teamB = [];
+
+                                        // Divide players into two teams
+                                        participantNames.forEach((name, index) => {
+                                            if (index % 2 === 0) {
+                                                teamA.push(name);
+                                            } else {
+                                                teamB.push(name);
+                                            }
+                                        });
+
+                                        const teamAHtml = teamA.map(name => `<li class="participant-item">${name}</li>`).join('');
+                                        const teamBHtml = teamB.map(name => `<li class="participant-item">${name}</li>`).join('');
+
+                                        participantsContainer.innerHTML = `
+                                            <ul class="team-list">
+                                                <h4>Team A</h4>
+                                                ${teamAHtml}
+                                            </ul>
+                                            <div class="vs-separator">VS</div>
+                                            <ul class="team-list">
+                                                <h4>Team B</h4>
+                                                ${teamBHtml}
+                                            </ul>
+                                        `;
+                                        participantsContainer.style.display = 'flex'; // Show the container
+                                    } else {
+                                        // If no participants, hide the container
+                                        participantsContainer.innerHTML = '';
+                                        participantsContainer.style.display = 'none';
+                                    }
+                                });
                             }
                         });
 
@@ -1008,8 +1106,7 @@
                     window.open(joinLink, '_blank');
                 }
                 
-                // Refresh the tournament list to show the "Joined" status
-                loadAndDisplayTournaments();
+                // Refresh the tournament list to show the "Joined" status - No need, .on() handles it
             });
 
             function closeTournamentPopup() {
