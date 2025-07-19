@@ -111,7 +111,7 @@
         #coin-css::before { content: ''; position: absolute; width: 80%; height: 80%; border: 4px solid rgba(0,0,0,0.15); border-radius: 50%; box-shadow: inset 0 0 10px rgba(0,0,0,0.2); }
         #coin-css::after { content: ''; position: absolute; top: 10%; left: 10%; width: 80%; height: 40%; background: linear-gradient(to bottom, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0)); border-radius: 50% / 100%; transform: rotate(45deg); }
         .coin-text { font-size: 24px; font-weight: 700; color: #8B4513; text-shadow: 1px 1px 2px rgba(255,255,255,0.4); line-height: 1.2; z-index: 5; }
-        .stats-container { text-align: center; margin-bottom: 15px; margin-top: 20px;}
+        .stats-container { text-align: center; margin-bottom: 15px; margin-top: 60px;}
         #score-display{font-size:48px; font-weight:700; margin: 0; text-shadow: 2px 2px 8px rgba(0,0,0,0.5);}
         #level-display { font-size: 22px; margin-top: 0; color: #ffdd57; font-weight: 600; }
         
@@ -307,10 +307,14 @@
             border: none;
             transition: background-color 0.2s;
         }
-        .join-button:hover {
+        .join-button:hover:not(:disabled) {
             background-color: #e67e22;
         }
-        /* ===== NEW CSS FOR JOIN POPUP ===== */
+        .join-button:disabled {
+            background-color: #7f8c8d;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
         #tournament-join-popup .popup-content {
             background-color: #34495e;
         }
@@ -567,18 +571,30 @@
         </div>
     </div>
 
-    <!-- ===== NEW HTML: TOURNAMENT JOIN CONFIRMATION POPUP ===== -->
+    <!-- MODIFIED TOURNAMENT JOIN POPUP -->
     <div id="tournament-join-popup" class="popup">
         <div class="popup-content">
             <span class="popup-close" id="tournament-join-popup-close">×</span>
             <img id="tournament-join-popup-image" src="" alt="Tournament Logo">
             <h3 id="tournament-join-popup-title">Join Tournament</h3>
-            <p>Entry Fee: <strong id="tournament-join-popup-fee">0 🪙</strong></p>
-            <p style="font-size: 16px; margin-top: 15px;">Confirm your name to join:</p>
-            <input type="text" id="tournament-join-name-input" class="withdraw-input" placeholder="Enter your name">
-            <div class="join-popup-buttons">
-                <button id="tournament-join-cancel-btn" class="action-button" style="background-color: #e74c3c; flex: 1;">Cancel</button>
-                <button id="tournament-join-confirm-btn" class="action-button" style="background-color: #f39c12; flex: 1;">Confirm & Join</button>
+    
+            <!-- NEW: Ad Watching View -->
+            <div id="tournament-ad-view">
+                <p style="font-size: 16px; margin-top: 15px;">You must watch 5 ads to proceed.</p>
+                <p>Progress: <strong id="tournament-ad-progress">0 / 5</strong></p>
+                <button id="tournament-watch-ad-btn" class="action-button" style="background-color: #f39c12; margin-top: 15px;">Watch Ad</button>
+                <button id="tournament-ad-cancel-btn" class="action-button" style="background-color: #e74c3c; margin-top: 10px;">Cancel</button>
+            </div>
+    
+            <!-- MODIFIED: Original Confirm View -->
+            <div id="tournament-confirm-view" style="display: none;">
+                <p>Entry Fee: <strong id="tournament-join-popup-fee">0 🪙</strong></p>
+                <p style="font-size: 16px; margin-top: 15px;">Confirm your name to join:</p>
+                <input type="text" id="tournament-join-name-input" class="withdraw-input" placeholder="Enter your name">
+                <div class="join-popup-buttons">
+                    <button id="tournament-join-cancel-btn" class="action-button" style="background-color: #e74c3c; flex: 1;">Cancel</button>
+                    <button id="tournament-join-confirm-btn" class="action-button" style="background-color: #f39c12; flex: 1;">Confirm & Join</button>
+                </div>
             </div>
         </div>
     </div>
@@ -758,7 +774,13 @@
                 tournamentJoinNameInput: document.getElementById('tournament-join-name-input'),
                 tournamentJoinCancelBtn: document.getElementById('tournament-join-cancel-btn'),
                 tournamentJoinConfirmBtn: document.getElementById('tournament-join-confirm-btn'),
-                // ===== NEW AIRDROP ELEMENTS =====
+                // New Tournament Popup Elements
+                tournamentAdView: document.getElementById('tournament-ad-view'),
+                tournamentConfirmView: document.getElementById('tournament-confirm-view'),
+                tournamentAdProgress: document.getElementById('tournament-ad-progress'),
+                tournamentWatchAdBtn: document.getElementById('tournament-watch-ad-btn'),
+                tournamentAdCancelBtn: document.getElementById('tournament-ad-cancel-btn'),
+                // Airdrop
                 airdropButton: document.getElementById('airdrop-button'),
                 airdropScreen: document.getElementById('airdrop-screen'),
                 loveCoinBalanceDisplay: document.getElementById('love-coin-balance-display'),
@@ -784,11 +806,20 @@
                 energyDepletedTime: 0,
                 energyRecoveryDuration: 0, 
                 fastRecoveryAdsWatched: 0,
-                loveCoins: 0, // Track the new Love Coins
+                loveCoins: 0,
+                joinedTournaments: {}, // NEW: To store joined tournament IDs
             };
             
             let currentBetAmount = 100;
             let isAdBoostActive = false;
+
+            // NEW: State for the current tournament join process
+            let currentTournamentJoinProcess = {
+                details: null,
+                adsWatched: 0,
+                adsRequired: 5,
+                adUrl: 'https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6'
+            };
 
             function loadAndDisplayTournaments() {
                 const tournamentsRef = database.ref('tournaments');
@@ -800,12 +831,17 @@
                         let activeTournamentsFound = false;
                         snapshot.forEach(childSnapshot => {
                             const tournament = childSnapshot.val();
+                            const tournamentId = childSnapshot.key;
+                            
                             if (tournament.isActive) {
                                 activeTournamentsFound = true;
                                 const card = document.createElement('div');
                                 card.className = 'tournament-card';
                                 
                                 const entryFeeText = tournament.entryFee > 0 ? `${tournament.entryFee.toLocaleString()} 🪙` : 'Free';
+                                const isJoined = state.joinedTournaments && state.joinedTournaments[tournamentId];
+                                const buttonText = isJoined ? 'Joined! Password on Telegram.' : 'Join Now';
+                                const buttonDisabled = isJoined ? 'disabled' : '';
 
                                 card.innerHTML = `
                                     <div class="tournament-card-header">
@@ -819,11 +855,13 @@
                                     <p><strong>Entry Fee:</strong> ${entryFeeText}</p>
                                     <p><strong>Rules:</strong> ${tournament.rules || 'Follow standard rules.'}</p>
                                     <button class="join-button" 
+                                        data-id="${tournamentId}"
                                         data-title="${tournament.title || 'Tournament'}"
                                         data-fee="${tournament.entryFee || 0}"
                                         data-link="${tournament.joinLink || '#'}"
-                                        data-image="${tournament.imageUrl || ''}">
-                                        Join Now
+                                        data-image="${tournament.imageUrl || ''}"
+                                        ${buttonDisabled}>
+                                        ${buttonText}
                                     </button>
                                 `;
                                 
@@ -843,35 +881,84 @@
                     elements.tournamentListContainer.innerHTML = '<p style="text-align:center; color: red;">Could not load events. Please try again later.</p>';
                 });
             }
+            
+            function initiateTournamentJoinProcess(details) {
+                // Reset process state
+                currentTournamentJoinProcess.details = details;
+                currentTournamentJoinProcess.adsWatched = 0;
 
-            function showJoinConfirmationPopup(details) {
+                // Setup popup
                 elements.tournamentJoinPopupTitle.innerText = details.title;
-                elements.tournamentJoinPopupFee.innerText = `${parseInt(details.fee).toLocaleString()} 🪙`;
                 elements.tournamentJoinPopupImage.src = details.image || 'https://via.placeholder.com/80';
-                elements.tournamentJoinNameInput.value = state.playerName;
-
-                elements.tournamentJoinConfirmBtn.dataset.fee = details.fee;
-                elements.tournamentJoinConfirmBtn.dataset.link = details.link;
-
+                
+                // Show ad view first
+                elements.tournamentAdProgress.innerText = `0 / ${currentTournamentJoinProcess.adsRequired}`;
+                elements.tournamentWatchAdBtn.disabled = false;
+                elements.tournamentWatchAdBtn.innerText = 'Watch Ad';
+                elements.tournamentAdView.style.display = 'block';
+                elements.tournamentConfirmView.style.display = 'none';
+                
                 elements.tournamentJoinPopup.style.display = 'flex';
             }
             
             elements.tournamentListContainer.addEventListener('click', (e) => {
-                if (e.target && e.target.classList.contains('join-button')) {
+                if (e.target && e.target.classList.contains('join-button') && !e.target.disabled) {
                     const button = e.target;
                     const tournamentDetails = {
+                        id: button.dataset.id,
                         title: button.dataset.title,
                         fee: button.dataset.fee,
                         link: button.dataset.link,
                         image: button.dataset.image
                     };
-                    showJoinConfirmationPopup(tournamentDetails);
+                    initiateTournamentJoinProcess(tournamentDetails);
                 }
+            });
+
+            elements.tournamentWatchAdBtn.addEventListener('click', () => {
+                const button = elements.tournamentWatchAdBtn;
+                if (state.isAdTimerActive) {
+                    alert("Please wait for the current ad timer to finish.");
+                    return;
+                }
+                state.isAdTimerActive = true;
+                window.open(currentTournamentJoinProcess.adUrl, '_blank');
+
+                button.disabled = true;
+                let countdown = 15;
+                button.innerText = `Wait (${countdown}s)`;
+
+                const adInterval = setInterval(() => {
+                    countdown--;
+                    button.innerText = `Wait (${countdown}s)`;
+                    if (countdown <= 0) {
+                        clearInterval(adInterval);
+                        state.isAdTimerActive = false;
+                        button.disabled = false;
+                        button.innerText = 'Watch Ad';
+
+                        currentTournamentJoinProcess.adsWatched++;
+                        elements.tournamentAdProgress.innerText = `${currentTournamentJoinProcess.adsWatched} / ${currentTournamentJoinProcess.adsRequired}`;
+
+                        if (currentTournamentJoinProcess.adsWatched >= currentTournamentJoinProcess.adsRequired) {
+                            // Switch to confirmation view
+                            elements.tournamentAdView.style.display = 'none';
+                            
+                            const details = currentTournamentJoinProcess.details;
+                            elements.tournamentJoinPopupFee.innerText = `${parseInt(details.fee).toLocaleString()} 🪙`;
+                            elements.tournamentJoinNameInput.value = state.playerName;
+                            
+                            elements.tournamentConfirmView.style.display = 'block';
+                        }
+                    }
+                }, 1000);
             });
             
             elements.tournamentJoinConfirmBtn.addEventListener('click', () => {
-                const entryFee = parseInt(elements.tournamentJoinConfirmBtn.dataset.fee, 10);
-                const joinLink = elements.tournamentJoinConfirmBtn.dataset.link;
+                const details = currentTournamentJoinProcess.details;
+                const tournamentId = details.id;
+                const entryFee = parseInt(details.fee, 10);
+                const joinLink = details.link;
                 const newName = elements.tournamentJoinNameInput.value.trim();
 
                 if (!newName) {
@@ -887,28 +974,52 @@
                 state.score -= entryFee;
                 if (state.playerName !== newName) {
                     state.playerName = newName;
-                    saveGame({ score: state.score, Totalearning: state.score, Name: newName });
-                    updatePlayerNameDisplay();
-                } else {
-                    saveGame({ score: state.score, Totalearning: state.score });
                 }
+
+                // Mark tournament as joined
+                if (!state.joinedTournaments) state.joinedTournaments = {};
+                state.joinedTournaments[tournamentId] = true;
+
+                // Prepare data for saving
+                const dataToSave = {
+                    score: state.score,
+                    Totalearning: state.score,
+                    Name: state.playerName,
+                    joinedTournaments: state.joinedTournaments
+                };
                 
+                // SAVE PARTICIPANT TO FIREBASE TOURNAMENT LIST
+                const participantData = {
+                    name: newName,
+                    joinTime: firebase.database.ServerValue.TIMESTAMP
+                };
+                database.ref(`tournaments/${tournamentId}/participants/${userId}`).set(participantData);
+                
+                // SAVE UPDATED USER DATA
+                saveGame(dataToSave);
+                updatePlayerNameDisplay();
                 updateDisplay();
-                alert(`Successfully joined! Fee of ${entryFee.toLocaleString()} 🪙 has been paid. Redirecting you to the event...`);
+                
+                alert(`Successfully joined! Fee of ${entryFee.toLocaleString()} 🪙 has been paid. The event password will be shared on our Telegram channel. Redirecting you...`);
                 
                 elements.tournamentJoinPopup.style.display = 'none';
 
                 if (joinLink && joinLink !== '#') {
                     window.open(joinLink, '_blank');
                 }
+                
+                // Refresh the tournament list to show the "Joined" status
+                loadAndDisplayTournaments();
             });
 
-            elements.tournamentJoinCancelBtn.addEventListener('click', () => {
+            function closeTournamentPopup() {
                 elements.tournamentJoinPopup.style.display = 'none';
-            });
-            elements.tournamentJoinPopupClose.addEventListener('click', () => {
-                elements.tournamentJoinPopup.style.display = 'none';
-            });
+                currentTournamentJoinProcess.details = null;
+            }
+
+            elements.tournamentJoinCancelBtn.addEventListener('click', closeTournamentPopup);
+            elements.tournamentAdCancelBtn.addEventListener('click', closeTournamentPopup);
+            elements.tournamentJoinPopupClose.addEventListener('click', closeTournamentPopup);
 
 
             const MINE_AD_URL = 'https://www.profitableratecpm.com/pk9fkd5v8?key=1afa6b8e3d8f61558b90095a0c9a2c44';
@@ -1427,7 +1538,6 @@
                 if(targetScreen) {
                     targetScreen.classList.remove('hidden');
                 } else {
-                    // Fallback to game screen if the screenId is invalid
                     document.getElementById('game-screen').classList.remove('hidden');
                     document.querySelector('.nav-button[data-screen="game-screen"]').classList.add('active');
                 }
@@ -1438,9 +1548,9 @@
                 if (screenId === 'wallet-screen') { renderWalletScreen(); } 
                 else if (screenId === 'boost-screen') { updateBoostButtons(); } 
                 else if (screenId === 'tasks-screen') { loadAndDisplayOffers(); renderLongTermAdTask(); } 
-                else if (screenId === 'video-screen') { renderVideoTasks(); }
-                else if (screenId === 'mine-screen') { renderMineScreen(); }
-                else if (screenId === 'tournament-screen') { loadAndDisplayTournaments(); }
+                else if (screenId === 'video-screen') { renderVideoTasks(); } 
+                else if (screenId === 'mine-screen') { renderMineScreen(); } 
+                else if (screenId === 'tournament-screen') { loadAndDisplayTournaments(); } 
                 else if (screenId === 'airdrop-screen') { renderAirdropScreen(); }
             }
             
@@ -1479,7 +1589,8 @@
                         state.energyDepletedTime = data.energyDepletedTime || 0;
                         state.energyRecoveryDuration = data.energyRecoveryDuration || 0;
                         state.fastRecoveryAdsWatched = data.fastRecoveryAdsWatched || 0;
-                        state.loveCoins = data.loveCoins || 0; // Load Love Coins
+                        state.loveCoins = data.loveCoins || 0;
+                        state.joinedTournaments = data.joinedTournaments || {}; // NEW
 
                         if (state.miningStartTime > 0 && Date.now() > state.miningEndTime) {
                            if (state.miningSessionTier > 0) { 
@@ -1769,7 +1880,6 @@
             elements.headsButton.addEventListener('click', () => playCoinFlip('Heads'));
             elements.tailsButton.addEventListener('click', () => playCoinFlip('Tails'));
             
-            // ===== NEW AIRDROP FUNCTIONALITY =====
             function renderAirdropScreen() {
                 elements.loveCoinBalanceDisplay.innerText = `${state.loveCoins.toLocaleString()} 💝`;
             }
@@ -1802,7 +1912,6 @@
                     }
                 }, 1000);
             });
-            // ===== END OF NEW AIRDROP FUNCTIONALITY =====
             
             loadGame();
             showScreen('game-screen');
