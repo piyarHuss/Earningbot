@@ -880,7 +880,6 @@
                 adUrl: 'https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6'
             };
 
-            // ===== THIS IS THE FULLY REPLACED FUNCTION =====
             function loadAndDisplayTournaments() {
                 const tournamentsRef = database.ref('tournaments');
                 elements.tournamentListContainer.innerHTML = '<p>Loading events...</p>';
@@ -903,9 +902,21 @@
                                 const buttonText = isJoined ? 'Joined! Good Luck!' : 'Join Now';
                                 const buttonDisabled = isJoined ? 'disabled' : '';
 
+                                // LOGIC TO FORMAT AND DISPLAY DATE AND TIME
+                                let dateTimeHtml = '';
+                                if (initialTournamentData.matchDate && initialTournamentData.matchTime) {
+                                    const date = new Date(`${initialTournamentData.matchDate}T${initialTournamentData.matchTime}`);
+                                    const formattedDate = date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+                                    const formattedTime = date.toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit', hour12: true });
+                                    dateTimeHtml = `<p><strong>Match Time:</strong> ${formattedDate} at ${formattedTime}</p>`;
+                                }
+
+                                const defaultLogoUrl = 'https://dummyimage.com/60x60/2c3e50/ffffff&text=Logo';
+                                const finalImageUrl = initialTournamentData.imageUrl || defaultLogoUrl;
+
                                 card.innerHTML = `
                                     <div class="tournament-card-header">
-                                        ${initialTournamentData.imageUrl ? `<img src="${initialTournamentData.imageUrl}" alt="Game Logo" class="tournament-card-logo">` : ''}
+                                        <img src="${finalImageUrl}" alt="Game Logo" class="tournament-card-logo" onerror="this.onerror=null; this.src='${defaultLogoUrl}';">
                                         <div class="tournament-card-title">
                                             <h3>${initialTournamentData.title || 'Untitled Tournament'}</h3>
                                             <p>${initialTournamentData.game || 'Special Event'}</p>
@@ -913,6 +924,7 @@
                                     </div>
                                     <p><strong>Prize Pool:</strong> ${initialTournamentData.prizePool || 'TBA'}</p>
                                     <p><strong>Entry Fee:</strong> ${entryFeeText}</p>
+                                    ${dateTimeHtml} 
                                     <p><strong>Rules:</strong> ${initialTournamentData.rules || 'Follow standard rules.'}</p>
                                     
                                     <div id="participants-${tournamentId}" class="participant-display-container"></div>
@@ -931,7 +943,6 @@
                                 
                                 elements.tournamentListContainer.appendChild(card);
 
-                                // REAL-TIME LISTENER FOR EACH TOURNAMENT TO SHOW WINNERS LIVE
                                 const singleTournamentRef = database.ref(`tournaments/${tournamentId}`);
                                 singleTournamentRef.on('value', tournamentSnapshot => {
                                     const tournamentData = tournamentSnapshot.val();
@@ -944,7 +955,6 @@
                                     const participants = tournamentData.participants || {};
                                     const participantEntries = Object.entries(participants);
                                     
-                                    // SHOW PRIZE DISTRIBUTED MESSAGE
                                     if (tournamentData.prizeAwarded) {
                                         prizeStatusContainer.innerHTML = `<div class="prize-distributed-message">🏆 Prize Distributed! 🏆</div>`;
                                     } else {
@@ -952,7 +962,6 @@
                                     }
 
                                     if (participantEntries.length > 0) {
-                                        // TEAM VIEW (2v2)
                                         if (tournamentData.minPlayers === 4) {
                                             const winningTeam = tournamentData.winningTeam || null;
                                             const team1 = participantEntries.filter((e, i) => i % 2 === 0);
@@ -967,7 +976,6 @@
                                                 <ul class="team-list"><h4>Team B ${winningTeam === 2 ? '🏆' : ''}</h4>${team2Html}</ul>
                                             `;
                                         } 
-                                        // INDIVIDUAL VIEW
                                         else {
                                             const participantHtml = participantEntries.map(([userId, playerData]) => {
                                                 const winnerIcon = playerData.isWinner ? '🏆 ' : '';
@@ -1848,7 +1856,31 @@
             elements.profileSection.addEventListener('click', () => { elements.newNameInput.value = state.playerName; elements.nameChangePopup.style.display = 'flex'; });
             elements.confirmNameButton.addEventListener('click', () => { const newName = elements.newNameInput.value.trim(); if (newName && newName !== "") { state.playerName = newName; updatePlayerNameDisplay(); saveGame({ Name: newName }); elements.nameChangePopup.style.display = 'none'; } else { alert("Name cannot be empty!"); } });
             elements.cancelNameButton.addEventListener('click', () => elements.nameChangePopup.style.display = 'none');
-            elements.upiWithdrawButton.addEventListener('click', () => { const amountToWithdraw = state.score; const name = elements.withdrawalNameInput.value.trim(); const upiId = elements.withdrawalUpiInput.value.trim(); if (!name || !upiId) { alert("Please enter both your name and UPI ID."); return; } const newWithdrawal = { amount: amountToWithdraw, name: name, upiId: upiId, date: new Date().toLocaleString(), status: 'Processing' }; database.ref(`withdrawals/${userId}`).push(newWithdrawal); const amountInRupees = (amountToWithdraw / 1000).toFixed(2); alert(`Withdrawal request for ${amountToWithdraw.toLocaleString()} coins (₹${amountInRupees}) has been sent to ${name} at ${upiId}. It may take some time to process.`); state.score = 0; state.withdrawalAdClicks = 0; saveGame({ score: 0, Totalearning: 0, withdrawalAdClicks: 0 }); updateDisplay(); elements.withdrawPopup.style.display = 'none'; elements.withdrawalNameInput.value = ''; elements.withdrawalUpiInput.value = ''; showScreen('wallet-screen'); });
+            
+            elements.upiWithdrawButton.addEventListener('click', () => { 
+                const amountToWithdraw = state.score; 
+                const name = elements.withdrawalNameInput.value.trim(); 
+                const upiId = elements.withdrawalUpiInput.value.trim(); 
+                if (!name || !upiId) { 
+                    alert("Please enter both your name and UPI ID."); 
+                    return; 
+                } 
+                const newWithdrawal = { amount: amountToWithdraw, name: name, upiId: upiId, date: new Date().toLocaleString(), status: 'Processing' }; 
+                database.ref(`withdrawals/${userId}`).push(newWithdrawal); 
+                const amountInRupees = (amountToWithdraw / 1000).toFixed(2); 
+                alert(`Withdrawal request for ${amountToWithdraw.toLocaleString()} coins (₹${amountInRupees}) has been sent to ${name} at ${upiId}. It may take some time to process.`); 
+                
+                state.score = 0; 
+                state.withdrawalAdClicks = 0; 
+                saveGame({ score: 0, Totalearning: 0, withdrawalAdClicks: 0 }); 
+                updateDisplay(); 
+                elements.withdrawPopup.style.display = 'none'; 
+                elements.withdrawalNameInput.value = ''; 
+                elements.withdrawalUpiInput.value = ''; 
+                
+                renderWalletScreen(); 
+            });
+
             elements.withdrawButton.addEventListener('click', () => { if (state.score >= 2000) { const amountToWithdraw = state.score; const amountInRupees = (amountToWithdraw / 1000).toFixed(2); elements.popupWithdrawalAmount.innerText = `${amountToWithdraw.toLocaleString()} 🪙`; elements.popupWithdrawalValueInr.innerText = `Value: ₹${amountInRupees} INR`; elements.withdrawPopup.style.display = 'flex'; } else { alert(`You need at least 2000 coins (₹2) to make a withdrawal.`); } });
             elements.popupCloseButton.addEventListener('click', () => elements.withdrawPopup.style.display = 'none');
             function buyBoost(cost, newTapPower, requiredLevel, newUpgradeLevel) { if (state.tapUpgradeLevel === requiredLevel && state.score >= cost) { state.score -= cost; state.tapPower = newTapPower; state.tapUpgradeLevel = newUpgradeLevel; alert('Upgrade Successful!'); saveGame({ score: state.score, Totalearning: state.score, tapPower: state.tapPower, tapUpgradeLevel: state.tapUpgradeLevel }); updateDisplay(); updateBoostButtons(); } else if (state.tapUpgradeLevel !== requiredLevel) { alert('You must purchase the previous upgrades first!'); } else { alert('Not enough coins!'); } }
