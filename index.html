@@ -380,6 +380,21 @@
             align-self: center;
         }
         /* ===== END: NEW TOURNAMENT PARTICIPANT STYLES (CORRECTED) ===== */
+        
+        /* ===== STYLES FOR WINNER DISPLAY ===== */
+        .participant-item.winner strong {
+            color: #f1c40f; /* Golden color for winner name */
+        }
+        .prize-distributed-message {
+            text-align: center;
+            font-weight: bold;
+            color: #2ecc71;
+            background-color: rgba(46, 204, 113, 0.15);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border: 1px solid #27ae60;
+        }
 
     </style>
 </head>
@@ -852,13 +867,12 @@
                 energyRecoveryDuration: 0, 
                 fastRecoveryAdsWatched: 0,
                 loveCoins: 0,
-                joinedTournaments: {}, // NEW: To store joined tournament IDs
+                joinedTournaments: {},
             };
             
             let currentBetAmount = 100;
             let isAdBoostActive = false;
 
-            // NEW: State for the current tournament join process
             let currentTournamentJoinProcess = {
                 details: null,
                 adsWatched: 0,
@@ -876,43 +890,40 @@
                     if (snapshot.exists()) {
                         let activeTournamentsFound = false;
                         snapshot.forEach(childSnapshot => {
-                            const tournament = childSnapshot.val();
+                            const initialTournamentData = childSnapshot.val();
                             const tournamentId = childSnapshot.key;
                             
-                            if (tournament.isActive) {
+                            if (initialTournamentData.isActive) {
                                 activeTournamentsFound = true;
                                 const card = document.createElement('div');
                                 card.className = 'tournament-card';
                                 
-                                const entryFeeText = tournament.entryFee > 0 ? `${tournament.entryFee.toLocaleString()} 🪙` : 'Free';
+                                const entryFeeText = initialTournamentData.entryFee > 0 ? `${initialTournamentData.entryFee.toLocaleString()} 🪙` : 'Free';
                                 const isJoined = state.joinedTournaments && state.joinedTournaments[tournamentId];
                                 const buttonText = isJoined ? 'Joined! Good Luck!' : 'Join Now';
                                 const buttonDisabled = isJoined ? 'disabled' : '';
 
-                                // Create the card structure with a placeholder for participants
                                 card.innerHTML = `
                                     <div class="tournament-card-header">
-                                        ${tournament.imageUrl ? `<img src="${tournament.imageUrl}" alt="Game Logo" class="tournament-card-logo">` : ''}
+                                        ${initialTournamentData.imageUrl ? `<img src="${initialTournamentData.imageUrl}" alt="Game Logo" class="tournament-card-logo">` : ''}
                                         <div class="tournament-card-title">
-                                            <h3>${tournament.title || 'Untitled Tournament'}</h3>
-                                            <p>${tournament.game || 'Special Event'}</p>
+                                            <h3>${initialTournamentData.title || 'Untitled Tournament'}</h3>
+                                            <p>${initialTournamentData.game || 'Special Event'}</p>
                                         </div>
                                     </div>
-                                    <p><strong>Prize Pool:</strong> ${tournament.prizePool || 'TBA'}</p>
+                                    <p><strong>Prize Pool:</strong> ${initialTournamentData.prizePool || 'TBA'}</p>
                                     <p><strong>Entry Fee:</strong> ${entryFeeText}</p>
-                                    <p><strong>Rules:</strong> ${tournament.rules || 'Follow standard rules.'}</p>
+                                    <p><strong>Rules:</strong> ${initialTournamentData.rules || 'Follow standard rules.'}</p>
                                     
-                                    <!-- This is the new container for the player list -->
-                                    <div id="participants-${tournamentId}" class="participant-display-container">
-                                        <!-- Player list will be dynamically inserted here -->
-                                    </div>
+                                    <div id="participants-${tournamentId}" class="participant-display-container"></div>
+                                    <div id="prize-status-${tournamentId}"></div> 
 
                                     <button class="join-button" 
                                         data-id="${tournamentId}"
-                                        data-title="${tournament.title || 'Tournament'}"
-                                        data-fee="${tournament.entryFee || 0}"
-                                        data-link="${tournament.joinLink || '#'}"
-                                        data-image="${tournament.imageUrl || ''}"
+                                        data-title="${initialTournamentData.title || 'Tournament'}"
+                                        data-fee="${initialTournamentData.entryFee || 0}"
+                                        data-link="${initialTournamentData.joinLink || '#'}"
+                                        data-image="${initialTournamentData.imageUrl || ''}"
                                         ${buttonDisabled}>
                                         ${buttonText}
                                     </button>
@@ -920,47 +931,53 @@
                                 
                                 elements.tournamentListContainer.appendChild(card);
 
-                                // NOW, FETCH PARTICIPANTS FOR THIS SPECIFIC TOURNAMENT
-                                // We use .on() so the list updates in real-time if someone joins!
-                                const participantsRef = database.ref(`tournaments/${tournamentId}/participants`);
-                                participantsRef.on('value', participantSnapshot => {
+                                // REAL-TIME LISTENER FOR EACH TOURNAMENT TO SHOW WINNERS LIVE
+                                const singleTournamentRef = database.ref(`tournaments/${tournamentId}`);
+                                singleTournamentRef.on('value', tournamentSnapshot => {
+                                    const tournamentData = tournamentSnapshot.val();
+                                    if (!tournamentData) return;
+
                                     const participantsContainer = document.getElementById(`participants-${tournamentId}`);
-                                    if (!participantsContainer) return; // Safety check
+                                    const prizeStatusContainer = document.getElementById(`prize-status-${tournamentId}`);
+                                    if (!participantsContainer || !prizeStatusContainer) return;
 
-                                    if (participantSnapshot.exists()) {
-                                        const participantsData = participantSnapshot.val();
-                                        const participantNames = Object.values(participantsData).map(p => p.name);
-
-                                        let teamA = [];
-                                        let teamB = [];
-
-                                        // Divide players into two teams
-                                        participantNames.forEach((name, index) => {
-                                            if (index % 2 === 0) {
-                                                teamA.push(name);
-                                            } else {
-                                                teamB.push(name);
-                                            }
-                                        });
-
-                                        const teamAHtml = teamA.map(name => `<li class="participant-item">${name}</li>`).join('');
-                                        const teamBHtml = teamB.map(name => `<li class="participant-item">${name}</li>`).join('');
-
-                                        participantsContainer.innerHTML = `
-                                            <ul class="team-list">
-                                                <h4>Team A</h4>
-                                                ${teamAHtml}
-                                            </ul>
-                                            <div class="vs-separator">VS</div>
-                                            <ul class="team-list">
-                                                <h4>Team B</h4>
-                                                ${teamBHtml}
-                                            </ul>
-                                        `;
-                                        participantsContainer.style.display = 'flex'; // Show the container
+                                    const participants = tournamentData.participants || {};
+                                    const participantEntries = Object.entries(participants);
+                                    
+                                    // SHOW PRIZE DISTRIBUTED MESSAGE
+                                    if (tournamentData.prizeAwarded) {
+                                        prizeStatusContainer.innerHTML = `<div class="prize-distributed-message">🏆 Prize Distributed! 🏆</div>`;
                                     } else {
-                                        // If no participants, hide the container
-                                        participantsContainer.innerHTML = '';
+                                        prizeStatusContainer.innerHTML = '';
+                                    }
+
+                                    if (participantEntries.length > 0) {
+                                        // TEAM VIEW (2v2)
+                                        if (tournamentData.minPlayers === 4) {
+                                            const winningTeam = tournamentData.winningTeam || null;
+                                            const team1 = participantEntries.filter((e, i) => i % 2 === 0);
+                                            const team2 = participantEntries.filter((e, i) => i % 2 !== 0);
+
+                                            const team1Html = team1.map(([uid, pdata]) => `<li class="participant-item">${pdata.name}</li>`).join('');
+                                            const team2Html = team2.map(([uid, pdata]) => `<li class="participant-item">${pdata.name}</li>`).join('');
+
+                                            participantsContainer.innerHTML = `
+                                                <ul class="team-list"><h4>Team A ${winningTeam === 1 ? '🏆' : ''}</h4>${team1Html}</ul>
+                                                <div class="vs-separator">VS</div>
+                                                <ul class="team-list"><h4>Team B ${winningTeam === 2 ? '🏆' : ''}</h4>${team2Html}</ul>
+                                            `;
+                                        } 
+                                        // INDIVIDUAL VIEW
+                                        else {
+                                            const participantHtml = participantEntries.map(([userId, playerData]) => {
+                                                const winnerIcon = playerData.isWinner ? '🏆 ' : '';
+                                                const winnerClass = playerData.isWinner ? 'winner' : '';
+                                                return `<li class="participant-item ${winnerClass}"><strong>${winnerIcon}${playerData.name}</strong></li>`;
+                                            }).join('');
+                                            participantsContainer.innerHTML = `<ul class="team-list" style="width:100%;">${participantHtml}</ul>`;
+                                        }
+                                        participantsContainer.style.display = 'flex';
+                                    } else {
                                         participantsContainer.style.display = 'none';
                                     }
                                 });
@@ -970,7 +987,6 @@
                         if (!activeTournamentsFound) {
                             elements.tournamentListContainer.innerHTML = '<p style="text-align:center;">No active events right now. Check back later!</p>';
                         }
-
                     } else {
                         elements.tournamentListContainer.innerHTML = '<p style="text-align:center;">No events available right now. Check back later!</p>';
                     }
@@ -981,21 +997,15 @@
             }
             
             function initiateTournamentJoinProcess(details) {
-                // Reset process state
                 currentTournamentJoinProcess.details = details;
                 currentTournamentJoinProcess.adsWatched = 0;
-
-                // Setup popup
                 elements.tournamentJoinPopupTitle.innerText = details.title;
                 elements.tournamentJoinPopupImage.src = details.image || 'https://via.placeholder.com/80';
-                
-                // Show ad view first
                 elements.tournamentAdProgress.innerText = `0 / ${currentTournamentJoinProcess.adsRequired}`;
                 elements.tournamentWatchAdBtn.disabled = false;
                 elements.tournamentWatchAdBtn.innerText = 'Watch Ad';
                 elements.tournamentAdView.style.display = 'block';
                 elements.tournamentConfirmView.style.display = 'none';
-                
                 elements.tournamentJoinPopup.style.display = 'flex';
             }
             
@@ -1021,11 +1031,9 @@
                 }
                 state.isAdTimerActive = true;
                 window.open(currentTournamentJoinProcess.adUrl, '_blank');
-
                 button.disabled = true;
                 let countdown = 15;
                 button.innerText = `Wait (${countdown}s)`;
-
                 const adInterval = setInterval(() => {
                     countdown--;
                     button.innerText = `Wait (${countdown}s)`;
@@ -1034,18 +1042,13 @@
                         state.isAdTimerActive = false;
                         button.disabled = false;
                         button.innerText = 'Watch Ad';
-
                         currentTournamentJoinProcess.adsWatched++;
                         elements.tournamentAdProgress.innerText = `${currentTournamentJoinProcess.adsWatched} / ${currentTournamentJoinProcess.adsRequired}`;
-
                         if (currentTournamentJoinProcess.adsWatched >= currentTournamentJoinProcess.adsRequired) {
-                            // Switch to confirmation view
                             elements.tournamentAdView.style.display = 'none';
-                            
                             const details = currentTournamentJoinProcess.details;
                             elements.tournamentJoinPopupFee.innerText = `${parseInt(details.fee).toLocaleString()} 🪙`;
                             elements.tournamentJoinNameInput.value = state.playerName;
-                            
                             elements.tournamentConfirmView.style.display = 'block';
                         }
                     }
@@ -1058,55 +1061,33 @@
                 const entryFee = parseInt(details.fee, 10);
                 const joinLink = details.link;
                 const newName = elements.tournamentJoinNameInput.value.trim();
-
                 if (!newName) {
-                    alert('Please enter your name to join.');
-                    return;
+                    alert('Please enter your name to join.'); return;
                 }
-
                 if (state.score < entryFee) {
-                    alert(`Not enough coins! You need ${entryFee.toLocaleString()} 🪙 to join.`);
-                    return;
+                    alert(`Not enough coins! You need ${entryFee.toLocaleString()} 🪙 to join.`); return;
                 }
-
                 state.score -= entryFee;
                 if (state.playerName !== newName) {
                     state.playerName = newName;
                 }
-
-                // Mark tournament as joined
                 if (!state.joinedTournaments) state.joinedTournaments = {};
                 state.joinedTournaments[tournamentId] = true;
-
-                // Prepare data for saving
                 const dataToSave = {
-                    score: state.score,
-                    Totalearning: state.score,
-                    Name: state.playerName,
-                    joinedTournaments: state.joinedTournaments
+                    score: state.score, Totalearning: state.score, Name: state.playerName, joinedTournaments: state.joinedTournaments
                 };
-                
-                // SAVE PARTICIPANT TO FIREBASE TOURNAMENT LIST
                 const participantData = {
-                    name: newName,
-                    joinTime: firebase.database.ServerValue.TIMESTAMP
+                    name: newName, joinTime: firebase.database.ServerValue.TIMESTAMP
                 };
                 database.ref(`tournaments/${tournamentId}/participants/${userId}`).set(participantData);
-                
-                // SAVE UPDATED USER DATA
                 saveGame(dataToSave);
                 updatePlayerNameDisplay();
                 updateDisplay();
-                
                 alert(`Successfully joined! Fee of ${entryFee.toLocaleString()} 🪙 has been paid. The event password will be shared on our Telegram channel. Redirecting you...`);
-                
                 elements.tournamentJoinPopup.style.display = 'none';
-
                 if (joinLink && joinLink !== '#') {
                     window.open(joinLink, '_blank');
                 }
-                
-                // Refresh the tournament list to show the "Joined" status - No need, .on() handles it
             });
 
             function closeTournamentPopup() {
@@ -1117,7 +1098,6 @@
             elements.tournamentJoinCancelBtn.addEventListener('click', closeTournamentPopup);
             elements.tournamentAdCancelBtn.addEventListener('click', closeTournamentPopup);
             elements.tournamentJoinPopupClose.addEventListener('click', closeTournamentPopup);
-
 
             const MINE_AD_URL = 'https://www.profitableratecpm.com/pk9fkd5v8?key=1afa6b8e3d8f61558b90095a0c9a2c44';
             const MINING_TIERS = {
@@ -1135,22 +1115,17 @@
             }
 
             function resetMiningState() {
-                state.miningAdsWatched = 0;
-                state.miningSessionTier = 0;
-                state.miningStartTime = 0;
-                state.miningEndTime = 0;
+                state.miningAdsWatched = 0; state.miningSessionTier = 0; state.miningStartTime = 0; state.miningEndTime = 0;
                 saveGame({ miningAdsWatched: 0, miningSessionTier: 0, miningStartTime: 0, miningEndTime: 0 });
             }
 
             function renderMineScreen() {
                 const now = Date.now();
                 const isSessionActive = state.miningStartTime > 0;
-
                 if (isSessionActive) {
                     const isClaimable = now >= state.miningEndTime;
                     elements.watchAdButton.style.display = 'none';
                     elements.startMiningButton.style.display = 'none';
-                    
                     if (isClaimable) {
                         elements.miningPickaxeIcon.classList.remove('swinging');
                         elements.claimMineButton.style.display = 'block';
@@ -1163,32 +1138,27 @@
                         elements.claimMineButton.disabled = true;
                         elements.claimMineButton.innerText = 'Mining...';
                     }
-
                 } else { 
                     elements.miningPickaxeIcon.classList.remove('swinging');
                     elements.claimMineButton.style.display = 'none';
                     elements.watchAdButton.style.display = 'block';
                     elements.watchAdButton.disabled = false;
-                    
                     const eligibleTier = getEligibleMiningTier();
                     let nextTierGoal = 1;
                     if (eligibleTier === 1) nextTierGoal = 2;
                     else if (eligibleTier === 2) nextTierGoal = 20;
-
                     if (eligibleTier >= 3) {
                          elements.watchAdButton.innerText = 'Max Tier Reached';
                          elements.watchAdButton.disabled = true;
                     } else {
                          elements.watchAdButton.innerText = `Watch Ad (${state.miningAdsWatched}/${nextTierGoal})`;
                     }
-
                     if (state.miningAdsWatched > 0) {
                         elements.startMiningButton.style.display = 'block';
                     } else {
                         elements.startMiningButton.style.display = 'none';
                     }
                 }
-                
                 const eligibleTier = getEligibleMiningTier();
                 const tierInfo = MINING_TIERS[eligibleTier];
                 elements.miningRateDisplay.innerText = `+${tierInfo.totalReward.toLocaleString()} 🪙`;
@@ -1198,24 +1168,20 @@
 
             function updateMiningTimerDisplay() {
                 if (state.miningStartTime === 0) {
-                    elements.miningTimerDisplay.innerText = "Inactive";
-                    return;
+                    elements.miningTimerDisplay.innerText = "Inactive"; return;
                 }
                 const now = Date.now();
                 if (now >= state.miningEndTime) {
-                    elements.miningTimerDisplay.innerText = "Finished!";
-                    return;
+                    elements.miningTimerDisplay.innerText = "Finished!"; return;
                 }
                 const remaining = state.miningEndTime - now;
                 const hours = Math.floor((remaining / (1000 * 60 * 60)) % 24).toString().padStart(2, '0');
                 const minutes = Math.floor((remaining / (1000 * 60)) % 60).toString().padStart(2, '0');
                 const seconds = Math.floor((remaining / 1000) % 60).toString().padStart(2, '0');
-                
                 const elapsed = now - state.miningStartTime;
                 const duration = state.miningEndTime - state.miningStartTime;
                 const progress = elapsed / duration;
                 const accumulated = MINING_TIERS[state.miningSessionTier].totalReward * progress;
-
                 elements.miningTimerDisplay.innerText = `${Math.floor(accumulated).toLocaleString()} 🪙 / ${hours}:${minutes}:${seconds}`;
             }
 
@@ -1223,18 +1189,15 @@
                 if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
                 state.isAdTimerActive = true;
                 window.open(MINE_AD_URL, '_blank');
-                
                 elements.watchAdButton.disabled = true;
                 let countdown = 10;
                 elements.watchAdButton.innerText = `Wait (${countdown}s)`;
-                
                 const adInterval = setInterval(() => {
                     countdown--;
                     elements.watchAdButton.innerText = `Wait (${countdown}s)`;
                     if(countdown <= 0) {
                         clearInterval(adInterval);
                         state.isAdTimerActive = false;
-                        
                         state.miningAdsWatched++;
                         saveGame({ miningAdsWatched: state.miningAdsWatched });
                         renderMineScreen();
@@ -1245,19 +1208,14 @@
             elements.startMiningButton.addEventListener('click', () => {
                 const eligibleTier = getEligibleMiningTier();
                 if (eligibleTier === 0) {
-                    alert("You must watch at least one ad to start mining!");
-                    return;
+                    alert("You must watch at least one ad to start mining!"); return;
                 }
-
                 const tierInfo = MINING_TIERS[eligibleTier];
                 state.miningSessionTier = eligibleTier;
                 state.miningStartTime = Date.now();
                 state.miningEndTime = state.miningStartTime + tierInfo.duration;
-                
                 saveGame({
-                    miningSessionTier: state.miningSessionTier,
-                    miningStartTime: state.miningStartTime,
-                    miningEndTime: state.miningEndTime,
+                    miningSessionTier: state.miningSessionTier, miningStartTime: state.miningStartTime, miningEndTime: state.miningEndTime,
                 });
                 renderMineScreen();
             });
@@ -1278,25 +1236,14 @@
             function renderVideoTasks() {
                 const container = elements.videoTasksContainer;
                 container.innerHTML = '';
-                
                 const specialAdCard = document.createElement('div');
                 specialAdCard.className = 'option-card';
-                specialAdCard.innerHTML = `
-                    <h3>Special Offer (18+)</h3>
-                    <p>Watch a special video to earn a <strong>40 🪙</strong> reward!</p>
-                    <button id="watch-18plus-ad-btn" class="action-button" style="background-color:#c0392b;">18+</button>
-                `;
+                specialAdCard.innerHTML = `<h3>Special Offer (18+)</h3><p>Watch a special video to earn a <strong>40 🪙</strong> reward!</p><button id="watch-18plus-ad-btn" class="action-button" style="background-color:#c0392b;">18+</button>`;
                 container.appendChild(specialAdCard);
-
                 if (state.myReferralC) {
                     const referralCard = document.createElement('div');
                     referralCard.className = 'option-card';
-                    referralCard.innerHTML = `
-                        <h3>🤝 Refer a Friend</h3>
-                        <p>Share your link! You get <strong>700 🪙</strong> automatically when your friend joins. Your friend gets a 500 🪙 bonus!</p>
-                        <p style="font-size: 14px; margin-bottom: 10px;">Your Code: <strong>${state.myReferralC}</strong></p>
-                        <button id="copy-referral-link-button" class="action-button" style="background-color: #0088cc;">Copy Invite Link</button>
-                    `;
+                    referralCard.innerHTML = `<h3>🤝 Refer a Friend</h3><p>Share your link! You get <strong>700 🪙</strong> automatically when your friend joins. Your friend gets a 500 🪙 bonus!</p><p style="font-size: 14px; margin-bottom: 10px;">Your Code: <strong>${state.myReferralC}</strong></p><button id="copy-referral-link-button" class="action-button" style="background-color: #0088cc;">Copy Invite Link</button>`;
                     container.appendChild(referralCard);
                 }
                 videoAdTasks.forEach(task => {
@@ -1320,18 +1267,14 @@
 
             elements.videoTasksContainer.addEventListener('click', (e) => {
                 const button = e.target;
-                
                 if (button.id === 'watch-18plus-ad-btn') {
                     if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
                     state.isAdTimerActive = true;
-                    
                     window.open('https://www.profitableratecpm.com/uhnqngyf?key=d467c8e5498339a61ae6addd69e30d9e', '_blank');
-
                     button.disabled = true;
                     let countdown = 30; 
                     const originalText = button.innerText;
                     button.innerText = `Wait (${countdown}s)`;
-
                     const countdownInterval = setInterval(() => {
                         countdown--;
                         button.innerText = `Wait (${countdown}s)`;
@@ -1347,7 +1290,6 @@
                         }
                     }, 1000);
                 }
-
                 if (button.id === 'copy-referral-link-button') {
                     const webReferralLink = `${window.location.origin}${window.location.pathname}?ref=${state.myReferralC}`;
                     navigator.clipboard.writeText(webReferralLink).then(() => {
@@ -1687,7 +1629,7 @@
                         state.energyRecoveryDuration = data.energyRecoveryDuration || 0;
                         state.fastRecoveryAdsWatched = data.fastRecoveryAdsWatched || 0;
                         state.loveCoins = data.loveCoins || 0;
-                        state.joinedTournaments = data.joinedTournaments || {}; // NEW
+                        state.joinedTournaments = data.joinedTournaments || {};
 
                         if (state.miningStartTime > 0 && Date.now() > state.miningEndTime) {
                            if (state.miningSessionTier > 0) { 
@@ -1837,35 +1779,25 @@
             function checkEnergyCooldown() {
                 if (state.energyDepletedTime > 0) {
                     const timeRemaining = (state.energyDepletedTime + state.energyRecoveryDuration) - Date.now();
-
                     if (timeRemaining <= 0) {
                         state.currentEnergy = state.maxEnergy;
                         state.energyDepletedTime = 0;
                         state.energyRecoveryDuration = 0;
                         state.fastRecoveryAdsWatched = 0;
-                        
                         elements.energyTimerDisplay.style.display = 'none';
                         elements.fastEnergyRecoveryBtn.style.display = 'none';
                         elements.energyText.style.display = 'block';
                         elements.energyBarFill.parentElement.style.display = 'block';
-
                         updateDisplay();
-                        saveGame({
-                            currentEnergy: state.currentEnergy,
-                            energyDepletedTime: 0,
-                            energyRecoveryDuration: 0,
-                            fastRecoveryAdsWatched: 0
-                        });
+                        saveGame({ currentEnergy: state.currentEnergy, energyDepletedTime: 0, energyRecoveryDuration: 0, fastRecoveryAdsWatched: 0 });
                     } else {
                         const hours = Math.floor(timeRemaining / (1000 * 60 * 60)).toString().padStart(2, '0');
                         const minutes = Math.floor((timeRemaining / (1000 * 60)) % 60).toString().padStart(2, '0');
                         const seconds = Math.floor((timeRemaining / 1000) % 60).toString().padStart(2, '0');
-                        
                         elements.energyTimerDisplay.innerText = `Next refill in: ${hours}:${minutes}:${seconds}`;
                         elements.energyTimerDisplay.style.display = 'block';
                         elements.energyText.style.display = 'none';
                         elements.energyBarFill.parentElement.style.display = 'none';
-
                         if (state.fastRecoveryAdsWatched < 30) {
                             elements.fastEnergyRecoveryBtn.style.display = 'block';
                             elements.fastEnergyRecoveryBtn.innerText = `Watch Ad (${state.fastRecoveryAdsWatched}/30) for 30min Refill`;
@@ -1884,15 +1816,12 @@
             elements.fastEnergyRecoveryBtn.addEventListener('click', () => {
                 if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
                 if (state.fastRecoveryAdsWatched >= 30) { alert("You have already watched enough ads."); return; }
-
                 state.isAdTimerActive = true;
                 window.open('https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315', '_blank');
-
                 const button = elements.fastEnergyRecoveryBtn;
                 button.disabled = true;
                 let countdown = 10;
                 button.innerText = `Wait (${countdown}s)`;
-
                 const adInterval = setInterval(() => {
                     countdown--;
                     button.innerText = `Wait (${countdown}s)`;
@@ -1900,23 +1829,19 @@
                         clearInterval(adInterval);
                         state.isAdTimerActive = false;
                         button.disabled = false;
-                        
                         state.fastRecoveryAdsWatched++;
                         let dataToSave = { fastRecoveryAdsWatched: state.fastRecoveryAdsWatched };
-
                         if (state.fastRecoveryAdsWatched >= 30) {
                             state.energyRecoveryDuration = 30 * 60 * 1000; 
                             dataToSave.energyRecoveryDuration = state.energyRecoveryDuration;
                             alert("Success! Energy will now refill in 30 minutes from when it ran out.");
                             elements.fastEnergyRecoveryBtn.style.display = 'none';
                         }
-                        
                         saveGame(dataToSave);
                         checkEnergyCooldown(); 
                     }
                 }, 1000);
             });
-
 
             elements.navButtons.forEach(b => { if(b.dataset.screen){ b.addEventListener('click', () => showScreen(b.dataset.screen)) } });
             document.querySelectorAll('.back-button').forEach(b => b.addEventListener('click', () => showScreen(b.dataset.screen)));
@@ -1934,8 +1859,7 @@
             
             function playCoinFlip(playerChoice) {
                 if (state.score < currentBetAmount) {
-                    alert(`You need at least ${currentBetAmount} coins to play!`);
-                    return;
+                    alert(`You need at least ${currentBetAmount} coins to play!`); return;
                 }
                 state.score -= currentBetAmount;
                 updateDisplay();
@@ -1944,18 +1868,15 @@
                 elements.flipResult.className = '';
                 elements.headsButton.disabled = true;
                 elements.tailsButton.disabled = true;
-                
                 setTimeout(() => {
                     const playerWinChance = 0.01; 
                     let result;
                     const randomRoll = Math.random();
-
                     if (randomRoll < playerWinChance) {
                         result = playerChoice;
                     } else {
                         result = (playerChoice === 'Heads') ? 'Tails' : 'Heads';
                     }
-
                     let finalScore = state.score;
                     if (playerChoice === result) {
                         const winnings = currentBetAmount * 2;
@@ -1986,14 +1907,11 @@
             elements.watchAdForLoveCoinBtn.addEventListener('click', () => {
                 if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
                 state.isAdTimerActive = true;
-                
                 window.open('https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6', '_blank');
-
                 const button = elements.watchAdForLoveCoinBtn;
                 button.disabled = true;
                 let countdown = 15; 
                 button.innerText = `Wait (${countdown}s)`;
-
                 const countdownInterval = setInterval(() => {
                     countdown--;
                     button.innerText = `Wait (${countdown}s)`;
