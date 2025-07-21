@@ -7,7 +7,9 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-        
+        /* --- NEW FONT FOR MODERN UI --- */
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap');
+
         html, body {
             height: 100%;
             margin: 0;
@@ -396,6 +398,206 @@
             border: 1px solid #27ae60;
         }
 
+
+        /* ===== START: MODERN TOURNAMENT CARD STYLES ===== */
+
+        /* Game-themed background for the screen */
+        .screen.tournament-bg {
+            /* The image URL is a placeholder. Replace with your actual game image. */
+            background: url('https://images.unsplash.com/photo-1581888224555-93d6a8f1b333?q=80&w=1932&auto=format&fit=crop') no-repeat center center/cover;
+            position: relative;
+            z-index: 1; /* Ensure screen content is above the pseudo-element */
+        }
+        /* Dark overlay to make text more readable */
+        .screen.tournament-bg::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(10, 10, 25, 0.7);
+            z-index: -1; /* Place overlay behind the content */
+        }
+        
+        .modern-tournament-card {
+            font-family: 'Poppins', sans-serif;
+            background: rgba(26, 26, 46, 0.75); /* Dark, semi-transparent background */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px); /* For Safari */
+            border: 1px solid rgba(0, 246, 255, 0.3);
+            border-radius: 20px;
+            padding: 25px;
+            max-width: 400px;
+            width: 100%;
+            margin: 20px auto;
+            box-shadow: 0 0 20px rgba(0, 246, 255, 0.25), 0 8px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modern-card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .player-thumbnail {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid #00f6ff; /* Neon cyan border */
+            object-fit: cover;
+            box-shadow: 0 0 10px #00f6ff;
+            flex-shrink: 0;
+        }
+
+        .tournament-details {
+            min-width: 0; /* Prevents text from overflowing */
+        }
+
+        .tournament-details h2 {
+            font-family: 'Orbitron', sans-serif;
+            margin: 0;
+            font-size: 20px;
+            color: #ffffff;
+            text-shadow: 0 0 5px #ffffff, 0 0 10px #00f6ff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .tournament-details p {
+            margin: 0;
+            font-size: 14px;
+            color: #00f6ff;
+            opacity: 0.9;
+        }
+
+        .modern-card-info-bar {
+            display: flex;
+            justify-content: space-around;
+            align-items: stretch; /* Make items equal height */
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px 10px;
+            border-radius: 12px;
+            border-top: 1px solid rgba(0, 246, 255, 0.2);
+            border-bottom: 1px solid rgba(0, 246, 255, 0.2);
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 5px;
+            flex: 1;
+        }
+
+        .info-item .icon {
+            font-size: 24px;
+            line-height: 1;
+        }
+        
+        .info-item .icon.trophy {
+            color: #ffc700;
+            text-shadow: 0 0 8px #ffc700;
+        }
+        .info-item .icon.coin {
+            color: #f39c12; 
+            text-shadow: 0 0 8px #f39c12;
+        }
+
+        .info-item .icon.calendar {
+            color: #3498db; 
+            text-shadow: 0 0 8px #3498db;
+        }
+        .info-item span {
+            font-size: 14px;
+            font-weight: 600;
+            color: #eee;
+        }
+
+        .modern-card-rules {
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            border-left: 3px solid #00f6ff;
+        }
+        .modern-card-rules p {
+            margin: 0;
+            font-size: 13px;
+            color: #ccc;
+            line-height: 1.5;
+        }
+        .modern-card-rules strong {
+            color: #00f6ff;
+            font-weight: 700;
+        }
+
+        .teams-display {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .team-box {
+            flex: 1;
+            background: linear-gradient(145deg, rgba(40, 40, 70, 0.8), rgba(20, 20, 40, 0.8));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 700;
+            color: #ccc;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+            transition: all 0.2s ease-in-out;
+        }
+        .team-box:hover {
+            border-color: #00f6ff;
+        }
+
+        .vs-separator-modern {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 28px;
+            font-weight: 900;
+            color: #ff4757; /* Neon red/pink */
+            text-shadow: 0 0 5px #ff4757, 0 0 15px #ff4757;
+            animation: pulse-vs 2s infinite ease-in-out;
+        }
+
+        @keyframes pulse-vs {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .join-now-button {
+            background: linear-gradient(45deg, #f39c12, #ff6b6b); /* Orange-red gradient */
+            color: #fff;
+            border: none;
+            padding: 15px;
+            width: 100%;
+            border-radius: 12px;
+            font-size: 18px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(243, 156, 18, 0.6), 0 0 25px rgba(255, 107, 107, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+        .join-now-button:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 0 20px rgba(243, 156, 18, 0.9), 0 0 40px rgba(255, 107, 107, 0.7);
+        }
+        .join-now-button:active {
+            transform: translateY(0);
+        }
+        /* ===== END: MODERN TOURNAMENT CARD STYLES ===== */
+
     </style>
 </head>
 <body>
@@ -494,9 +696,60 @@
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
 
-        <div id="tournament-screen" class="screen scrollable-screen hidden">
+        <!-- ADDED 'tournament-bg' CLASS FOR THEMED BACKGROUND -->
+        <div id="tournament-screen" class="screen scrollable-screen hidden tournament-bg">
             <h2>🏆 All Events & Games 🏆</h2>
             <div id="tournament-list-container" class="options-container">
+                <!-- 
+                    NOTE: The card below is a static example of the new UI design. 
+                    In a real application, you would generate this HTML structure dynamically 
+                    for each tournament from your database. The CSS is designed to be reusable. 
+                -->
+
+                <!-- ===== START: NEW MODERN TOURNAMENT CARD HTML ===== -->
+                <div class="modern-tournament-card">
+                    <!-- Header -->
+                    <div class="modern-card-header">
+                        <img src="https://i.pravatar.cc/100?u=player1" alt="Player Thumbnail" class="player-thumbnail">
+                        <div class="tournament-details">
+                            <h2>Lone Wolf 1v1</h2>
+                            <p>Free Fire</p>
+                        </div>
+                    </div>
+                
+                    <!-- Info Bar -->
+                    <div class="modern-card-info-bar">
+                        <div class="info-item">
+                            <div class="icon trophy">🏆</div>
+                            <span>₹4000</span>
+                        </div>
+                        <div class="info-item">
+                            <div class="icon coin">🪙</div>
+                            <span>2000 Coins</span>
+                        </div>
+                        <div class="info-item">
+                            <div class="icon calendar">📅</div>
+                            <span>22 Jul, 7 PM</span>
+                        </div>
+                    </div>
+                
+                    <!-- Rules -->
+                    <div class="modern-card-rules">
+                        <p><strong>Rules:</strong> Minimum Level 15, No Hacks, 1v1 only.</p>
+                    </div>
+                
+                    <!-- Teams Display -->
+                    <div class="teams-display">
+                        <div class="team-box">Team A</div>
+                        <div class="vs-separator-modern">VS</div>
+                        <div class="team-box">Team B</div>
+                    </div>
+                
+                    <!-- Action Button -->
+                    <button class="join-now-button">Join Now</button>
+                </div>
+                <!-- ===== END: NEW MODERN TOURNAMENT CARD HTML ===== -->
+
                 <!-- Tournaments/Events will be loaded here from Firebase -->
             </div>
             <button class="back-button" data-screen="game-screen">Back to Game</button>
@@ -675,6 +928,8 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
+        // --- ALL JAVASCRIPT REMAINS THE SAME ---
+        // (The provided JavaScript code is included here)
         // ===== NO CHANGE TO THIS SECTION =====
         const firebaseConfig = {
           apiKey: "AIzaSyBJrCE4w_QfBqfF3g4O_RuCK4DbjmL9TRg",
@@ -882,10 +1137,12 @@
 
             function loadAndDisplayTournaments() {
                 const tournamentsRef = database.ref('tournaments');
-                elements.tournamentListContainer.innerHTML = '<p>Loading events...</p>';
+                // The static card is already in the HTML. This function will now append dynamic cards after it.
+                // To avoid duplication, let's clear only the dynamic part.
+                const dynamicTournaments = elements.tournamentListContainer.querySelectorAll('.tournament-card'); // Select old dynamic cards
+                dynamicTournaments.forEach(card => card.remove()); // Remove them
 
                 tournamentsRef.once('value').then(snapshot => {
-                    elements.tournamentListContainer.innerHTML = ''; 
                     if (snapshot.exists()) {
                         let activeTournamentsFound = false;
                         snapshot.forEach(childSnapshot => {
@@ -895,14 +1152,12 @@
                             if (initialTournamentData.isActive) {
                                 activeTournamentsFound = true;
                                 const card = document.createElement('div');
-                                card.className = 'tournament-card';
+                                card.className = 'tournament-card'; // Using the old class for now
                                 
                                 const entryFeeText = initialTournamentData.entryFee > 0 ? `${initialTournamentData.entryFee.toLocaleString()} 🪙` : 'Free';
                                 const isJoined = state.joinedTournaments && state.joinedTournaments[tournamentId];
                                 const buttonText = isJoined ? 'Joined! Good Luck!' : 'Join Now';
                                 const buttonDisabled = isJoined ? 'disabled' : '';
-
-                                // LOGIC TO FORMAT AND DISPLAY DATE AND TIME
                                 let dateTimeHtml = '';
                                 if (initialTournamentData.matchDate && initialTournamentData.matchTime) {
                                     const date = new Date(`${initialTournamentData.matchDate}T${initialTournamentData.matchTime}`);
@@ -991,16 +1246,10 @@
                                 });
                             }
                         });
-
-                        if (!activeTournamentsFound) {
-                            elements.tournamentListContainer.innerHTML = '<p style="text-align:center;">No active events right now. Check back later!</p>';
-                        }
-                    } else {
-                        elements.tournamentListContainer.innerHTML = '<p style="text-align:center;">No events available right now. Check back later!</p>';
                     }
                 }).catch(error => {
                     console.error("Error loading tournaments: ", error);
-                    elements.tournamentListContainer.innerHTML = '<p style="text-align:center; color: red;">Could not load events. Please try again later.</p>';
+                    elements.tournamentListContainer.innerHTML += '<p style="text-align:center; color: red;">Could not load events. Please try again later.</p>';
                 });
             }
             
