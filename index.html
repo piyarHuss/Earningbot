@@ -261,7 +261,14 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
+            transition: opacity 0.3s;
         }
+        /* **** NEW: Style for finished tournaments **** */
+        .tournament-card.finished {
+            opacity: 0.6;
+            border-color: #7f8c8d;
+        }
+
         .tournament-card-header {
             display: flex;
             align-items: center;
@@ -338,7 +345,24 @@
             gap: 15px;
         }
 
-        /* ===== START: NEW TOURNAMENT PARTICIPANT STYLES (CORRECTED) ===== */
+        /* **** NEW: Room Info Container **** */
+        .room-info-container {
+            background-color: rgba(46, 204, 113, 0.1);
+            border: 1px solid #2ecc71;
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 8px;
+        }
+        .room-info-container h4 {
+            margin: 0 0 8px 0;
+            color: #2ecc71;
+            font-size: 16px;
+        }
+        .room-info-container p {
+            margin: 3px 0;
+            font-size: 15px;
+        }
+
         .participant-display-container {
             display: none; /* Hidden by default, shown by JS if players exist */
             justify-content: space-around;
@@ -346,7 +370,7 @@
             margin-top: 20px;
             padding-top: 15px;
             border-top: 2px solid rgba(241, 196, 15, 0.3);
-            gap: 5px; /* Reduced gap */
+            gap: 5px;
         }
         .team-list {
             list-style: none;
@@ -354,17 +378,17 @@
             margin: 0;
             flex: 1;
             text-align: center;
-            min-width: 0; /* THIS IS THE CRITICAL FIX for long names */
+            min-width: 0;
         }
         .team-list h4 {
             margin: 0 0 8px 0;
             color: #f39c12;
-            font-size: 16px; /* Made smaller */
+            font-size: 16px;
             text-transform: uppercase;
         }
         .participant-item {
             padding: 5px 8px;
-            font-size: 14px; /* Made smaller */
+            font-size: 14px;
             font-weight: 600;
             background-color: rgba(0,0,0,0.3);
             border-radius: 6px;
@@ -375,17 +399,15 @@
         }
         .vs-separator {
             font-family: 'Press Start 2P', cursive;
-            font-size: 24px; /* Made smaller */
+            font-size: 24px;
             font-weight: bold;
             color: #e74c3c;
-            padding: 0 5px; /* Reduced padding */
+            padding: 0 5px;
             align-self: center;
         }
-        /* ===== END: NEW TOURNAMENT PARTICIPANT STYLES (CORRECTED) ===== */
         
-        /* ===== STYLES FOR WINNER DISPLAY ===== */
         .participant-item.winner strong {
-            color: #f1c40f; /* Golden color for winner name */
+            color: #f1c40f;
         }
         .prize-distributed-message {
             text-align: center;
@@ -398,30 +420,25 @@
             border: 1px solid #27ae60;
         }
 
-
         /* ===== START: MODERN TOURNAMENT CARD STYLES ===== */
-
-        /* Game-themed background for the screen */
         .screen.tournament-bg {
-            /* The image URL is a placeholder. Replace with your actual game image. */
             background: url('https://images.unsplash.com/photo-1581888224555-93d6a8f1b333?q=80&w=1932&auto=format&fit=crop') no-repeat center center/cover;
             position: relative;
-            z-index: 1; /* Ensure screen content is above the pseudo-element */
+            z-index: 1;
         }
-        /* Dark overlay to make text more readable */
         .screen.tournament-bg::before {
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
             background-color: rgba(10, 10, 25, 0.7);
-            z-index: -1; /* Place overlay behind the content */
+            z-index: -1;
         }
         
         .modern-tournament-card {
             font-family: 'Poppins', sans-serif;
-            background: rgba(26, 26, 46, 0.75); /* Dark, semi-transparent background */
+            background: rgba(26, 26, 46, 0.75);
             backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px); /* For Safari */
+            -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(0, 246, 255, 0.3);
             border-radius: 20px;
             padding: 25px;
@@ -435,27 +452,21 @@
             position: relative;
             overflow: hidden;
         }
-
         .modern-card-header {
             display: flex;
             align-items: center;
             gap: 15px;
         }
-
         .player-thumbnail {
             width: 50px;
             height: 50px;
             border-radius: 50%;
-            border: 2px solid #00f6ff; /* Neon cyan border */
+            border: 2px solid #00f6ff;
             object-fit: cover;
             box-shadow: 0 0 10px #00f6ff;
             flex-shrink: 0;
         }
-
-        .tournament-details {
-            min-width: 0; /* Prevents text from overflowing */
-        }
-
+        .tournament-details { min-width: 0; }
         .tournament-details h2 {
             font-family: 'Orbitron', sans-serif;
             margin: 0;
@@ -472,18 +483,16 @@
             color: #00f6ff;
             opacity: 0.9;
         }
-
         .modern-card-info-bar {
             display: flex;
             justify-content: space-around;
-            align-items: stretch; /* Make items equal height */
+            align-items: stretch;
             background: rgba(0, 0, 0, 0.3);
             padding: 12px 10px;
             border-radius: 12px;
             border-top: 1px solid rgba(0, 246, 255, 0.2);
             border-bottom: 1px solid rgba(0, 246, 255, 0.2);
         }
-
         .info-item {
             display: flex;
             flex-direction: column;
@@ -492,55 +501,25 @@
             gap: 5px;
             flex: 1;
         }
-
-        .info-item .icon {
-            font-size: 24px;
-            line-height: 1;
-        }
-        
-        .info-item .icon.trophy {
-            color: #ffc700;
-            text-shadow: 0 0 8px #ffc700;
-        }
-        .info-item .icon.coin {
-            color: #f39c12; 
-            text-shadow: 0 0 8px #f39c12;
-        }
-
-        .info-item .icon.calendar {
-            color: #3498db; 
-            text-shadow: 0 0 8px #3498db;
-        }
-        .info-item span {
-            font-size: 14px;
-            font-weight: 600;
-            color: #eee;
-        }
-
+        .info-item .icon { font-size: 24px; line-height: 1; }
+        .info-item .icon.trophy { color: #ffc700; text-shadow: 0 0 8px #ffc700; }
+        .info-item .icon.coin { color: #f39c12; text-shadow: 0 0 8px #f39c12; }
+        .info-item .icon.calendar { color: #3498db; text-shadow: 0 0 8px #3498db; }
+        .info-item span { font-size: 14px; font-weight: 600; color: #eee; }
         .modern-card-rules {
             padding: 12px;
             background: rgba(0, 0, 0, 0.2);
             border-radius: 8px;
             border-left: 3px solid #00f6ff;
         }
-        .modern-card-rules p {
-            margin: 0;
-            font-size: 13px;
-            color: #ccc;
-            line-height: 1.5;
-        }
-        .modern-card-rules strong {
-            color: #00f6ff;
-            font-weight: 700;
-        }
-
+        .modern-card-rules p { margin: 0; font-size: 13px; color: #ccc; line-height: 1.5; }
+        .modern-card-rules strong { color: #00f6ff; font-weight: 700; }
         .teams-display {
             display: flex;
             justify-content: space-between;
             align-items: center;
             gap: 10px;
         }
-
         .team-box {
             flex: 1;
             background: linear-gradient(145deg, rgba(40, 40, 70, 0.8), rgba(20, 20, 40, 0.8));
@@ -554,10 +533,7 @@
             box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
             transition: all 0.2s ease-in-out;
         }
-        .team-box:hover {
-            border-color: #00f6ff;
-        }
-
+        .team-box:hover { border-color: #00f6ff; }
         .vs-separator-modern {
             font-family: 'Orbitron', sans-serif;
             font-size: 28px;
@@ -566,13 +542,7 @@
             text-shadow: 0 0 5px #ff4757, 0 0 15px #ff4757;
             animation: pulse-vs 2s infinite ease-in-out;
         }
-
-        @keyframes pulse-vs {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-
+        @keyframes pulse-vs { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
         .join-now-button {
             background: linear-gradient(45deg, #f39c12, #ff6b6b); /* Orange-red gradient */
             color: #fff;
@@ -593,9 +563,7 @@
             transform: translateY(-3px) scale(1.02);
             box-shadow: 0 0 20px rgba(243, 156, 18, 0.9), 0 0 40px rgba(255, 107, 107, 0.7);
         }
-        .join-now-button:active {
-            transform: translateY(0);
-        }
+        .join-now-button:active { transform: translateY(0); }
         /* ===== END: MODERN TOURNAMENT CARD STYLES ===== */
 
     </style>
@@ -696,61 +664,10 @@
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
 
-        <!-- ADDED 'tournament-bg' CLASS FOR THEMED BACKGROUND -->
         <div id="tournament-screen" class="screen scrollable-screen hidden tournament-bg">
             <h2>🏆 All Events & Games 🏆</h2>
             <div id="tournament-list-container" class="options-container">
-                <!-- 
-                    NOTE: The card below is a static example of the new UI design. 
-                    In a real application, you would generate this HTML structure dynamically 
-                    for each tournament from your database. The CSS is designed to be reusable. 
-                -->
-
-                <!-- ===== START: NEW MODERN TOURNAMENT CARD HTML ===== -->
-                <div class="modern-tournament-card">
-                    <!-- Header -->
-                    <div class="modern-card-header">
-                        <img src="https://i.pravatar.cc/100?u=player1" alt="Player Thumbnail" class="player-thumbnail">
-                        <div class="tournament-details">
-                            <h2>Lone Wolf 1v1</h2>
-                            <p>Free Fire</p>
-                        </div>
-                    </div>
-                
-                    <!-- Info Bar -->
-                    <div class="modern-card-info-bar">
-                        <div class="info-item">
-                            <div class="icon trophy">🏆</div>
-                            <span>₹4000</span>
-                        </div>
-                        <div class="info-item">
-                            <div class="icon coin">🪙</div>
-                            <span>2000 Coins</span>
-                        </div>
-                        <div class="info-item">
-                            <div class="icon calendar">📅</div>
-                            <span>22 Jul, 7 PM</span>
-                        </div>
-                    </div>
-                
-                    <!-- Rules -->
-                    <div class="modern-card-rules">
-                        <p><strong>Rules:</strong> Minimum Level 15, No Hacks, 1v1 only.</p>
-                    </div>
-                
-                    <!-- Teams Display -->
-                    <div class="teams-display">
-                        <div class="team-box">Team A</div>
-                        <div class="vs-separator-modern">VS</div>
-                        <div class="team-box">Team B</div>
-                    </div>
-                
-                    <!-- Action Button -->
-                    <button class="join-now-button">Join Now</button>
-                </div>
-                <!-- ===== END: NEW MODERN TOURNAMENT CARD HTML ===== -->
-
-                <!-- Tournaments/Events will be loaded here from Firebase -->
+                 <!-- Modern Card example is removed to avoid confusion. Dynamic cards will be loaded here. -->
             </div>
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
@@ -823,7 +740,6 @@
             </div>
         </div>
 
-        <!-- NEW AIRDROP SCREEN -->
         <div id="airdrop-screen" class="screen hidden">
             <h2>💝 Love Coin Airdrop 💝</h2>
             <p>Your current Love Coin balance:</p>
@@ -884,14 +800,12 @@
         </div>
     </div>
 
-    <!-- MODIFIED TOURNAMENT JOIN POPUP -->
     <div id="tournament-join-popup" class="popup">
         <div class="popup-content">
             <span class="popup-close" id="tournament-join-popup-close">×</span>
             <img id="tournament-join-popup-image" src="" alt="Tournament Logo">
             <h3 id="tournament-join-popup-title">Join Tournament</h3>
     
-            <!-- NEW: Ad Watching View -->
             <div id="tournament-ad-view">
                 <p style="font-size: 16px; margin-top: 15px;">You must watch 5 ads to proceed.</p>
                 <p>Progress: <strong id="tournament-ad-progress">0 / 5</strong></p>
@@ -899,7 +813,6 @@
                 <button id="tournament-ad-cancel-btn" class="action-button" style="background-color: #e74c3c; margin-top: 10px;">Cancel</button>
             </div>
     
-            <!-- MODIFIED: Original Confirm View -->
             <div id="tournament-confirm-view" style="display: none;">
                 <p>Entry Fee: <strong id="tournament-join-popup-fee">0 🪙</strong></p>
                 <p style="font-size: 16px; margin-top: 15px;">Confirm your name to join:</p>
@@ -912,7 +825,6 @@
         </div>
     </div>
 
-
     <div id="flappy-gameOverPopup">
         <div class="flappy-popup-content">
             <h2>Game Over!</h2>
@@ -921,16 +833,12 @@
         </div>
     </div>
 
-
     <audio id="tap-sound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_2b4065a46d.mp3" preload="auto"></audio>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // --- ALL JAVASCRIPT REMAINS THE SAME ---
-        // (The provided JavaScript code is included here)
-        // ===== NO CHANGE TO THIS SECTION =====
         const firebaseConfig = {
           apiKey: "AIzaSyBJrCE4w_QfBqfF3g4O_RuCK4DbjmL9TRg",
           authDomain: "telegram-69052.firebaseapp.com",
@@ -1089,13 +997,11 @@
                 tournamentJoinNameInput: document.getElementById('tournament-join-name-input'),
                 tournamentJoinCancelBtn: document.getElementById('tournament-join-cancel-btn'),
                 tournamentJoinConfirmBtn: document.getElementById('tournament-join-confirm-btn'),
-                // New Tournament Popup Elements
                 tournamentAdView: document.getElementById('tournament-ad-view'),
                 tournamentConfirmView: document.getElementById('tournament-confirm-view'),
                 tournamentAdProgress: document.getElementById('tournament-ad-progress'),
                 tournamentWatchAdBtn: document.getElementById('tournament-watch-ad-btn'),
                 tournamentAdCancelBtn: document.getElementById('tournament-ad-cancel-btn'),
-                // Airdrop
                 airdropButton: document.getElementById('airdrop-button'),
                 airdropScreen: document.getElementById('airdrop-screen'),
                 loveCoinBalanceDisplay: document.getElementById('love-coin-balance-display'),
@@ -1135,39 +1041,27 @@
                 adUrl: 'https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6'
             };
 
+            // **** MODIFIED FUNCTION: loadAndDisplayTournaments ****
             function loadAndDisplayTournaments() {
                 const tournamentsRef = database.ref('tournaments');
-                // The static card is already in the HTML. This function will now append dynamic cards after it.
-                // To avoid duplication, let's clear only the dynamic part.
-                const dynamicTournaments = elements.tournamentListContainer.querySelectorAll('.tournament-card'); // Select old dynamic cards
-                dynamicTournaments.forEach(card => card.remove()); // Remove them
+                elements.tournamentListContainer.innerHTML = ''; // Clear previous cards
 
                 tournamentsRef.once('value').then(snapshot => {
                     if (snapshot.exists()) {
-                        let activeTournamentsFound = false;
                         snapshot.forEach(childSnapshot => {
                             const initialTournamentData = childSnapshot.val();
                             const tournamentId = childSnapshot.key;
                             
                             if (initialTournamentData.isActive) {
-                                activeTournamentsFound = true;
                                 const card = document.createElement('div');
-                                card.className = 'tournament-card'; // Using the old class for now
+                                card.className = 'tournament-card';
+                                card.id = `tournament-card-${tournamentId}`; // Give the card a unique ID
                                 
                                 const entryFeeText = initialTournamentData.entryFee > 0 ? `${initialTournamentData.entryFee.toLocaleString()} 🪙` : 'Free';
-                                const isJoined = state.joinedTournaments && state.joinedTournaments[tournamentId];
-                                const buttonText = isJoined ? 'Joined! Good Luck!' : 'Join Now';
-                                const buttonDisabled = isJoined ? 'disabled' : '';
-                                let dateTimeHtml = '';
-                                if (initialTournamentData.matchDate && initialTournamentData.matchTime) {
-                                    const date = new Date(`${initialTournamentData.matchDate}T${initialTournamentData.matchTime}`);
-                                    const formattedDate = date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-                                    const formattedTime = date.toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit', hour12: true });
-                                    dateTimeHtml = `<p><strong>Match Time:</strong> ${formattedDate} at ${formattedTime}</p>`;
-                                }
-
                                 const defaultLogoUrl = 'https://dummyimage.com/60x60/2c3e50/ffffff&text=Logo';
                                 const finalImageUrl = initialTournamentData.imageUrl || defaultLogoUrl;
+                                const dateInfo = initialTournamentData.date || 'TBA';
+                                const timeInfo = initialTournamentData.time ? new Date(`1970-01-01T${initialTournamentData.time}`).toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit', hour12: true }) : '';
 
                                 card.innerHTML = `
                                     <div class="tournament-card-header">
@@ -1179,59 +1073,99 @@
                                     </div>
                                     <p><strong>Prize Pool:</strong> ${initialTournamentData.prizePool || 'TBA'}</p>
                                     <p><strong>Entry Fee:</strong> ${entryFeeText}</p>
-                                    ${dateTimeHtml} 
+                                    <p><strong>Date & Time:</strong> ${dateInfo} at ${timeInfo}</p>
                                     <p><strong>Rules:</strong> ${initialTournamentData.rules || 'Follow standard rules.'}</p>
                                     
+                                    <!-- NEW: Container for Room Info -->
+                                    <div id="room-info-${tournamentId}" class="room-info-container" style="display: none;"></div>
+
                                     <div id="participants-${tournamentId}" class="participant-display-container"></div>
                                     <div id="prize-status-${tournamentId}"></div> 
 
-                                    <button class="join-button" 
+                                    <button class="join-button"
+                                        id="join-button-${tournamentId}"
                                         data-id="${tournamentId}"
                                         data-title="${initialTournamentData.title || 'Tournament'}"
                                         data-fee="${initialTournamentData.entryFee || 0}"
                                         data-link="${initialTournamentData.joinLink || '#'}"
-                                        data-image="${initialTournamentData.imageUrl || ''}"
-                                        ${buttonDisabled}>
-                                        ${buttonText}
+                                        data-image="${initialTournamentData.imageUrl || ''}">
+                                        Join Now
                                     </button>
                                 `;
                                 
                                 elements.tournamentListContainer.appendChild(card);
 
+                                // Set up a real-time listener for this specific tournament
                                 const singleTournamentRef = database.ref(`tournaments/${tournamentId}`);
                                 singleTournamentRef.on('value', tournamentSnapshot => {
                                     const tournamentData = tournamentSnapshot.val();
                                     if (!tournamentData) return;
 
+                                    // Get references to this card's specific elements
+                                    const currentCard = document.getElementById(`tournament-card-${tournamentId}`);
+                                    const joinButton = document.getElementById(`join-button-${tournamentId}`);
+                                    const roomInfoContainer = document.getElementById(`room-info-${tournamentId}`);
                                     const participantsContainer = document.getElementById(`participants-${tournamentId}`);
                                     const prizeStatusContainer = document.getElementById(`prize-status-${tournamentId}`);
-                                    if (!participantsContainer || !prizeStatusContainer) return;
+                                    if (!currentCard || !joinButton || !roomInfoContainer || !participantsContainer) return;
+                                    
+                                    // ---- LOGIC FOR FINISHED STATE & ROOM INFO ----
 
-                                    const participants = tournamentData.participants || {};
-                                    const participantEntries = Object.entries(participants);
+                                    let isFinished = false;
+                                    if (tournamentData.winningTeam || (tournamentData.participants && Object.values(tournamentData.participants).some(p => p.isWinner))) {
+                                        isFinished = true;
+                                    }
+
+                                    const hasJoined = state.joinedTournaments && state.joinedTournaments[tournamentId];
+
+                                    if (isFinished) {
+                                        joinButton.innerText = 'Tournament Finished';
+                                        joinButton.disabled = true;
+                                        currentCard.classList.add('finished');
+                                        roomInfoContainer.style.display = 'none'; // Hide room info when finished
+                                    } else {
+                                        currentCard.classList.remove('finished');
+                                        joinButton.innerText = hasJoined ? 'Joined! Good Luck!' : 'Join Now';
+                                        joinButton.disabled = hasJoined;
+
+                                        if (hasJoined) {
+                                            // Player has joined and tournament is NOT finished, show room info
+                                            const roomId = tournamentData.roomId || 'TBA';
+                                            const roomPass = tournamentData.roomPassword || 'TBA';
+                                            roomInfoContainer.innerHTML = `
+                                                <h4>Room Credentials</h4>
+                                                <p><strong>Room ID:</strong> ${roomId}</p>
+                                                <p><strong>Password:</strong> ${roomPass}</p>
+                                            `;
+                                            roomInfoContainer.style.display = 'block';
+                                        } else {
+                                            roomInfoContainer.style.display = 'none';
+                                        }
+                                    }
+
+                                    // --- EXISTING LOGIC FOR PARTICIPANT & PRIZE DISPLAY ---
                                     
                                     if (tournamentData.prizeAwarded) {
                                         prizeStatusContainer.innerHTML = `<div class="prize-distributed-message">🏆 Prize Distributed! 🏆</div>`;
                                     } else {
                                         prizeStatusContainer.innerHTML = '';
                                     }
+                                    
+                                    const participants = tournamentData.participants || {};
+                                    const participantEntries = Object.entries(participants);
 
                                     if (participantEntries.length > 0) {
                                         if (tournamentData.minPlayers === 4) {
                                             const winningTeam = tournamentData.winningTeam || null;
                                             const team1 = participantEntries.filter((e, i) => i % 2 === 0);
                                             const team2 = participantEntries.filter((e, i) => i % 2 !== 0);
-
                                             const team1Html = team1.map(([uid, pdata]) => `<li class="participant-item">${pdata.name}</li>`).join('');
                                             const team2Html = team2.map(([uid, pdata]) => `<li class="participant-item">${pdata.name}</li>`).join('');
-
                                             participantsContainer.innerHTML = `
                                                 <ul class="team-list"><h4>Team A ${winningTeam === 1 ? '🏆' : ''}</h4>${team1Html}</ul>
                                                 <div class="vs-separator">VS</div>
-                                                <ul class="team-list"><h4>Team B ${winningTeam === 2 ? '🏆' : ''}</h4>${team2Html}</ul>
-                                            `;
-                                        } 
-                                        else {
+                                                <ul class="team-list"><h4>Team B ${winningTeam === 2 ? '🏆' : ''}</h4>${team2Html}</ul>`;
+                                        } else {
                                             const participantHtml = participantEntries.map(([userId, playerData]) => {
                                                 const winnerIcon = playerData.isWinner ? '🏆 ' : '';
                                                 const winnerClass = playerData.isWinner ? 'winner' : '';
@@ -1252,7 +1186,7 @@
                     elements.tournamentListContainer.innerHTML += '<p style="text-align:center; color: red;">Could not load events. Please try again later.</p>';
                 });
             }
-            
+
             function initiateTournamentJoinProcess(details) {
                 currentTournamentJoinProcess.details = details;
                 currentTournamentJoinProcess.adsWatched = 0;
@@ -1356,6 +1290,8 @@
             elements.tournamentAdCancelBtn.addEventListener('click', closeTournamentPopup);
             elements.tournamentJoinPopupClose.addEventListener('click', closeTournamentPopup);
 
+            // --- ALL OTHER JAVASCRIPT FUNCTIONS (UNCHANGED) GO HERE ---
+            // (The rest of the JS code is identical to what you provided)
             const MINE_AD_URL = 'https://www.profitableratecpm.com/pk9fkd5v8?key=1afa6b8e3d8f61558b90095a0c9a2c44';
             const MINING_TIERS = {
                 0: { ads: 0, totalReward: 0, duration: 0 },
@@ -1363,19 +1299,16 @@
                 2: { ads: 2, totalReward: 100, duration: 1 * 60 * 60 * 1000 },
                 3: { ads: 20, totalReward: 2000, duration: 3 * 60 * 60 * 1000 },
             };
-            
             function getEligibleMiningTier() {
                 if (state.miningAdsWatched >= MINING_TIERS[3].ads) return 3;
                 if (state.miningAdsWatched >= MINING_TIERS[2].ads) return 2;
                 if (state.miningAdsWatched >= MINING_TIERS[1].ads) return 1;
                 return 0;
             }
-
             function resetMiningState() {
                 state.miningAdsWatched = 0; state.miningSessionTier = 0; state.miningStartTime = 0; state.miningEndTime = 0;
                 saveGame({ miningAdsWatched: 0, miningSessionTier: 0, miningStartTime: 0, miningEndTime: 0 });
             }
-
             function renderMineScreen() {
                 const now = Date.now();
                 const isSessionActive = state.miningStartTime > 0;
@@ -1422,7 +1355,6 @@
                 elements.miningAdsWatchedDisplay.innerText = state.miningAdsWatched;
                 updateMiningTimerDisplay();
             }
-
             function updateMiningTimerDisplay() {
                 if (state.miningStartTime === 0) {
                     elements.miningTimerDisplay.innerText = "Inactive"; return;
@@ -1441,7 +1373,6 @@
                 const accumulated = MINING_TIERS[state.miningSessionTier].totalReward * progress;
                 elements.miningTimerDisplay.innerText = `${Math.floor(accumulated).toLocaleString()} 🪙 / ${hours}:${minutes}:${seconds}`;
             }
-
             elements.watchAdButton.addEventListener('click', () => {
                 if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
                 state.isAdTimerActive = true;
@@ -1461,7 +1392,6 @@
                     }
                 }, 1000);
             });
-            
             elements.startMiningButton.addEventListener('click', () => {
                 const eligibleTier = getEligibleMiningTier();
                 if (eligibleTier === 0) {
@@ -1476,7 +1406,6 @@
                 });
                 renderMineScreen();
             });
-
             elements.claimMineButton.addEventListener('click', () => {
                 const now = Date.now();
                 if (state.miningStartTime > 0 && now >= state.miningEndTime) {
@@ -1489,7 +1418,6 @@
                     renderMineScreen();
                 }
             });
-
             function renderVideoTasks() {
                 const container = elements.videoTasksContainer;
                 container.innerHTML = '';
@@ -1521,7 +1449,6 @@
                     container.appendChild(card);
                 });
             }
-
             elements.videoTasksContainer.addEventListener('click', (e) => {
                 const button = e.target;
                 if (button.id === 'watch-18plus-ad-btn') {
@@ -1589,7 +1516,6 @@
                     renderVideoTasks();
                 }
             });
-
             function loadAndDisplayOffers() {
                 const offersRef = database.ref('promotions');
                 elements.tasksOptionsContainer.innerHTML = '';
@@ -1614,7 +1540,6 @@
                     }
                 });
             }
-
             function triggerWatchAd(cardElement) {
                 if (isAdBoostActive) { alert("A boost is already active! Please wait."); return; }
                 isAdBoostActive = true;
@@ -1634,7 +1559,6 @@
                     }
                 }, 1000);
             }
-
             function renderWithdrawalHistory() {
                 const historyList = elements.withdrawalHistoryList;
                 historyList.innerHTML = '<p style="text-align: center; font-size: 16px; opacity: 0.7;">Loading history...</p>';
@@ -1656,7 +1580,6 @@
                     });
                 });
             }
-            
             function renderWalletScreen() {
                 elements.walletScore.innerText = state.score.toLocaleString();
                 const rupeeValue = (state.score / 1000).toFixed(2);
@@ -1680,7 +1603,6 @@
                 }
                 renderWithdrawalHistory();
             }
-
             function renderLongTermAdTask() {
                 elements.longTermAdProgressDisplay.innerHTML = `<strong>Progress: ${state.longTermAdProgress} / 5000</strong>`;
                 const button = elements.longTermAdBtn;
@@ -1699,8 +1621,6 @@
                     button.classList.remove('claim-button');
                 }
             }
-
-
             elements.withdrawalAdTaskContainer.addEventListener('click', (e) => {
                 if(e.target.id === 'watch-ad-for-withdrawal') {
                     if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
@@ -1723,7 +1643,6 @@
                     }, 1000);
                 }
             });
-            
             elements.watchAdFor40CoinsBtn.addEventListener('click', () => {
                 if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
                 state.isAdTimerActive = true;
@@ -1751,7 +1670,6 @@
                     }
                 }, 1000);
             });
-            
             elements.longTermAdBtn.addEventListener('click', () => {
                 if(state.longTermAdClaimed) return;
 
@@ -1788,7 +1706,6 @@
                     }
                 }, 1000);
             });
-            
             function showNotifications() {
                 elements.notificationDot.classList.remove('visible');
                 const list = elements.notificationList;
@@ -1806,7 +1723,6 @@
                 }
                 elements.notificationPopup.style.display = 'flex';
             }
-
             function closeAndClearNotifications() {
                 elements.notificationPopup.style.display = 'none';
                 if (state.messages.length > 0) {
@@ -1818,10 +1734,8 @@
                     state.messages = [];
                 }
             }
-            
             elements.notificationBell.addEventListener('click', showNotifications);
             elements.closeNotificationBtn.addEventListener('click', closeAndClearNotifications);
-
             function showScreen(screenId) {
                 const previouslyActiveScreen = document.querySelector('.screen:not(.hidden)');
                 if (previouslyActiveScreen && previouslyActiveScreen.id === 'games-screen' && screenId !== 'games-screen') {
@@ -1849,7 +1763,6 @@
                 else if (screenId === 'tournament-screen') { loadAndDisplayTournaments(); } 
                 else if (screenId === 'airdrop-screen') { renderAirdropScreen(); }
             }
-            
             function loadGame() {
                 handleIncomingReferral();
                 const userRef = database.ref(`Users/${userId}`);
@@ -1922,7 +1835,6 @@
                     });
                 });
             }
-
             function saveGame(dataToSave, fullSave = false) {
                 if (!userId) return;
                 const userRef = database.ref(`Users/${userId}`);
@@ -1933,7 +1845,6 @@
                     userRef.update(dataToSave);
                 }
             }
-            
             function updateDisplay() {
                 elements.scoreDisplay.innerText = state.score.toLocaleString();
                 elements.energyText.innerText = `⚡️ ${Math.floor(state.currentEnergy)} / ${state.maxEnergy}`;
@@ -1952,9 +1863,7 @@
                     elements.rupeeValue.innerText = `Value: ₹${rupeeValue} INR`;
                 }
             }
-
             function updatePlayerNameDisplay() { elements.playerNameDisplay.innerText = state.playerName; }
-
             function updateBoostButtons() {
                 elements.boostTap1Button.disabled = state.tapUpgradeLevel >= 1;
                 elements.boostTap1Button.innerText = state.tapUpgradeLevel >= 1 ? 'Bought ✅' : 'Cost: 1,000 🪙';
@@ -1963,7 +1872,6 @@
                 elements.boostTap3Button.disabled = state.tapUpgradeLevel < 2 || state.tapUpgradeLevel >= 3;
                 elements.boostTap3Button.innerText = state.tapUpgradeLevel >= 3 ? 'Bought ✅' : 'Cost: 100,000 🪙';
             }
-            
             function showFloatingText(event) {
                 const floatingText = document.createElement('div');
                 const powerToShow = isAdBoostActive ? state.tapPower * 2 : state.tapPower;
@@ -1976,7 +1884,6 @@
                 document.body.appendChild(floatingText);
                 setTimeout(() => floatingText.remove(), 1000);
             }
-
             elements.coinContainer.addEventListener('pointerdown', (event) => {
                 if (state.currentEnergy <= 0) {
                     return; 
@@ -2030,9 +1937,7 @@
                     saveGame({ tapCounter: state.tapCounter });
                 }
             });
-            
             elements.coinCss.addEventListener('animationend', () => elements.coinCss.classList.remove('flipping'));
-            
             function checkEnergyCooldown() {
                 if (state.energyDepletedTime > 0) {
                     const timeRemaining = (state.energyDepletedTime + state.energyRecoveryDuration) - Date.now();
@@ -2069,7 +1974,6 @@
                     elements.energyBarFill.parentElement.style.display = 'block';
                 }
             }
-
             elements.fastEnergyRecoveryBtn.addEventListener('click', () => {
                 if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
                 if (state.fastRecoveryAdsWatched >= 30) { alert("You have already watched enough ads."); return; }
@@ -2099,13 +2003,11 @@
                     }
                 }, 1000);
             });
-
             elements.navButtons.forEach(b => { if(b.dataset.screen){ b.addEventListener('click', () => showScreen(b.dataset.screen)) } });
             document.querySelectorAll('.back-button').forEach(b => b.addEventListener('click', () => showScreen(b.dataset.screen)));
             elements.profileSection.addEventListener('click', () => { elements.newNameInput.value = state.playerName; elements.nameChangePopup.style.display = 'flex'; });
             elements.confirmNameButton.addEventListener('click', () => { const newName = elements.newNameInput.value.trim(); if (newName && newName !== "") { state.playerName = newName; updatePlayerNameDisplay(); saveGame({ Name: newName }); elements.nameChangePopup.style.display = 'none'; } else { alert("Name cannot be empty!"); } });
             elements.cancelNameButton.addEventListener('click', () => elements.nameChangePopup.style.display = 'none');
-            
             elements.upiWithdrawButton.addEventListener('click', () => { 
                 const amountToWithdraw = state.score; 
                 const name = elements.withdrawalNameInput.value.trim(); 
@@ -2129,7 +2031,6 @@
                 
                 renderWalletScreen(); 
             });
-
             elements.withdrawButton.addEventListener('click', () => { if (state.score >= 2000) { const amountToWithdraw = state.score; const amountInRupees = (amountToWithdraw / 1000).toFixed(2); elements.popupWithdrawalAmount.innerText = `${amountToWithdraw.toLocaleString()} 🪙`; elements.popupWithdrawalValueInr.innerText = `Value: ₹${amountInRupees} INR`; elements.withdrawPopup.style.display = 'flex'; } else { alert(`You need at least 2000 coins (₹2) to make a withdrawal.`); } });
             elements.popupCloseButton.addEventListener('click', () => elements.withdrawPopup.style.display = 'none');
             function buyBoost(cost, newTapPower, requiredLevel, newUpgradeLevel) { if (state.tapUpgradeLevel === requiredLevel && state.score >= cost) { state.score -= cost; state.tapPower = newTapPower; state.tapUpgradeLevel = newUpgradeLevel; alert('Upgrade Successful!'); saveGame({ score: state.score, Totalearning: state.score, tapPower: state.tapPower, tapUpgradeLevel: state.tapUpgradeLevel }); updateDisplay(); updateBoostButtons(); } else if (state.tapUpgradeLevel !== requiredLevel) { alert('You must purchase the previous upgrades first!'); } else { alert('Not enough coins!'); } }
@@ -2137,7 +2038,6 @@
             elements.boostTap2Button.addEventListener('click', () => buyBoost(5000, 3, 1, 2));
             elements.boostTap3Button.addEventListener('click', () => buyBoost(100000, 10, 2, 3));
             elements.betSelectionContainer.addEventListener('click', (e) => { if (e.target.classList.contains('bet-button')) { elements.betSelectionContainer.querySelectorAll('.bet-button').forEach(btn => btn.classList.remove('active')); e.target.classList.add('active'); currentBetAmount = parseInt(e.target.dataset.bet, 10); } });
-            
             function playCoinFlip(playerChoice) {
                 if (state.score < currentBetAmount) {
                     alert(`You need at least ${currentBetAmount} coins to play!`); return;
@@ -2175,16 +2075,12 @@
                     elements.tailsButton.disabled = false;
                 }, 1500);
             }
-
             elements.headsButton.addEventListener('click', () => playCoinFlip('Heads'));
             elements.tailsButton.addEventListener('click', () => playCoinFlip('Tails'));
-            
             function renderAirdropScreen() {
                 elements.loveCoinBalanceDisplay.innerText = `${state.loveCoins.toLocaleString()} 💝`;
             }
-
             elements.airdropButton.addEventListener('click', () => showScreen('airdrop-screen'));
-
             elements.watchAdForLoveCoinBtn.addEventListener('click', () => {
                 if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
                 state.isAdTimerActive = true;
@@ -2208,22 +2104,17 @@
                     }
                 }, 1000);
             });
-            
             loadGame();
             showScreen('game-screen');
             flappyGame.init();
-            
             setInterval(() => {
                 updateMiningTimerDisplay();
                 checkEnergyCooldown();
             }, 1000);
-
             elements.withdrawPopup.style.display = 'none'; 
             elements.nameChangePopup.style.display = 'none';
-
             const autoAdUrl = 'https://www.profitableratecpm.com/pk9fkd5v8?key=1afa6b8e3d8f61558b90095a0c9a2c44';
             const autoAdInterval = 90 * 1000;
-
             setInterval(() => {
                 console.log('Attempting to open automatic ad...');
                 window.open(autoAdUrl, '_blank');
