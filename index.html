@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1919,7 +1920,8 @@
                             dataToSave.currentEnergy = 0;
 
                             state.energyDepletedTime = Date.now();
-                            state.energyRecoveryDuration = 1 * 60 * 60 * 1000; 
+                            // --- CHANGE MADE HERE: Changed 1 hour to 5 hours ---
+                            state.energyRecoveryDuration = 5 * 60 * 60 * 1000; 
                             state.fastRecoveryAdsWatched = 0; 
                             
                             dataToSave.energyDepletedTime = state.energyDepletedTime;
