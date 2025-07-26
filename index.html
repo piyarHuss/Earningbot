@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -668,7 +667,7 @@
         <div id="tournament-screen" class="screen scrollable-screen hidden tournament-bg">
             <h2>🏆 All Events & Games 🏆</h2>
             <div id="tournament-list-container" class="options-container">
-                 <!-- Modern Card example is removed to avoid confusion. Dynamic cards will be loaded here. -->
+                 <!-- Dynamic cards will be loaded here. -->
             </div>
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
@@ -861,6 +860,42 @@
             }
             return result;
         }
+        
+        function copyTextToClipboard(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('Invite link copied to your clipboard!');
+                }).catch(err => {
+                    console.error('Modern copy failed, trying fallback: ', err);
+                    fallbackCopyTextToClipboard(text);
+                });
+            } else {
+                fallbackCopyTextToClipboard(text);
+            }
+        }
+
+        function fallbackCopyTextToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.top = '-9999px';
+            textArea.style.left = '-9999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    alert('Invite link copied to your clipboard!');
+                } else {
+                    alert('Could not copy the link. Please copy it manually.');
+                }
+            } catch (err) {
+                console.error('Fallback copy failed: ', err);
+                alert('Could not copy the link. Please copy it manually.');
+            }
+            document.body.removeChild(textArea);
+        }
 
         function handleIncomingReferral() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -941,9 +976,10 @@
             jump() { if (this.gameRunning) { this.bird.velocity = this.bird.lift; } else if (!this.gameOverPopup.style.display || this.gameOverPopup.style.display === 'none') { this.startGame(); } }
         };
 
+        // --- UPDATED TASK LIST ---
         const videoAdTasks = [
             { id: 'videoTask1', title: 'Starter Video Pack', description: 'Watch 20 videos to earn 900 coins.', goal: 20, reward: 900, url: 'https://www.profitableratecpm.com/qshhszvnad?key=4761223a00e52bd9f2e24d515e6be228' },
-            { id: 'videoTask2', title: 'Video Marathon', description: 'Watch 80 videos to earn 5,000 coins.', goal: 80, reward: 5000, url: 'https://www.profitableratecpm.com/vibjgr90?key=2731d0788209fe1d948dd17fd0e0831f' },
+            { id: 'videoTask2', title: 'Video Marathon', description: 'Watch 150 videos to earn 5,000 coins.', goal: 150, reward: 5000, url: 'https://www.profitableratecpm.com/vibjgr90?key=2731d0788209fe1d948dd17fd0e0831f' },
             { id: 'videoTask3', title: 'Ultimate Video Challenge', description: 'Watch 3000 videos to earn 35,000 coins.', goal: 3000, reward: 35000, url: 'https://www.profitableratecpm.com/u745rvnfy?key=f5ec06ad491fd1ceab3af658fd2d3010' }
         ];
 
@@ -1042,10 +1078,9 @@
                 adUrl: 'https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6'
             };
 
-            // **** MODIFIED FUNCTION: loadAndDisplayTournaments ****
             function loadAndDisplayTournaments() {
                 const tournamentsRef = database.ref('tournaments');
-                elements.tournamentListContainer.innerHTML = ''; // Clear previous cards
+                elements.tournamentListContainer.innerHTML = ''; 
 
                 tournamentsRef.once('value').then(snapshot => {
                     if (snapshot.exists()) {
@@ -1056,7 +1091,7 @@
                             if (initialTournamentData.isActive) {
                                 const card = document.createElement('div');
                                 card.className = 'tournament-card';
-                                card.id = `tournament-card-${tournamentId}`; // Give the card a unique ID
+                                card.id = `tournament-card-${tournamentId}`;
                                 
                                 const entryFeeText = initialTournamentData.entryFee > 0 ? `${initialTournamentData.entryFee.toLocaleString()} 🪙` : 'Free';
                                 const defaultLogoUrl = 'https://dummyimage.com/60x60/2c3e50/ffffff&text=Logo';
@@ -1077,7 +1112,6 @@
                                     <p><strong>Date & Time:</strong> ${dateInfo} at ${timeInfo}</p>
                                     <p><strong>Rules:</strong> ${initialTournamentData.rules || 'Follow standard rules.'}</p>
                                     
-                                    <!-- NEW: Container for Room Info -->
                                     <div id="room-info-${tournamentId}" class="room-info-container" style="display: none;"></div>
 
                                     <div id="participants-${tournamentId}" class="participant-display-container"></div>
@@ -1096,13 +1130,11 @@
                                 
                                 elements.tournamentListContainer.appendChild(card);
 
-                                // Set up a real-time listener for this specific tournament
                                 const singleTournamentRef = database.ref(`tournaments/${tournamentId}`);
                                 singleTournamentRef.on('value', tournamentSnapshot => {
                                     const tournamentData = tournamentSnapshot.val();
                                     if (!tournamentData) return;
 
-                                    // Get references to this card's specific elements
                                     const currentCard = document.getElementById(`tournament-card-${tournamentId}`);
                                     const joinButton = document.getElementById(`join-button-${tournamentId}`);
                                     const roomInfoContainer = document.getElementById(`room-info-${tournamentId}`);
@@ -1110,8 +1142,6 @@
                                     const prizeStatusContainer = document.getElementById(`prize-status-${tournamentId}`);
                                     if (!currentCard || !joinButton || !roomInfoContainer || !participantsContainer) return;
                                     
-                                    // ---- LOGIC FOR FINISHED STATE & ROOM INFO ----
-
                                     let isFinished = false;
                                     if (tournamentData.winningTeam || (tournamentData.participants && Object.values(tournamentData.participants).some(p => p.isWinner))) {
                                         isFinished = true;
@@ -1123,14 +1153,13 @@
                                         joinButton.innerText = 'Tournament Finished';
                                         joinButton.disabled = true;
                                         currentCard.classList.add('finished');
-                                        roomInfoContainer.style.display = 'none'; // Hide room info when finished
+                                        roomInfoContainer.style.display = 'none';
                                     } else {
                                         currentCard.classList.remove('finished');
                                         joinButton.innerText = hasJoined ? 'Joined! Good Luck!' : 'Join Now';
                                         joinButton.disabled = hasJoined;
 
                                         if (hasJoined) {
-                                            // Player has joined and tournament is NOT finished, show room info
                                             const roomId = tournamentData.roomId || 'TBA';
                                             const roomPass = tournamentData.roomPassword || 'TBA';
                                             roomInfoContainer.innerHTML = `
@@ -1143,8 +1172,6 @@
                                             roomInfoContainer.style.display = 'none';
                                         }
                                     }
-
-                                    // --- EXISTING LOGIC FOR PARTICIPANT & PRIZE DISPLAY ---
                                     
                                     if (tournamentData.prizeAwarded) {
                                         prizeStatusContainer.innerHTML = `<div class="prize-distributed-message">🏆 Prize Distributed! 🏆</div>`;
@@ -1291,8 +1318,6 @@
             elements.tournamentAdCancelBtn.addEventListener('click', closeTournamentPopup);
             elements.tournamentJoinPopupClose.addEventListener('click', closeTournamentPopup);
 
-            // --- ALL OTHER JAVASCRIPT FUNCTIONS (UNCHANGED) GO HERE ---
-            // (The rest of the JS code is identical to what you provided)
             const MINE_AD_URL = 'https://www.profitableratecpm.com/pk9fkd5v8?key=1afa6b8e3d8f61558b90095a0c9a2c44';
             const MINING_TIERS = {
                 0: { ads: 0, totalReward: 0, duration: 0 },
@@ -1476,12 +1501,8 @@
                     }, 1000);
                 }
                 if (button.id === 'copy-referral-link-button') {
-                    const webReferralLink = `${window.location.origin}${window.location.pathname}?ref=${state.myReferralC}`;
-                    navigator.clipboard.writeText(webReferralLink).then(() => {
-                        alert('Invite link copied to your clipboard!');
-                    }).catch(err => {
-                        alert('Could not copy the link.');
-                    });
+                    const webReferralLink = `https://t.me/squid_456_bot?start=${state.myReferralC}`;
+                    copyTextToClipboard(webReferralLink);
                 }
                 if (button.classList.contains('video-task-button')) {
                     if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
@@ -1920,7 +1941,6 @@
                             dataToSave.currentEnergy = 0;
 
                             state.energyDepletedTime = Date.now();
-                            // --- CHANGE MADE HERE: Changed 1 hour to 5 hours ---
                             state.energyRecoveryDuration = 5 * 60 * 60 * 1000; 
                             state.fastRecoveryAdsWatched = 0; 
                             
