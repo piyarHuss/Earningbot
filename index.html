@@ -263,6 +263,7 @@
             gap: 10px;
             transition: opacity 0.3s;
         }
+        /* **** NEW: Style for finished tournaments **** */
         .tournament-card.finished {
             opacity: 0.6;
             border-color: #7f8c8d;
@@ -344,6 +345,7 @@
             gap: 15px;
         }
 
+        /* **** NEW: Room Info Container **** */
         .room-info-container {
             background-color: rgba(46, 204, 113, 0.1);
             border: 1px solid #2ecc71;
@@ -362,7 +364,7 @@
         }
 
         .participant-display-container {
-            display: none;
+            display: none; /* Hidden by default, shown by JS if players exist */
             justify-content: space-around;
             align-items: flex-start;
             margin-top: 20px;
@@ -418,6 +420,7 @@
             border: 1px solid #27ae60;
         }
 
+        /* ===== START: MODERN TOURNAMENT CARD STYLES ===== */
         .screen.tournament-bg {
             background: url('https://images.unsplash.com/photo-1581888224555-93d6a8f1b333?q=80&w=1932&auto=format&fit=crop') no-repeat center center/cover;
             position: relative;
@@ -430,6 +433,139 @@
             background-color: rgba(10, 10, 25, 0.7);
             z-index: -1;
         }
+        
+        .modern-tournament-card {
+            font-family: 'Poppins', sans-serif;
+            background: rgba(26, 26, 46, 0.75);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 246, 255, 0.3);
+            border-radius: 20px;
+            padding: 25px;
+            max-width: 400px;
+            width: 100%;
+            margin: 20px auto;
+            box-shadow: 0 0 20px rgba(0, 246, 255, 0.25), 0 8px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .modern-card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .player-thumbnail {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid #00f6ff;
+            object-fit: cover;
+            box-shadow: 0 0 10px #00f6ff;
+            flex-shrink: 0;
+        }
+        .tournament-details { min-width: 0; }
+        .tournament-details h2 {
+            font-family: 'Orbitron', sans-serif;
+            margin: 0;
+            font-size: 20px;
+            color: #ffffff;
+            text-shadow: 0 0 5px #ffffff, 0 0 10px #00f6ff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .tournament-details p {
+            margin: 0;
+            font-size: 14px;
+            color: #00f6ff;
+            opacity: 0.9;
+        }
+        .modern-card-info-bar {
+            display: flex;
+            justify-content: space-around;
+            align-items: stretch;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px 10px;
+            border-radius: 12px;
+            border-top: 1px solid rgba(0, 246, 255, 0.2);
+            border-bottom: 1px solid rgba(0, 246, 255, 0.2);
+        }
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 5px;
+            flex: 1;
+        }
+        .info-item .icon { font-size: 24px; line-height: 1; }
+        .info-item .icon.trophy { color: #ffc700; text-shadow: 0 0 8px #ffc700; }
+        .info-item .icon.coin { color: #f39c12; text-shadow: 0 0 8px #f39c12; }
+        .info-item .icon.calendar { color: #3498db; text-shadow: 0 0 8px #3498db; }
+        .info-item span { font-size: 14px; font-weight: 600; color: #eee; }
+        .modern-card-rules {
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            border-left: 3px solid #00f6ff;
+        }
+        .modern-card-rules p { margin: 0; font-size: 13px; color: #ccc; line-height: 1.5; }
+        .modern-card-rules strong { color: #00f6ff; font-weight: 700; }
+        .teams-display {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+        .team-box {
+            flex: 1;
+            background: linear-gradient(145deg, rgba(40, 40, 70, 0.8), rgba(20, 20, 40, 0.8));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 700;
+            color: #ccc;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+            transition: all 0.2s ease-in-out;
+        }
+        .team-box:hover { border-color: #00f6ff; }
+        .vs-separator-modern {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 28px;
+            font-weight: 900;
+            color: #ff4757; /* Neon red/pink */
+            text-shadow: 0 0 5px #ff4757, 0 0 15px #ff4757;
+            animation: pulse-vs 2s infinite ease-in-out;
+        }
+        @keyframes pulse-vs { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        .join-now-button {
+            background: linear-gradient(45deg, #f39c12, #ff6b6b); /* Orange-red gradient */
+            color: #fff;
+            border: none;
+            padding: 15px;
+            width: 100%;
+            border-radius: 12px;
+            font-size: 18px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(243, 156, 18, 0.6), 0 0 25px rgba(255, 107, 107, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+        .join-now-button:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 0 20px rgba(243, 156, 18, 0.9), 0 0 40px rgba(255, 107, 107, 0.7);
+        }
+        .join-now-button:active { transform: translateY(0); }
+        /* ===== END: MODERN TOURNAMENT CARD STYLES ===== */
+
     </style>
 </head>
 <body>
@@ -849,80 +985,6 @@
         document.addEventListener('DOMContentLoaded', () => {
             updateUserPresence(userId);
 
-            // --- NEW AD WATCHER SYSTEM ---
-            let adWatcherState = {
-                isWatching: false,
-                startTime: 0,
-                requiredDuration: 15000, // 15 seconds
-                onSuccess: null,
-                onFailure: null,
-            };
-
-            document.addEventListener('visibilitychange', () => {
-                if (!adWatcherState.isWatching) {
-                    return;
-                }
-
-                if (document.visibilityState === 'hidden') {
-                    // User has left the tab, start the timer
-                    adWatcherState.startTime = Date.now();
-                } else if (document.visibilityState === 'visible') {
-                    // User has returned to the tab
-                    if (adWatcherState.startTime === 0) {
-                        // This can happen if the ad window was blocked or closed instantly
-                        // before the 'hidden' state could register. Treat as failure.
-                        if (adWatcherState.onFailure) adWatcherState.onFailure();
-                    } else {
-                        const elapsedTime = Date.now() - adWatcherState.startTime;
-                        if (elapsedTime >= adWatcherState.requiredDuration) {
-                            if (adWatcherState.onSuccess) adWatcherState.onSuccess();
-                        } else {
-                            if (adWatcherState.onFailure) adWatcherState.onFailure();
-                        }
-                    }
-                    // Reset watcher
-                    adWatcherState.isWatching = false;
-                    adWatcherState.startTime = 0;
-                    adWatcherState.onSuccess = null;
-                    adWatcherState.onFailure = null;
-                }
-            });
-
-            function manageAdWatch(button, adUrl, successCallback) {
-                if (state.isAdTimerActive) {
-                    alert("An ad process is already active. Please wait.");
-                    return;
-                }
-                state.isAdTimerActive = true;
-                button.disabled = true;
-                const originalButtonText = button.innerText;
-                button.innerText = "Loading Ad...";
-
-                adWatcherState.isWatching = true;
-                adWatcherState.requiredDuration = 15000;
-
-                const resetState = () => {
-                    state.isAdTimerActive = false;
-                    button.disabled = false;
-                    button.innerText = originalButtonText;
-                };
-
-                adWatcherState.onSuccess = () => {
-                    console.log("Ad watch successful!");
-                    successCallback();
-                    resetState();
-                };
-
-                adWatcherState.onFailure = () => {
-                    console.log("Ad watch failed (too short).");
-                    alert("Ad watch incomplete. Minimum 15 second watch required.");
-                    resetState();
-                };
-                
-                window.open(adUrl, '_blank');
-            }
-            // --- END OF NEW AD WATCHER SYSTEM ---
-
             setTimeout(() => {
                 document.getElementById('loading-screen').classList.add('hidden');
             }, 3000);
@@ -1179,21 +1241,36 @@
                 }
             });
 
-            elements.tournamentWatchAdBtn.addEventListener('click', (e) => {
-                const button = e.target;
-                const adUrl = currentTournamentJoinProcess.adUrl;
-
-                manageAdWatch(button, adUrl, () => {
-                    currentTournamentJoinProcess.adsWatched++;
-                    elements.tournamentAdProgress.innerText = `${currentTournamentJoinProcess.adsWatched} / ${currentTournamentJoinProcess.adsRequired}`;
-                    if (currentTournamentJoinProcess.adsWatched >= currentTournamentJoinProcess.adsRequired) {
-                        elements.tournamentAdView.style.display = 'none';
-                        const details = currentTournamentJoinProcess.details;
-                        elements.tournamentJoinPopupFee.innerText = `${parseInt(details.fee).toLocaleString()} 🪙`;
-                        elements.tournamentJoinNameInput.value = state.playerName;
-                        elements.tournamentConfirmView.style.display = 'block';
+            elements.tournamentWatchAdBtn.addEventListener('click', () => {
+                const button = elements.tournamentWatchAdBtn;
+                if (state.isAdTimerActive) {
+                    alert("Please wait for the current ad timer to finish.");
+                    return;
+                }
+                state.isAdTimerActive = true;
+                window.open(currentTournamentJoinProcess.adUrl, '_blank');
+                button.disabled = true;
+                let countdown = 15;
+                button.innerText = `Wait (${countdown}s)`;
+                const adInterval = setInterval(() => {
+                    countdown--;
+                    button.innerText = `Wait (${countdown}s)`;
+                    if (countdown <= 0) {
+                        clearInterval(adInterval);
+                        state.isAdTimerActive = false;
+                        button.disabled = false;
+                        button.innerText = 'Watch Ad';
+                        currentTournamentJoinProcess.adsWatched++;
+                        elements.tournamentAdProgress.innerText = `${currentTournamentJoinProcess.adsWatched} / ${currentTournamentJoinProcess.adsRequired}`;
+                        if (currentTournamentJoinProcess.adsWatched >= currentTournamentJoinProcess.adsRequired) {
+                            elements.tournamentAdView.style.display = 'none';
+                            const details = currentTournamentJoinProcess.details;
+                            elements.tournamentJoinPopupFee.innerText = `${parseInt(details.fee).toLocaleString()} 🪙`;
+                            elements.tournamentJoinNameInput.value = state.playerName;
+                            elements.tournamentConfirmView.style.display = 'block';
+                        }
                     }
-                });
+                }, 1000);
             });
             
             elements.tournamentJoinConfirmBtn.addEventListener('click', () => {
@@ -1321,12 +1398,24 @@
                 const accumulated = MINING_TIERS[state.miningSessionTier].totalReward * progress;
                 elements.miningTimerDisplay.innerText = `${Math.floor(accumulated).toLocaleString()} 🪙 / ${hours}:${minutes}:${seconds}`;
             }
-            elements.watchAdButton.addEventListener('click', (e) => {
-                manageAdWatch(e.target, MINE_AD_URL, () => {
-                    state.miningAdsWatched++;
-                    saveGame({ miningAdsWatched: state.miningAdsWatched });
-                    renderMineScreen();
-                });
+            elements.watchAdButton.addEventListener('click', () => {
+                if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
+                state.isAdTimerActive = true;
+                window.open(MINE_AD_URL, '_blank');
+                elements.watchAdButton.disabled = true;
+                let countdown = 10;
+                elements.watchAdButton.innerText = `Wait (${countdown}s)`;
+                const adInterval = setInterval(() => {
+                    countdown--;
+                    elements.watchAdButton.innerText = `Wait (${countdown}s)`;
+                    if(countdown <= 0) {
+                        clearInterval(adInterval);
+                        state.isAdTimerActive = false;
+                        state.miningAdsWatched++;
+                        saveGame({ miningAdsWatched: state.miningAdsWatched });
+                        renderMineScreen();
+                    }
+                }, 1000);
             });
             elements.startMiningButton.addEventListener('click', () => {
                 const eligibleTier = getEligibleMiningTier();
@@ -1359,6 +1448,7 @@
                 container.innerHTML = '';
                 const specialAdCard = document.createElement('div');
                 specialAdCard.className = 'option-card';
+                // --- TEXT CHANGE HERE ---
                 specialAdCard.innerHTML = `<h3>Special Offer (18+)</h3><p>Watch a special video to earn a <strong>15 🪙</strong> reward!</p><button id="watch-18plus-ad-btn" class="action-button" style="background-color:#c0392b;">18+</button>`;
                 container.appendChild(specialAdCard);
                 if (state.myReferralC) {
@@ -1388,28 +1478,55 @@
             elements.videoTasksContainer.addEventListener('click', (e) => {
                 const button = e.target;
                 if (button.id === 'watch-18plus-ad-btn') {
-                    const adUrl = 'https://www.profitableratecpm.com/uhnqngyf?key=d467c8e5498339a61ae6addd69e30d9e';
-                    manageAdWatch(button, adUrl, () => {
-                        state.score += 15; 
-                        updateDisplay();
-                        saveGame({ score: state.score, Totalearning: state.score });
-                        alert("You earned 15 coins!");
-                    });
+                    if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
+                    state.isAdTimerActive = true;
+                    window.open('https://www.profitableratecpm.com/uhnqngyf?key=d467c8e5498339a61ae6addd69e30d9e', '_blank');
+                    button.disabled = true;
+                    let countdown = 30; 
+                    const originalText = button.innerText;
+                    button.innerText = `Wait (${countdown}s)`;
+                    const countdownInterval = setInterval(() => {
+                        countdown--;
+                        button.innerText = `Wait (${countdown}s)`;
+                        if (countdown <= 0) {
+                            clearInterval(countdownInterval);
+                            // --- REWARD CHANGE HERE ---
+                            state.score += 15; 
+                            updateDisplay();
+                            saveGame({ score: state.score, Totalearning: state.score });
+                            // --- ALERT CHANGE HERE ---
+                            alert("You earned 15 coins!");
+                            button.disabled = false;
+                            button.innerText = originalText;
+                            state.isAdTimerActive = false;
+                        }
+                    }, 1000);
                 }
                 if (button.id === 'copy-referral-link-button') {
                     const webReferralLink = `https://t.me/squid_456_bot?start=${state.myReferralC}`;
                     copyTextToClipboard(webReferralLink);
                 }
                 if (button.classList.contains('video-task-button')) {
+                    if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
                     const taskId = button.dataset.taskId;
                     const task = videoAdTasks.find(t => t.id === taskId);
                     if (!task) return;
-                    
-                    manageAdWatch(button, task.url, () => {
-                        state[taskId + 'Progress']++;
-                        saveGame({ [taskId + 'Progress']: state[taskId + 'Progress'] });
-                        renderVideoTasks();
-                    });
+                    state.isAdTimerActive = true;
+                    window.open(task.url, '_blank');
+                    button.disabled = true;
+                    let countdown = 10;
+                    button.innerText = `Wait (${countdown}s)`;
+                    const countdownInterval = setInterval(() => {
+                        countdown--;
+                        button.innerText = `Wait (${countdown}s)`;
+                        if (countdown <= 0) {
+                            clearInterval(countdownInterval);
+                            state[taskId + 'Progress']++;
+                            saveGame({ [taskId + 'Progress']: state[taskId + 'Progress'] });
+                            renderVideoTasks(); 
+                            state.isAdTimerActive = false;
+                        }
+                    }, 1000);
                 }
                 if (button.classList.contains('claim-video-reward-button')) {
                     const taskId = button.dataset.taskId;
@@ -1530,24 +1647,54 @@
             }
             elements.withdrawalAdTaskContainer.addEventListener('click', (e) => {
                 if(e.target.id === 'watch-ad-for-withdrawal') {
-                    const adUrl = 'https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315';
-                    manageAdWatch(e.target, adUrl, () => {
-                        state.withdrawalAdClicks++;
-                        saveGame({ withdrawalAdClicks: state.withdrawalAdClicks });
-                        renderWalletScreen();
-                    });
+                    if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
+                    state.isAdTimerActive = true;
+                    window.open('https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315', '_blank');
+                    const button = e.target;
+                    button.disabled = true;
+                    let countdown = 10;
+                    button.innerText = `Wait (${countdown}s)`;
+                    const countdownInterval = setInterval(() => {
+                        countdown--;
+                        button.innerText = `Wait (${countdown}s)`;
+                        if (countdown <= 0) {
+                            clearInterval(countdownInterval);
+                            state.withdrawalAdClicks++;
+                            saveGame({ withdrawalAdClicks: state.withdrawalAdClicks });
+                            renderWalletScreen(); 
+                            state.isAdTimerActive = false;
+                        }
+                    }, 1000);
                 }
             });
-            elements.watchAdFor40CoinsBtn.addEventListener('click', (e) => {
-                const adUrlFor10Coins = 'https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6';
-                manageAdWatch(e.target, adUrlFor10Coins, () => {
-                    state.score += 10; 
-                    updateDisplay();
-                    saveGame({ score: state.score, Totalearning: state.score });
-                    alert("You earned 10 coins!");
-                });
+            elements.watchAdFor40CoinsBtn.addEventListener('click', () => {
+                if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
+                state.isAdTimerActive = true;
+                
+                const adUrlFor40Coins = 'https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6';
+                window.open(adUrlFor40Coins, '_blank');
+
+                const button = elements.watchAdFor40CoinsBtn;
+                button.disabled = true;
+                let countdown = 35; 
+                button.innerText = `Wait (${countdown}s)`;
+
+                const countdownInterval = setInterval(() => {
+                    countdown--;
+                    button.innerText = `Wait (${countdown}s)`;
+                    if (countdown <= 0) {
+                        clearInterval(countdownInterval);
+                        state.score += 10; 
+                        updateDisplay();
+                        saveGame({ score: state.score, Totalearning: state.score });
+                        alert("You earned 10 coins!");
+                        button.disabled = false;
+                        button.innerText = "Watch Ad (+10 🪙)";
+                        state.isAdTimerActive = false;
+                    }
+                }, 1000);
             });
-            elements.longTermAdBtn.addEventListener('click', (e) => {
+            elements.longTermAdBtn.addEventListener('click', () => {
                 if(state.longTermAdClaimed) return;
 
                 if (state.longTermAdProgress >= 5000) {
@@ -1559,13 +1706,29 @@
                     renderLongTermAdTask();
                     return;
                 }
-                
+
+                if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
+                state.isAdTimerActive = true;
+
                 const adUrlForMarathon = 'https://www.profitableratecpm.com/d4cku5ewnn?key=a29645f253b4d6eb62da85d3f5105d02';
-                manageAdWatch(e.target, adUrlForMarathon, () => {
-                    state.longTermAdProgress++;
-                    saveGame({ longTermAdProgress: state.longTermAdProgress });
-                    renderLongTermAdTask();
-                });
+                window.open(adUrlForMarathon, '_blank');
+
+                const button = elements.longTermAdBtn;
+                button.disabled = true;
+                let countdown = 30;
+                button.innerText = `Wait (${countdown}s)`;
+                
+                const countdownInterval = setInterval(() => {
+                    countdown--;
+                    button.innerText = `Wait (${countdown}s)`;
+                    if (countdown <= 0) {
+                        clearInterval(countdownInterval);
+                        state.longTermAdProgress++;
+                        saveGame({ longTermAdProgress: state.longTermAdProgress });
+                        renderLongTermAdTask();
+                        state.isAdTimerActive = false;
+                    }
+                }, 1000);
             });
             function showNotifications() {
                 elements.notificationDot.classList.remove('visible');
@@ -1835,21 +1998,34 @@
                     elements.energyBarFill.parentElement.style.display = 'block';
                 }
             }
-            elements.fastEnergyRecoveryBtn.addEventListener('click', (e) => {
+            elements.fastEnergyRecoveryBtn.addEventListener('click', () => {
+                if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
                 if (state.fastRecoveryAdsWatched >= 30) { alert("You have already watched enough ads."); return; }
-
-                const adUrl = 'https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315';
-                manageAdWatch(e.target, adUrl, () => {
-                    state.fastRecoveryAdsWatched++;
-                    let dataToSave = { fastRecoveryAdsWatched: state.fastRecoveryAdsWatched };
-                    if (state.fastRecoveryAdsWatched >= 30) {
-                        state.energyRecoveryDuration = 30 * 60 * 1000; 
-                        dataToSave.energyRecoveryDuration = state.energyRecoveryDuration;
-                        alert("Success! Energy will now refill in 30 minutes from when it ran out.");
+                state.isAdTimerActive = true;
+                window.open('https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315', '_blank');
+                const button = elements.fastEnergyRecoveryBtn;
+                button.disabled = true;
+                let countdown = 10;
+                button.innerText = `Wait (${countdown}s)`;
+                const adInterval = setInterval(() => {
+                    countdown--;
+                    button.innerText = `Wait (${countdown}s)`;
+                    if (countdown <= 0) {
+                        clearInterval(adInterval);
+                        state.isAdTimerActive = false;
+                        button.disabled = false;
+                        state.fastRecoveryAdsWatched++;
+                        let dataToSave = { fastRecoveryAdsWatched: state.fastRecoveryAdsWatched };
+                        if (state.fastRecoveryAdsWatched >= 30) {
+                            state.energyRecoveryDuration = 30 * 60 * 1000; 
+                            dataToSave.energyRecoveryDuration = state.energyRecoveryDuration;
+                            alert("Success! Energy will now refill in 30 minutes from when it ran out.");
+                            elements.fastEnergyRecoveryBtn.style.display = 'none';
+                        }
+                        saveGame(dataToSave);
+                        checkEnergyCooldown(); 
                     }
-                    saveGame(dataToSave);
-                    checkEnergyCooldown(); 
-                });
+                }, 1000);
             });
             elements.navButtons.forEach(b => { if(b.dataset.screen){ b.addEventListener('click', () => showScreen(b.dataset.screen)) } });
             document.querySelectorAll('.back-button').forEach(b => b.addEventListener('click', () => showScreen(b.dataset.screen)));
@@ -1929,14 +2105,28 @@
                 elements.loveCoinBalanceDisplay.innerText = `${state.loveCoins.toLocaleString()} 💝`;
             }
             elements.airdropButton.addEventListener('click', () => showScreen('airdrop-screen'));
-            elements.watchAdForLoveCoinBtn.addEventListener('click', (e) => {
-                const adUrl = 'https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6';
-                manageAdWatch(e.target, adUrl, () => {
-                    state.loveCoins++;
-                    saveGame({ loveCoins: state.loveCoins });
-                    renderAirdropScreen();
-                    alert("You earned 1 💝 Love Coin!");
-                });
+            elements.watchAdForLoveCoinBtn.addEventListener('click', () => {
+                if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
+                state.isAdTimerActive = true;
+                window.open('https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6', '_blank');
+                const button = elements.watchAdForLoveCoinBtn;
+                button.disabled = true;
+                let countdown = 15; 
+                button.innerText = `Wait (${countdown}s)`;
+                const countdownInterval = setInterval(() => {
+                    countdown--;
+                    button.innerText = `Wait (${countdown}s)`;
+                    if (countdown <= 0) {
+                        clearInterval(countdownInterval);
+                        state.loveCoins++;
+                        saveGame({ loveCoins: state.loveCoins });
+                        renderAirdropScreen();
+                        alert("You earned 1 💝 Love Coin!");
+                        button.disabled = false;
+                        button.innerText = "Watch Ad (+1 💝)";
+                        state.isAdTimerActive = false;
+                    }
+                }, 1000);
             });
             loadGame();
             showScreen('game-screen');
