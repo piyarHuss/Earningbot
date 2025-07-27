@@ -976,7 +976,6 @@
             jump() { if (this.gameRunning) { this.bird.velocity = this.bird.lift; } else if (!this.gameOverPopup.style.display || this.gameOverPopup.style.display === 'none') { this.startGame(); } }
         };
 
-        // --- UPDATED TASK LIST ---
         const videoAdTasks = [
             { id: 'videoTask1', title: 'Starter Video Pack', description: 'Watch 20 videos to earn 900 coins.', goal: 20, reward: 900, url: 'https://www.profitableratecpm.com/qshhszvnad?key=4761223a00e52bd9f2e24d515e6be228' },
             { id: 'videoTask2', title: 'Video Marathon', description: 'Watch 150 videos to earn 5,000 coins.', goal: 150, reward: 5000, url: 'https://www.profitableratecpm.com/vibjgr90?key=2731d0788209fe1d948dd17fd0e0831f' },
@@ -1449,7 +1448,8 @@
                 container.innerHTML = '';
                 const specialAdCard = document.createElement('div');
                 specialAdCard.className = 'option-card';
-                specialAdCard.innerHTML = `<h3>Special Offer (18+)</h3><p>Watch a special video to earn a <strong>40 🪙</strong> reward!</p><button id="watch-18plus-ad-btn" class="action-button" style="background-color:#c0392b;">18+</button>`;
+                // --- TEXT CHANGE HERE ---
+                specialAdCard.innerHTML = `<h3>Special Offer (18+)</h3><p>Watch a special video to earn a <strong>15 🪙</strong> reward!</p><button id="watch-18plus-ad-btn" class="action-button" style="background-color:#c0392b;">18+</button>`;
                 container.appendChild(specialAdCard);
                 if (state.myReferralC) {
                     const referralCard = document.createElement('div');
@@ -1490,10 +1490,12 @@
                         button.innerText = `Wait (${countdown}s)`;
                         if (countdown <= 0) {
                             clearInterval(countdownInterval);
-                            state.score += 40; 
+                            // --- REWARD CHANGE HERE ---
+                            state.score += 15; 
                             updateDisplay();
                             saveGame({ score: state.score, Totalearning: state.score });
-                            alert("You earned 40 coins!");
+                            // --- ALERT CHANGE HERE ---
+                            alert("You earned 15 coins!");
                             button.disabled = false;
                             button.innerText = originalText;
                             state.isAdTimerActive = false;
