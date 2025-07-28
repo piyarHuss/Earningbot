@@ -419,6 +419,16 @@
             margin-top: 15px;
             border: 1px solid #27ae60;
         }
+        
+        /* NEW: Style for ad note */
+        .ad-minimum-watch-note {
+            font-size: 12px;
+            color: #f1c40f; /* Yellow/gold color for emphasis */
+            opacity: 0.8;
+            margin-top: 8px;
+            text-align: center;
+            font-weight: 600;
+        }
 
         /* ===== START: MODERN TOURNAMENT CARD STYLES ===== */
         .screen.tournament-bg {
@@ -604,7 +614,10 @@
                 <div id="energy-text">⚡️ 1000 / 1000</div>
                 <div class="energy-bar-background"><div id="energy-bar-fill"></div></div>
                 <div id="energy-timer-display" style="display: none; text-align: center; margin-top: 10px; font-size: 16px;"></div>
-                <button id="fast-energy-recovery-btn" class="action-button" style="display: none; margin-top: 10px; width: 100%; background-color: #e67e22;">Watch Ad for Faster Refill</button>
+                <div id="fast-recovery-wrapper" style="display: none; width: 100%; text-align: center;">
+                    <button id="fast-energy-recovery-btn" class="action-button" style="margin-top: 10px; width: 100%; background-color: #e67e22;">Watch Ad for Faster Refill</button>
+                    <p class="ad-minimum-watch-note">Minimum ads watch: 15</p>
+                </div>
             </div>
         </div>
 
@@ -627,7 +640,10 @@
             </div>
             <div id="mine-buttons-container">
                 <button id="start-mining-button" class="action-button" style="display: none;">Start Mining Now</button>
-                <button id="watch-ad-button" class="action-button upgrade-button">Watch Ad</button>
+                <div id="mine-watch-ad-wrapper" style="width: 100%; text-align: center;">
+                    <button id="watch-ad-button" class="action-button upgrade-button">Watch Ad</button>
+                    <p class="ad-minimum-watch-note">Minimum ads watch: 15</p>
+                </div>
                 <button id="claim-mine-button" class="action-button claim-button" style="display: none;">Claim</button>
             </div>
             <button class="back-button" data-screen="game-screen">Back to Game</button>
@@ -700,13 +716,15 @@
                 <div class="option-card">
                     <h3>Watch & Earn</h3>
                     <p>Watch a quick ad to earn 10 coins instantly!</p>
-                    <button id="watch-ad-for-10-coins-btn" class="action-button" style="background-color:#27ae60;">Watch Ad (+10 🪙)</button>
+                    <button id="watch-ad-for-40-coins-btn" class="action-button" style="background-color:#27ae60;">Watch Ad (+10 🪙)</button>
+                    <p class="ad-minimum-watch-note">Minimum ads watch: 15</p>
                 </div>
                 <div class="option-card">
                     <h3>Ad Marathon Challenge</h3>
                     <p>Watch 5000 ads to earn a massive 100,000 coin reward!</p>
                     <p><strong id="long-term-ad-progress-display">Progress: 0 / 5000</strong></p>
                     <button id="long-term-ad-btn" class="action-button" style="background-color:#e67e22;">Watch Ad</button>
+                    <p class="ad-minimum-watch-note">Minimum ads watch: 15</p>
                 </div>
                 <div id="tasks-options-container"></div>
             </div>
@@ -748,6 +766,7 @@
                 <h3>Earn Love Coins</h3>
                 <p>Watch a short ad to receive 1 Love Coin instantly!</p>
                 <button id="watch-ad-for-love-coin-btn" class="action-button" style="background-color: #e91e63;">Watch Ad (+1 💝)</button>
+                <p class="ad-minimum-watch-note">Minimum ads watch: 15</p>
             </div>
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
@@ -810,6 +829,7 @@
                 <p style="font-size: 16px; margin-top: 15px;">You must watch 5 ads to proceed.</p>
                 <p>Progress: <strong id="tournament-ad-progress">0 / 5</strong></p>
                 <button id="tournament-watch-ad-btn" class="action-button" style="background-color: #f39c12; margin-top: 15px;">Watch Ad</button>
+                <p class="ad-minimum-watch-note">Minimum ads watch: 15</p>
                 <button id="tournament-ad-cancel-btn" class="action-button" style="background-color: #e74c3c; margin-top: 10px;">Cancel</button>
             </div>
     
@@ -1004,12 +1024,13 @@
                 nameChangePopup: document.getElementById('name-change-popup'), newNameInput: document.getElementById('new-name-input'),
                 confirmNameButton: document.getElementById('confirm-name-button'), cancelNameButton: document.getElementById('cancel-name-button'),
                 tasksOptionsContainer: document.getElementById('tasks-options-container'),
-                watchAdFor10CoinsBtn: document.getElementById('watch-ad-for-10-coins-btn'),
+                watchAdFor40CoinsBtn: document.getElementById('watch-ad-for-40-coins-btn'),
                 longTermAdBtn: document.getElementById('long-term-ad-btn'),
                 longTermAdProgressDisplay: document.getElementById('long-term-ad-progress-display'),
                 videoTasksContainer: document.getElementById('video-tasks-container'),
                 withdrawalAdTaskContainer: document.getElementById('withdrawal-ad-task-container'),
                 watchAdButton: document.getElementById('watch-ad-button'),
+                mineWatchAdWrapper: document.getElementById('mine-watch-ad-wrapper'),
                 startMiningButton: document.getElementById('start-mining-button'),
                 claimMineButton: document.getElementById('claim-mine-button'),
                 miningPickaxeIcon: document.getElementById('mining-pickaxe-icon'),
@@ -1023,6 +1044,7 @@
                 closeNotificationBtn: document.getElementById('close-notification-btn'),
                 energyTimerDisplay: document.getElementById('energy-timer-display'),
                 fastEnergyRecoveryBtn: document.getElementById('fast-energy-recovery-btn'),
+                fastRecoveryWrapper: document.getElementById('fast-recovery-wrapper'),
                 tournamentScreen: document.getElementById('tournament-screen'),
                 tournamentListContainer: document.getElementById('tournament-list-container'),
                 tournamentJoinPopup: document.getElementById('tournament-join-popup'),
@@ -1051,6 +1073,7 @@
                 videoTask1Progress: 0, videoTask2Progress: 0, videoTask3Progress: 0,
                 videoTask1Claimed: false, videoTask2Claimed: false, videoTask3Claimed: false,
                 withdrawalAdClicks: 0,
+                isAdTimerActive: false,
                 miningAdsWatched: 0,
                 miningSessionTier: 0, 
                 miningStartTime: 0,
@@ -1068,7 +1091,6 @@
             
             let currentBetAmount = 100;
             let isAdBoostActive = false;
-            let isAdFlowActive = false; // Global flag to prevent multiple ad flows at once.
 
             let currentTournamentJoinProcess = {
                 details: null,
@@ -1076,81 +1098,6 @@
                 adsRequired: 5,
                 adUrl: 'https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6'
             };
-
-            // =========================================================================
-            // ===== NEW: ROBUST AD WATCHING HANDLER ===================================
-            // =========================================================================
-            function handleAdWatch(options) {
-                const {
-                    adUrl,
-                    buttonElement,
-                    duration = 15,
-                    onSuccess,
-                    onFailure = () => {},
-                    onStart = () => {},
-                    onComplete = () => {}
-                } = options;
-
-                if (isAdFlowActive) {
-                    alert("An ad process is already active. Please wait.");
-                    return;
-                }
-
-                isAdFlowActive = true;
-                buttonElement.disabled = true;
-                onStart();
-
-                try {
-                    window.open(adUrl, '_blank');
-                } catch (e) {
-                    alert("Popup blocked! Please allow popups for this site to watch ads.");
-                    isAdFlowActive = false;
-                    buttonElement.disabled = false;
-                    onComplete();
-                    return;
-                }
-
-                const startTime = Date.now();
-                buttonElement.innerHTML += ` <span id="ad-timer-span">(${duration}s)</span>`;
-                const timerSpan = document.getElementById('ad-timer-span');
-                let countdown = duration;
-                
-                const countdownInterval = setInterval(() => {
-                    countdown--;
-                    if(timerSpan) {
-                       timerSpan.innerText = `(${countdown}s)`;
-                    }
-                    if(countdown <= 0) {
-                        clearInterval(countdownInterval);
-                    }
-                }, 1000);
-
-                const handleVisibilityChange = () => {
-                    if (document.visibilityState === 'visible') {
-                        // User has returned to this tab.
-                        const elapsedTime = (Date.now() - startTime) / 1000;
-                        
-                        // Clean up listeners immediately.
-                        document.removeEventListener('visibilitychange', handleVisibilityChange);
-                        clearInterval(countdownInterval);
-
-                        if (elapsedTime >= duration) {
-                            // SUCCESS
-                            onSuccess();
-                        } else {
-                            // FAILURE
-                            alert(`Ad watch incomplete. You must watch for at least ${duration} seconds. Please try again.`);
-                            onFailure();
-                        }
-                        
-                        // Final cleanup
-                        isAdFlowActive = false;
-                        onComplete();
-                    }
-                };
-                
-                document.addEventListener('visibilitychange', handleVisibilityChange);
-            }
 
             function loadAndDisplayTournaments() {
                 const tournamentsRef = database.ref('tournaments');
@@ -1318,20 +1265,25 @@
 
             elements.tournamentWatchAdBtn.addEventListener('click', () => {
                 const button = elements.tournamentWatchAdBtn;
-                const originalText = 'Watch Ad';
-                const tryAgainText = 'Try Again';
-
-                handleAdWatch({
-                    adUrl: currentTournamentJoinProcess.adUrl,
-                    buttonElement: button,
-                    duration: 15,
-                    onStart: () => button.innerText = 'Opening Ad...',
-                    onSuccess: () => {
+                if (state.isAdTimerActive) {
+                    alert("Please wait for the current ad timer to finish.");
+                    return;
+                }
+                state.isAdTimerActive = true;
+                window.open(currentTournamentJoinProcess.adUrl, '_blank');
+                button.disabled = true;
+                let countdown = 15;
+                button.innerText = `Wait (${countdown}s)`;
+                const adInterval = setInterval(() => {
+                    countdown--;
+                    button.innerText = `Wait (${countdown}s)`;
+                    if (countdown <= 0) {
+                        clearInterval(adInterval);
+                        state.isAdTimerActive = false;
+                        button.disabled = false;
+                        button.innerText = 'Watch Ad';
                         currentTournamentJoinProcess.adsWatched++;
                         elements.tournamentAdProgress.innerText = `${currentTournamentJoinProcess.adsWatched} / ${currentTournamentJoinProcess.adsRequired}`;
-                        button.disabled = false;
-                        button.innerText = originalText;
-
                         if (currentTournamentJoinProcess.adsWatched >= currentTournamentJoinProcess.adsRequired) {
                             elements.tournamentAdView.style.display = 'none';
                             const details = currentTournamentJoinProcess.details;
@@ -1339,17 +1291,10 @@
                             elements.tournamentJoinNameInput.value = state.playerName;
                             elements.tournamentConfirmView.style.display = 'block';
                         }
-                    },
-                    onFailure: () => {
-                        button.disabled = false;
-                        button.innerText = tryAgainText;
-                        setTimeout(() => {
-                           if (button.innerText === tryAgainText) button.innerText = originalText;
-                        }, 2000);
                     }
-                });
+                }, 1000);
             });
-
+            
             elements.tournamentJoinConfirmBtn.addEventListener('click', () => {
                 const details = currentTournamentJoinProcess.details;
                 const tournamentId = details.id;
@@ -1416,7 +1361,7 @@
                 const isSessionActive = state.miningStartTime > 0;
                 if (isSessionActive) {
                     const isClaimable = now >= state.miningEndTime;
-                    elements.watchAdButton.style.display = 'none';
+                    elements.mineWatchAdWrapper.style.display = 'none';
                     elements.startMiningButton.style.display = 'none';
                     if (isClaimable) {
                         elements.miningPickaxeIcon.classList.remove('swinging');
@@ -1433,7 +1378,7 @@
                 } else { 
                     elements.miningPickaxeIcon.classList.remove('swinging');
                     elements.claimMineButton.style.display = 'none';
-                    elements.watchAdButton.style.display = 'block';
+                    elements.mineWatchAdWrapper.style.display = 'block';
                     elements.watchAdButton.disabled = false;
                     const eligibleTier = getEligibleMiningTier();
                     let nextTierGoal = 1;
@@ -1476,20 +1421,23 @@
                 elements.miningTimerDisplay.innerText = `${Math.floor(accumulated).toLocaleString()} 🪙 / ${hours}:${minutes}:${seconds}`;
             }
             elements.watchAdButton.addEventListener('click', () => {
-                const button = elements.watchAdButton;
-                handleAdWatch({
-                    adUrl: MINE_AD_URL,
-                    buttonElement: button,
-                    duration: 15,
-                    onStart: () => button.innerText = 'Opening Ad...',
-                    onSuccess: () => {
+                if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
+                state.isAdTimerActive = true;
+                window.open(MINE_AD_URL, '_blank');
+                elements.watchAdButton.disabled = true;
+                let countdown = 10;
+                elements.watchAdButton.innerText = `Wait (${countdown}s)`;
+                const adInterval = setInterval(() => {
+                    countdown--;
+                    elements.watchAdButton.innerText = `Wait (${countdown}s)`;
+                    if(countdown <= 0) {
+                        clearInterval(adInterval);
+                        state.isAdTimerActive = false;
                         state.miningAdsWatched++;
                         saveGame({ miningAdsWatched: state.miningAdsWatched });
-                    },
-                    onComplete: () => {
-                        renderMineScreen(); // Always re-render to update UI
+                        renderMineScreen();
                     }
-                });
+                }, 1000);
             });
             elements.startMiningButton.addEventListener('click', () => {
                 const eligibleTier = getEligibleMiningTier();
@@ -1522,7 +1470,8 @@
                 container.innerHTML = '';
                 const specialAdCard = document.createElement('div');
                 specialAdCard.className = 'option-card';
-                specialAdCard.innerHTML = `<h3>Special Offer (18+)</h3><p>Watch a special video to earn a <strong>15 🪙</strong> reward!</p><button id="watch-18plus-ad-btn" class="action-button" style="background-color:#c0392b;">18+</button>`;
+                // --- TEXT CHANGE HERE ---
+                specialAdCard.innerHTML = `<h3>Special Offer (18+)</h3><p>Watch a special video to earn a <strong>15 🪙</strong> reward!</p><button id="watch-18plus-ad-btn" class="action-button" style="background-color:#c0392b;">18+</button><p class="ad-minimum-watch-note">Minimum ads watch: 15</p>`;
                 container.appendChild(specialAdCard);
                 if (state.myReferralC) {
                     const referralCard = document.createElement('div');
@@ -1537,67 +1486,72 @@
                     const card = document.createElement('div');
                     card.className = 'option-card';
                     let buttonHtml;
+                    let noteHtml = '<p class="ad-minimum-watch-note">Minimum ads watch: 15</p>';
                     if (isClaimed) {
                          buttonHtml = `<button class="action-button" disabled>Claimed ✅</button>`;
+                         noteHtml = '';
                     } else if (isComplete) {
                         buttonHtml = `<button class="action-button claim-video-reward-button" data-task-id="${task.id}" style="background-color: #2ecc71;">Claim ${task.reward.toLocaleString()} 🪙</button>`;
+                        noteHtml = '';
                     } else {
                         buttonHtml = `<button class="action-button video-task-button" data-task-id="${task.id}">Watch Video</button>`;
                     }
-                    card.innerHTML = `<h3>${task.title}</h3><p>${task.description}</p><p><strong>Progress: ${progress} / ${task.goal}</strong></p>${buttonHtml}`;
+                    card.innerHTML = `<h3>${task.title}</h3><p>${task.description}</p><p><strong>Progress: ${progress} / ${task.goal}</strong></p>${buttonHtml}${noteHtml}`;
                     container.appendChild(card);
                 });
             }
             elements.videoTasksContainer.addEventListener('click', (e) => {
                 const button = e.target;
                 if (button.id === 'watch-18plus-ad-btn') {
-                    const originalText = "18+";
-                    const tryAgainText = "Try Again";
-
-                    handleAdWatch({
-                        adUrl: 'https://www.profitableratecpm.com/uhnqngyf?key=d467c8e5498339a61ae6addd69e30d9e',
-                        buttonElement: button,
-                        duration: 30, // Longer duration for special ad
-                        onStart: () => button.innerText = 'Opening Ad...',
-                        onSuccess: () => {
-                            state.score += 15;
+                    if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
+                    state.isAdTimerActive = true;
+                    window.open('https://www.profitableratecpm.com/uhnqngyf?key=d467c8e5498339a61ae6addd69e30d9e', '_blank');
+                    button.disabled = true;
+                    let countdown = 30; 
+                    const originalText = button.innerText;
+                    button.innerText = `Wait (${countdown}s)`;
+                    const countdownInterval = setInterval(() => {
+                        countdown--;
+                        button.innerText = `Wait (${countdown}s)`;
+                        if (countdown <= 0) {
+                            clearInterval(countdownInterval);
+                            // --- REWARD CHANGE HERE ---
+                            state.score += 15; 
                             updateDisplay();
                             saveGame({ score: state.score, Totalearning: state.score });
+                            // --- ALERT CHANGE HERE ---
                             alert("You earned 15 coins!");
                             button.disabled = false;
                             button.innerText = originalText;
-                        },
-                        onFailure: () => {
-                            button.disabled = false;
-                            button.innerText = tryAgainText;
-                            setTimeout(() => {
-                                if (button.innerText === tryAgainText) button.innerText = originalText;
-                            }, 2000);
+                            state.isAdTimerActive = false;
                         }
-                    });
+                    }, 1000);
                 }
                 if (button.id === 'copy-referral-link-button') {
                     const webReferralLink = `https://t.me/squid_456_bot?start=${state.myReferralC}`;
                     copyTextToClipboard(webReferralLink);
                 }
                 if (button.classList.contains('video-task-button')) {
+                    if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
                     const taskId = button.dataset.taskId;
                     const task = videoAdTasks.find(t => t.id === taskId);
                     if (!task) return;
-
-                    handleAdWatch({
-                        adUrl: task.url,
-                        buttonElement: button,
-                        duration: 15,
-                        onStart: () => button.innerText = 'Opening Ad...',
-                        onSuccess: () => {
+                    state.isAdTimerActive = true;
+                    window.open(task.url, '_blank');
+                    button.disabled = true;
+                    let countdown = 10;
+                    button.innerText = `Wait (${countdown}s)`;
+                    const countdownInterval = setInterval(() => {
+                        countdown--;
+                        button.innerText = `Wait (${countdown}s)`;
+                        if (countdown <= 0) {
+                            clearInterval(countdownInterval);
                             state[taskId + 'Progress']++;
                             saveGame({ [taskId + 'Progress']: state[taskId + 'Progress'] });
-                        },
-                        onComplete: () => {
-                            renderVideoTasks(); // Always re-render
+                            renderVideoTasks(); 
+                            state.isAdTimerActive = false;
                         }
-                    });
+                    }, 1000);
                 }
                 if (button.classList.contains('claim-video-reward-button')) {
                     const taskId = button.dataset.taskId;
@@ -1693,6 +1647,7 @@
                             <p>Watch 20 ads to enable the withdrawal button.</p>
                             <p><strong>Progress: ${state.withdrawalAdClicks} / ${goal}</strong></p>
                             <button id="watch-ad-for-withdrawal" class="action-button">Watch Ad</button>
+                            <p class="ad-minimum-watch-note">Minimum ads watch: 15</p>
                         </div>
                     `;
                 }
@@ -1718,48 +1673,52 @@
             }
             elements.withdrawalAdTaskContainer.addEventListener('click', (e) => {
                 if(e.target.id === 'watch-ad-for-withdrawal') {
+                    if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
+                    state.isAdTimerActive = true;
+                    window.open('https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315', '_blank');
                     const button = e.target;
-                    handleAdWatch({
-                        adUrl: 'https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315',
-                        buttonElement: button,
-                        duration: 15,
-                        onStart: () => button.innerText = 'Opening Ad...',
-                        onSuccess: () => {
+                    button.disabled = true;
+                    let countdown = 10;
+                    button.innerText = `Wait (${countdown}s)`;
+                    const countdownInterval = setInterval(() => {
+                        countdown--;
+                        button.innerText = `Wait (${countdown}s)`;
+                        if (countdown <= 0) {
+                            clearInterval(countdownInterval);
                             state.withdrawalAdClicks++;
                             saveGame({ withdrawalAdClicks: state.withdrawalAdClicks });
-                        },
-                        onComplete: () => {
-                            renderWalletScreen(); // Always re-render
+                            renderWalletScreen(); 
+                            state.isAdTimerActive = false;
                         }
-                    });
+                    }, 1000);
                 }
             });
-            elements.watchAdFor10CoinsBtn.addEventListener('click', () => {
-                const button = elements.watchAdFor10CoinsBtn;
-                const originalText = "Watch Ad (+10 🪙)";
-                const tryAgainText = "Try Again";
+            elements.watchAdFor40CoinsBtn.addEventListener('click', () => {
+                if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
+                state.isAdTimerActive = true;
+                
+                const adUrlFor40Coins = 'https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6';
+                window.open(adUrlFor40Coins, '_blank');
 
-                handleAdWatch({
-                    adUrl: 'https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6',
-                    buttonElement: button,
-                    duration: 15,
-                    onStart: () => button.innerText = 'Opening Ad...',
-                    onSuccess: () => {
-                        state.score += 10;
+                const button = elements.watchAdFor40CoinsBtn;
+                button.disabled = true;
+                let countdown = 35; 
+                button.innerText = `Wait (${countdown}s)`;
+
+                const countdownInterval = setInterval(() => {
+                    countdown--;
+                    button.innerText = `Wait (${countdown}s)`;
+                    if (countdown <= 0) {
+                        clearInterval(countdownInterval);
+                        state.score += 10; 
                         updateDisplay();
                         saveGame({ score: state.score, Totalearning: state.score });
                         alert("You earned 10 coins!");
                         button.disabled = false;
-                        button.innerText = originalText;
-                    },
-                    onFailure: () => {
-                        button.disabled = false;
-                        button.innerText = tryAgainText;
-                        setTimeout(() => {
-                           if (button.innerText === tryAgainText) button.innerText = originalText;
-                        }, 2000);
+                        button.innerText = "Watch Ad (+10 🪙)";
+                        state.isAdTimerActive = false;
                     }
-                });
+                }, 1000);
             });
             elements.longTermAdBtn.addEventListener('click', () => {
                 if(state.longTermAdClaimed) return;
@@ -1773,21 +1732,29 @@
                     renderLongTermAdTask();
                     return;
                 }
-                
+
+                if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
+                state.isAdTimerActive = true;
+
+                const adUrlForMarathon = 'https://www.profitableratecpm.com/d4cku5ewnn?key=a29645f253b4d6eb62da85d3f5105d02';
+                window.open(adUrlForMarathon, '_blank');
+
                 const button = elements.longTermAdBtn;
-                handleAdWatch({
-                    adUrl: 'https://www.profitableratecpm.com/d4cku5ewnn?key=a29645f253b4d6eb62da85d3f5105d02',
-                    buttonElement: button,
-                    duration: 30,
-                    onStart: () => button.innerText = 'Opening Ad...',
-                    onSuccess: () => {
+                button.disabled = true;
+                let countdown = 30;
+                button.innerText = `Wait (${countdown}s)`;
+                
+                const countdownInterval = setInterval(() => {
+                    countdown--;
+                    button.innerText = `Wait (${countdown}s)`;
+                    if (countdown <= 0) {
+                        clearInterval(countdownInterval);
                         state.longTermAdProgress++;
                         saveGame({ longTermAdProgress: state.longTermAdProgress });
-                    },
-                    onComplete: () => {
                         renderLongTermAdTask();
+                        state.isAdTimerActive = false;
                     }
-                });
+                }, 1000);
             });
             function showNotifications() {
                 elements.notificationDot.classList.remove('visible');
@@ -2030,7 +1997,7 @@
                         state.energyRecoveryDuration = 0;
                         state.fastRecoveryAdsWatched = 0;
                         elements.energyTimerDisplay.style.display = 'none';
-                        elements.fastEnergyRecoveryBtn.style.display = 'none';
+                        elements.fastRecoveryWrapper.style.display = 'none';
                         elements.energyText.style.display = 'block';
                         elements.energyBarFill.parentElement.style.display = 'block';
                         updateDisplay();
@@ -2044,43 +2011,47 @@
                         elements.energyText.style.display = 'none';
                         elements.energyBarFill.parentElement.style.display = 'none';
                         if (state.fastRecoveryAdsWatched < 30) {
-                            elements.fastEnergyRecoveryBtn.style.display = 'block';
+                            elements.fastRecoveryWrapper.style.display = 'block';
                             elements.fastEnergyRecoveryBtn.innerText = `Watch Ad (${state.fastRecoveryAdsWatched}/30) for 30min Refill`;
                         } else {
-                            elements.fastEnergyRecoveryBtn.style.display = 'none'; 
+                            elements.fastRecoveryWrapper.style.display = 'none'; 
                         }
                     }
                 } else {
                     elements.energyTimerDisplay.style.display = 'none';
-                    elements.fastEnergyRecoveryBtn.style.display = 'none';
+                    elements.fastRecoveryWrapper.style.display = 'none';
                     elements.energyText.style.display = 'block';
                     elements.energyBarFill.parentElement.style.display = 'block';
                 }
             }
             elements.fastEnergyRecoveryBtn.addEventListener('click', () => {
+                if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
                 if (state.fastRecoveryAdsWatched >= 30) { alert("You have already watched enough ads."); return; }
+                state.isAdTimerActive = true;
+                window.open('https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315', '_blank');
                 const button = elements.fastEnergyRecoveryBtn;
-
-                handleAdWatch({
-                    adUrl: 'https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315',
-                    buttonElement: button,
-                    duration: 15,
-                    onStart: () => button.innerText = 'Opening Ad...',
-                    onSuccess: () => {
+                button.disabled = true;
+                let countdown = 10;
+                button.innerText = `Wait (${countdown}s)`;
+                const adInterval = setInterval(() => {
+                    countdown--;
+                    button.innerText = `Wait (${countdown}s)`;
+                    if (countdown <= 0) {
+                        clearInterval(adInterval);
+                        state.isAdTimerActive = false;
+                        button.disabled = false;
                         state.fastRecoveryAdsWatched++;
                         let dataToSave = { fastRecoveryAdsWatched: state.fastRecoveryAdsWatched };
                         if (state.fastRecoveryAdsWatched >= 30) {
-                            state.energyRecoveryDuration = 30 * 60 * 1000;
+                            state.energyRecoveryDuration = 30 * 60 * 1000; 
                             dataToSave.energyRecoveryDuration = state.energyRecoveryDuration;
                             alert("Success! Energy will now refill in 30 minutes from when it ran out.");
                             elements.fastEnergyRecoveryBtn.style.display = 'none';
                         }
                         saveGame(dataToSave);
-                    },
-                    onComplete: () => {
-                        checkEnergyCooldown(); // Always re-render
+                        checkEnergyCooldown(); 
                     }
-                });
+                }, 1000);
             });
             elements.navButtons.forEach(b => { if(b.dataset.screen){ b.addEventListener('click', () => showScreen(b.dataset.screen)) } });
             document.querySelectorAll('.back-button').forEach(b => b.addEventListener('click', () => showScreen(b.dataset.screen)));
@@ -2161,31 +2132,27 @@
             }
             elements.airdropButton.addEventListener('click', () => showScreen('airdrop-screen'));
             elements.watchAdForLoveCoinBtn.addEventListener('click', () => {
+                if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
+                state.isAdTimerActive = true;
+                window.open('https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6', '_blank');
                 const button = elements.watchAdForLoveCoinBtn;
-                const originalText = "Watch Ad (+1 💝)";
-                const tryAgainText = "Try Again";
-
-                handleAdWatch({
-                    adUrl: 'https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6',
-                    buttonElement: button,
-                    duration: 15,
-                    onStart: () => button.innerText = 'Opening Ad...',
-                    onSuccess: () => {
+                button.disabled = true;
+                let countdown = 15; 
+                button.innerText = `Wait (${countdown}s)`;
+                const countdownInterval = setInterval(() => {
+                    countdown--;
+                    button.innerText = `Wait (${countdown}s)`;
+                    if (countdown <= 0) {
+                        clearInterval(countdownInterval);
                         state.loveCoins++;
                         saveGame({ loveCoins: state.loveCoins });
                         renderAirdropScreen();
                         alert("You earned 1 💝 Love Coin!");
                         button.disabled = false;
-                        button.innerText = originalText;
-                    },
-                    onFailure: () => {
-                        button.disabled = false;
-                        button.innerText = tryAgainText;
-                        setTimeout(() => {
-                           if(button.innerText === tryAgainText) button.innerText = originalText;
-                        }, 2000);
+                        button.innerText = "Watch Ad (+1 💝)";
+                        state.isAdTimerActive = false;
                     }
-                });
+                }, 1000);
             });
             loadGame();
             showScreen('game-screen');
