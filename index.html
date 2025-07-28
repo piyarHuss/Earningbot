@@ -700,7 +700,7 @@
                 <div class="option-card">
                     <h3>Watch & Earn</h3>
                     <p>Watch a quick ad to earn 10 coins instantly!</p>
-                    <button id="watch-ad-for-40-coins-btn" class="action-button" style="background-color:#27ae60;">Watch Ad (+10 🪙)</button>
+                    <button id="watch-ad-for-10-coins-btn" class="action-button" style="background-color:#27ae60;">Watch Ad (+10 🪙)</button>
                 </div>
                 <div class="option-card">
                     <h3>Ad Marathon Challenge</h3>
@@ -1004,7 +1004,7 @@
                 nameChangePopup: document.getElementById('name-change-popup'), newNameInput: document.getElementById('new-name-input'),
                 confirmNameButton: document.getElementById('confirm-name-button'), cancelNameButton: document.getElementById('cancel-name-button'),
                 tasksOptionsContainer: document.getElementById('tasks-options-container'),
-                watchAdFor40CoinsBtn: document.getElementById('watch-ad-for-40-coins-btn'),
+                watchAdFor10CoinsBtn: document.getElementById('watch-ad-for-10-coins-btn'),
                 longTermAdBtn: document.getElementById('long-term-ad-btn'),
                 longTermAdProgressDisplay: document.getElementById('long-term-ad-progress-display'),
                 videoTasksContainer: document.getElementById('video-tasks-container'),
@@ -1051,7 +1051,6 @@
                 videoTask1Progress: 0, videoTask2Progress: 0, videoTask3Progress: 0,
                 videoTask1Claimed: false, videoTask2Claimed: false, videoTask3Claimed: false,
                 withdrawalAdClicks: 0,
-                isAdTimerActive: false,
                 miningAdsWatched: 0,
                 miningSessionTier: 0, 
                 miningStartTime: 0,
@@ -1069,6 +1068,7 @@
             
             let currentBetAmount = 100;
             let isAdBoostActive = false;
+            let isAdFlowActive = false; // Global flag to prevent multiple ad flows at once.
 
             let currentTournamentJoinProcess = {
                 details: null,
@@ -1076,6 +1076,101 @@
                 adsRequired: 5,
                 adUrl: 'https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6'
             };
+
+            // =========================================================================
+            // ===== NEW: ADVANCED AD WATCHING HANDLER =================================
+            // =========================================================================
+            function handleAdWatch(options) {
+                const {
+                    adUrl,
+                    buttonElement,
+                    duration = 15,
+                    onSuccess,
+                    onFailure,
+                    onStart = () => {},
+                    onComplete = () => {}
+                } = options;
+
+                if (isAdFlowActive) {
+                    alert("An ad process is already active. Please wait.");
+                    return;
+                }
+
+                isAdFlowActive = true;
+                buttonElement.disabled = true;
+                onStart();
+
+                try {
+                    const adWindow = window.open(adUrl, '_blank');
+                    if (!adWindow || adWindow.closed || typeof adWindow.closed == 'undefined') {
+                        throw new Error("Popup blocked");
+                    }
+                } catch (e) {
+                    alert("Popup blocked! Please allow popups for this site to watch ads.");
+                    isAdFlowActive = false;
+                    buttonElement.disabled = false;
+                    onComplete();
+                    return;
+                }
+
+                const startTime = Date.now();
+                let successTimer = null;
+                let countdownInterval = null;
+
+                let countdown = duration;
+                buttonElement.innerText = `Waiting... (${countdown}s)`;
+                countdownInterval = setInterval(() => {
+                    countdown--;
+                    if (countdown >= 0) {
+                        buttonElement.innerText = `Waiting... (${countdown}s)`;
+                    } else {
+                        clearInterval(countdownInterval);
+                    }
+                }, 1000);
+
+                // This timer fires if the user stays on the ad page without returning.
+                // We assume this is a success.
+                successTimer = setTimeout(() => {
+                    handleSuccess();
+                }, duration * 1000);
+
+                const handleVisibilityChange = () => {
+                    if (document.visibilityState === 'visible') {
+                        const elapsedTime = (Date.now() - startTime) / 1000;
+                        clearTimeout(successTimer); // Stop the automatic success timer
+
+                        if (elapsedTime >= duration) {
+                            handleSuccess();
+                        } else {
+                            handleFailure();
+                        }
+                        document.removeEventListener('visibilitychange', handleVisibilityChange);
+                    }
+                };
+
+                document.addEventListener('visibilitychange', handleVisibilityChange);
+
+                function handleSuccess() {
+                    console.log("Ad watch successful.");
+                    cleanUp();
+                    onSuccess();
+                }
+
+                function handleFailure() {
+                    console.log("Ad watch failed (returned too early).");
+                    alert(`Ad watch incomplete. You must stay on the ad page for at least ${duration} seconds. Please try again.`);
+                    cleanUp();
+                    onFailure();
+                }
+                
+                function cleanUp() {
+                    clearInterval(countdownInterval);
+                    document.removeEventListener('visibilitychange', handleVisibilityChange);
+                    isAdFlowActive = false;
+                    onComplete();
+                }
+            }
+
 
             function loadAndDisplayTournaments() {
                 const tournamentsRef = database.ref('tournaments');
@@ -1243,25 +1338,19 @@
 
             elements.tournamentWatchAdBtn.addEventListener('click', () => {
                 const button = elements.tournamentWatchAdBtn;
-                if (state.isAdTimerActive) {
-                    alert("Please wait for the current ad timer to finish.");
-                    return;
-                }
-                state.isAdTimerActive = true;
-                window.open(currentTournamentJoinProcess.adUrl, '_blank');
-                button.disabled = true;
-                let countdown = 15;
-                button.innerText = `Wait (${countdown}s)`;
-                const adInterval = setInterval(() => {
-                    countdown--;
-                    button.innerText = `Wait (${countdown}s)`;
-                    if (countdown <= 0) {
-                        clearInterval(adInterval);
-                        state.isAdTimerActive = false;
-                        button.disabled = false;
-                        button.innerText = 'Watch Ad';
+                const originalText = 'Watch Ad';
+                const tryAgainText = 'Try Again';
+
+                handleAdWatch({
+                    adUrl: currentTournamentJoinProcess.adUrl,
+                    buttonElement: button,
+                    duration: 15,
+                    onSuccess: () => {
                         currentTournamentJoinProcess.adsWatched++;
                         elements.tournamentAdProgress.innerText = `${currentTournamentJoinProcess.adsWatched} / ${currentTournamentJoinProcess.adsRequired}`;
+                        button.disabled = false;
+                        button.innerText = originalText;
+
                         if (currentTournamentJoinProcess.adsWatched >= currentTournamentJoinProcess.adsRequired) {
                             elements.tournamentAdView.style.display = 'none';
                             const details = currentTournamentJoinProcess.details;
@@ -1269,10 +1358,17 @@
                             elements.tournamentJoinNameInput.value = state.playerName;
                             elements.tournamentConfirmView.style.display = 'block';
                         }
+                    },
+                    onFailure: () => {
+                        button.disabled = false;
+                        button.innerText = tryAgainText;
+                        setTimeout(() => {
+                           if (button.innerText === tryAgainText) button.innerText = originalText;
+                        }, 2000);
                     }
-                }, 1000);
+                });
             });
-            
+
             elements.tournamentJoinConfirmBtn.addEventListener('click', () => {
                 const details = currentTournamentJoinProcess.details;
                 const tournamentId = details.id;
@@ -1399,23 +1495,20 @@
                 elements.miningTimerDisplay.innerText = `${Math.floor(accumulated).toLocaleString()} 🪙 / ${hours}:${minutes}:${seconds}`;
             }
             elements.watchAdButton.addEventListener('click', () => {
-                if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
-                state.isAdTimerActive = true;
-                window.open(MINE_AD_URL, '_blank');
-                elements.watchAdButton.disabled = true;
-                let countdown = 10;
-                elements.watchAdButton.innerText = `Wait (${countdown}s)`;
-                const adInterval = setInterval(() => {
-                    countdown--;
-                    elements.watchAdButton.innerText = `Wait (${countdown}s)`;
-                    if(countdown <= 0) {
-                        clearInterval(adInterval);
-                        state.isAdTimerActive = false;
+                const button = elements.watchAdButton;
+                handleAdWatch({
+                    adUrl: MINE_AD_URL,
+                    buttonElement: button,
+                    duration: 15,
+                    onSuccess: () => {
                         state.miningAdsWatched++;
                         saveGame({ miningAdsWatched: state.miningAdsWatched });
                         renderMineScreen();
+                    },
+                    onFailure: () => {
+                        renderMineScreen(); // Just re-render to reset the button text
                     }
-                }, 1000);
+                });
             });
             elements.startMiningButton.addEventListener('click', () => {
                 const eligibleTier = getEligibleMiningTier();
@@ -1478,55 +1571,52 @@
             elements.videoTasksContainer.addEventListener('click', (e) => {
                 const button = e.target;
                 if (button.id === 'watch-18plus-ad-btn') {
-                    if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
-                    state.isAdTimerActive = true;
-                    window.open('https://www.profitableratecpm.com/uhnqngyf?key=d467c8e5498339a61ae6addd69e30d9e', '_blank');
-                    button.disabled = true;
-                    let countdown = 30; 
-                    const originalText = button.innerText;
-                    button.innerText = `Wait (${countdown}s)`;
-                    const countdownInterval = setInterval(() => {
-                        countdown--;
-                        button.innerText = `Wait (${countdown}s)`;
-                        if (countdown <= 0) {
-                            clearInterval(countdownInterval);
-                            // --- REWARD CHANGE HERE ---
-                            state.score += 15; 
+                    const originalText = "18+";
+                    const tryAgainText = "Try Again";
+
+                    handleAdWatch({
+                        adUrl: 'https://www.profitableratecpm.com/uhnqngyf?key=d467c8e5498339a61ae6addd69e30d9e',
+                        buttonElement: button,
+                        duration: 30, // Longer duration for special ad
+                        onSuccess: () => {
+                            state.score += 15;
                             updateDisplay();
                             saveGame({ score: state.score, Totalearning: state.score });
-                            // --- ALERT CHANGE HERE ---
                             alert("You earned 15 coins!");
                             button.disabled = false;
                             button.innerText = originalText;
-                            state.isAdTimerActive = false;
+                        },
+                        onFailure: () => {
+                            button.disabled = false;
+                            button.innerText = tryAgainText;
+                            setTimeout(() => {
+                                if (button.innerText === tryAgainText) button.innerText = originalText;
+                            }, 2000);
                         }
-                    }, 1000);
+                    });
                 }
                 if (button.id === 'copy-referral-link-button') {
                     const webReferralLink = `https://t.me/squid_456_bot?start=${state.myReferralC}`;
                     copyTextToClipboard(webReferralLink);
                 }
                 if (button.classList.contains('video-task-button')) {
-                    if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
                     const taskId = button.dataset.taskId;
                     const task = videoAdTasks.find(t => t.id === taskId);
                     if (!task) return;
-                    state.isAdTimerActive = true;
-                    window.open(task.url, '_blank');
-                    button.disabled = true;
-                    let countdown = 10;
-                    button.innerText = `Wait (${countdown}s)`;
-                    const countdownInterval = setInterval(() => {
-                        countdown--;
-                        button.innerText = `Wait (${countdown}s)`;
-                        if (countdown <= 0) {
-                            clearInterval(countdownInterval);
+
+                    handleAdWatch({
+                        adUrl: task.url,
+                        buttonElement: button,
+                        duration: 15,
+                        onSuccess: () => {
                             state[taskId + 'Progress']++;
                             saveGame({ [taskId + 'Progress']: state[taskId + 'Progress'] });
-                            renderVideoTasks(); 
-                            state.isAdTimerActive = false;
+                            renderVideoTasks(); // Re-render to show progress
+                        },
+                        onFailure: () => {
+                            renderVideoTasks(); // Re-render to reset button state
                         }
-                    }, 1000);
+                    });
                 }
                 if (button.classList.contains('claim-video-reward-button')) {
                     const taskId = button.dataset.taskId;
@@ -1647,52 +1737,47 @@
             }
             elements.withdrawalAdTaskContainer.addEventListener('click', (e) => {
                 if(e.target.id === 'watch-ad-for-withdrawal') {
-                    if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
-                    state.isAdTimerActive = true;
-                    window.open('https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315', '_blank');
                     const button = e.target;
-                    button.disabled = true;
-                    let countdown = 10;
-                    button.innerText = `Wait (${countdown}s)`;
-                    const countdownInterval = setInterval(() => {
-                        countdown--;
-                        button.innerText = `Wait (${countdown}s)`;
-                        if (countdown <= 0) {
-                            clearInterval(countdownInterval);
+                    handleAdWatch({
+                        adUrl: 'https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315',
+                        buttonElement: button,
+                        duration: 15,
+                        onSuccess: () => {
                             state.withdrawalAdClicks++;
                             saveGame({ withdrawalAdClicks: state.withdrawalAdClicks });
-                            renderWalletScreen(); 
-                            state.isAdTimerActive = false;
+                            renderWalletScreen(); // Re-render to update progress
+                        },
+                        onFailure: () => {
+                            renderWalletScreen(); // Re-render to reset button
                         }
-                    }, 1000);
+                    });
                 }
             });
-            elements.watchAdFor40CoinsBtn.addEventListener('click', () => {
-                if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
-                state.isAdTimerActive = true;
-                
-                const adUrlFor40Coins = 'https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6';
-                window.open(adUrlFor40Coins, '_blank');
+            elements.watchAdFor10CoinsBtn.addEventListener('click', () => {
+                const button = elements.watchAdFor10CoinsBtn;
+                const originalText = "Watch Ad (+10 🪙)";
+                const tryAgainText = "Try Again";
 
-                const button = elements.watchAdFor40CoinsBtn;
-                button.disabled = true;
-                let countdown = 35; 
-                button.innerText = `Wait (${countdown}s)`;
-
-                const countdownInterval = setInterval(() => {
-                    countdown--;
-                    button.innerText = `Wait (${countdown}s)`;
-                    if (countdown <= 0) {
-                        clearInterval(countdownInterval);
-                        state.score += 10; 
+                handleAdWatch({
+                    adUrl: 'https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6',
+                    buttonElement: button,
+                    duration: 15,
+                    onSuccess: () => {
+                        state.score += 10;
                         updateDisplay();
                         saveGame({ score: state.score, Totalearning: state.score });
                         alert("You earned 10 coins!");
                         button.disabled = false;
-                        button.innerText = "Watch Ad (+10 🪙)";
-                        state.isAdTimerActive = false;
+                        button.innerText = originalText;
+                    },
+                    onFailure: () => {
+                        button.disabled = false;
+                        button.innerText = tryAgainText;
+                        setTimeout(() => {
+                           if (button.innerText === tryAgainText) button.innerText = originalText;
+                        }, 2000);
                     }
-                }, 1000);
+                });
             });
             elements.longTermAdBtn.addEventListener('click', () => {
                 if(state.longTermAdClaimed) return;
@@ -1706,29 +1791,21 @@
                     renderLongTermAdTask();
                     return;
                 }
-
-                if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
-                state.isAdTimerActive = true;
-
-                const adUrlForMarathon = 'https://www.profitableratecpm.com/d4cku5ewnn?key=a29645f253b4d6eb62da85d3f5105d02';
-                window.open(adUrlForMarathon, '_blank');
-
-                const button = elements.longTermAdBtn;
-                button.disabled = true;
-                let countdown = 30;
-                button.innerText = `Wait (${countdown}s)`;
                 
-                const countdownInterval = setInterval(() => {
-                    countdown--;
-                    button.innerText = `Wait (${countdown}s)`;
-                    if (countdown <= 0) {
-                        clearInterval(countdownInterval);
+                const button = elements.longTermAdBtn;
+                handleAdWatch({
+                    adUrl: 'https://www.profitableratecpm.com/d4cku5ewnn?key=a29645f253b4d6eb62da85d3f5105d02',
+                    buttonElement: button,
+                    duration: 30,
+                    onSuccess: () => {
                         state.longTermAdProgress++;
                         saveGame({ longTermAdProgress: state.longTermAdProgress });
                         renderLongTermAdTask();
-                        state.isAdTimerActive = false;
+                    },
+                    onFailure: () => {
+                        renderLongTermAdTask();
                     }
-                }, 1000);
+                });
             });
             function showNotifications() {
                 elements.notificationDot.classList.remove('visible');
@@ -1999,33 +2076,29 @@
                 }
             }
             elements.fastEnergyRecoveryBtn.addEventListener('click', () => {
-                if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
                 if (state.fastRecoveryAdsWatched >= 30) { alert("You have already watched enough ads."); return; }
-                state.isAdTimerActive = true;
-                window.open('https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315', '_blank');
                 const button = elements.fastEnergyRecoveryBtn;
-                button.disabled = true;
-                let countdown = 10;
-                button.innerText = `Wait (${countdown}s)`;
-                const adInterval = setInterval(() => {
-                    countdown--;
-                    button.innerText = `Wait (${countdown}s)`;
-                    if (countdown <= 0) {
-                        clearInterval(adInterval);
-                        state.isAdTimerActive = false;
-                        button.disabled = false;
+
+                handleAdWatch({
+                    adUrl: 'https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315',
+                    buttonElement: button,
+                    duration: 15,
+                    onSuccess: () => {
                         state.fastRecoveryAdsWatched++;
                         let dataToSave = { fastRecoveryAdsWatched: state.fastRecoveryAdsWatched };
                         if (state.fastRecoveryAdsWatched >= 30) {
-                            state.energyRecoveryDuration = 30 * 60 * 1000; 
+                            state.energyRecoveryDuration = 30 * 60 * 1000;
                             dataToSave.energyRecoveryDuration = state.energyRecoveryDuration;
                             alert("Success! Energy will now refill in 30 minutes from when it ran out.");
                             elements.fastEnergyRecoveryBtn.style.display = 'none';
                         }
                         saveGame(dataToSave);
-                        checkEnergyCooldown(); 
+                        checkEnergyCooldown();
+                    },
+                    onFailure: () => {
+                        checkEnergyCooldown(); // Just re-render the button
                     }
-                }, 1000);
+                });
             });
             elements.navButtons.forEach(b => { if(b.dataset.screen){ b.addEventListener('click', () => showScreen(b.dataset.screen)) } });
             document.querySelectorAll('.back-button').forEach(b => b.addEventListener('click', () => showScreen(b.dataset.screen)));
@@ -2106,27 +2179,30 @@
             }
             elements.airdropButton.addEventListener('click', () => showScreen('airdrop-screen'));
             elements.watchAdForLoveCoinBtn.addEventListener('click', () => {
-                if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
-                state.isAdTimerActive = true;
-                window.open('https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6', '_blank');
                 const button = elements.watchAdForLoveCoinBtn;
-                button.disabled = true;
-                let countdown = 15; 
-                button.innerText = `Wait (${countdown}s)`;
-                const countdownInterval = setInterval(() => {
-                    countdown--;
-                    button.innerText = `Wait (${countdown}s)`;
-                    if (countdown <= 0) {
-                        clearInterval(countdownInterval);
+                const originalText = "Watch Ad (+1 💝)";
+                const tryAgainText = "Try Again";
+
+                handleAdWatch({
+                    adUrl: 'https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6',
+                    buttonElement: button,
+                    duration: 15,
+                    onSuccess: () => {
                         state.loveCoins++;
                         saveGame({ loveCoins: state.loveCoins });
                         renderAirdropScreen();
                         alert("You earned 1 💝 Love Coin!");
                         button.disabled = false;
-                        button.innerText = "Watch Ad (+1 💝)";
-                        state.isAdTimerActive = false;
+                        button.innerText = originalText;
+                    },
+                    onFailure: () => {
+                        button.disabled = false;
+                        button.innerText = tryAgainText;
+                        setTimeout(() => {
+                           if(button.innerText === tryAgainText) button.innerText = originalText;
+                        }, 2000);
                     }
-                }, 1000);
+                });
             });
             loadGame();
             showScreen('game-screen');
