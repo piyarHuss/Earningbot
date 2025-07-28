@@ -1078,7 +1078,7 @@
             };
 
             // =========================================================================
-            // ===== NEW: ADVANCED AD WATCHING HANDLER =================================
+            // ===== NEW: ROBUST AD WATCHING HANDLER ===================================
             // =========================================================================
             function handleAdWatch(options) {
                 const {
@@ -1086,7 +1086,7 @@
                     buttonElement,
                     duration = 15,
                     onSuccess,
-                    onFailure,
+                    onFailure = () => {},
                     onStart = () => {},
                     onComplete = () => {}
                 } = options;
@@ -1101,10 +1101,7 @@
                 onStart();
 
                 try {
-                    const adWindow = window.open(adUrl, '_blank');
-                    if (!adWindow || adWindow.closed || typeof adWindow.closed == 'undefined') {
-                        throw new Error("Popup blocked");
-                    }
+                    window.open(adUrl, '_blank');
                 } catch (e) {
                     alert("Popup blocked! Please allow popups for this site to watch ads.");
                     isAdFlowActive = false;
@@ -1114,63 +1111,46 @@
                 }
 
                 const startTime = Date.now();
-                let successTimer = null;
-                let countdownInterval = null;
-
+                buttonElement.innerHTML += ` <span id="ad-timer-span">(${duration}s)</span>`;
+                const timerSpan = document.getElementById('ad-timer-span');
                 let countdown = duration;
-                buttonElement.innerText = `Waiting... (${countdown}s)`;
-                countdownInterval = setInterval(() => {
+                
+                const countdownInterval = setInterval(() => {
                     countdown--;
-                    if (countdown >= 0) {
-                        buttonElement.innerText = `Waiting... (${countdown}s)`;
-                    } else {
+                    if(timerSpan) {
+                       timerSpan.innerText = `(${countdown}s)`;
+                    }
+                    if(countdown <= 0) {
                         clearInterval(countdownInterval);
                     }
                 }, 1000);
 
-                // This timer fires if the user stays on the ad page without returning.
-                // We assume this is a success.
-                successTimer = setTimeout(() => {
-                    handleSuccess();
-                }, duration * 1000);
-
                 const handleVisibilityChange = () => {
                     if (document.visibilityState === 'visible') {
+                        // User has returned to this tab.
                         const elapsedTime = (Date.now() - startTime) / 1000;
-                        clearTimeout(successTimer); // Stop the automatic success timer
+                        
+                        // Clean up listeners immediately.
+                        document.removeEventListener('visibilitychange', handleVisibilityChange);
+                        clearInterval(countdownInterval);
 
                         if (elapsedTime >= duration) {
-                            handleSuccess();
+                            // SUCCESS
+                            onSuccess();
                         } else {
-                            handleFailure();
+                            // FAILURE
+                            alert(`Ad watch incomplete. You must watch for at least ${duration} seconds. Please try again.`);
+                            onFailure();
                         }
-                        document.removeEventListener('visibilitychange', handleVisibilityChange);
+                        
+                        // Final cleanup
+                        isAdFlowActive = false;
+                        onComplete();
                     }
                 };
-
-                document.addEventListener('visibilitychange', handleVisibilityChange);
-
-                function handleSuccess() {
-                    console.log("Ad watch successful.");
-                    cleanUp();
-                    onSuccess();
-                }
-
-                function handleFailure() {
-                    console.log("Ad watch failed (returned too early).");
-                    alert(`Ad watch incomplete. You must stay on the ad page for at least ${duration} seconds. Please try again.`);
-                    cleanUp();
-                    onFailure();
-                }
                 
-                function cleanUp() {
-                    clearInterval(countdownInterval);
-                    document.removeEventListener('visibilitychange', handleVisibilityChange);
-                    isAdFlowActive = false;
-                    onComplete();
-                }
+                document.addEventListener('visibilitychange', handleVisibilityChange);
             }
-
 
             function loadAndDisplayTournaments() {
                 const tournamentsRef = database.ref('tournaments');
@@ -1345,6 +1325,7 @@
                     adUrl: currentTournamentJoinProcess.adUrl,
                     buttonElement: button,
                     duration: 15,
+                    onStart: () => button.innerText = 'Opening Ad...',
                     onSuccess: () => {
                         currentTournamentJoinProcess.adsWatched++;
                         elements.tournamentAdProgress.innerText = `${currentTournamentJoinProcess.adsWatched} / ${currentTournamentJoinProcess.adsRequired}`;
@@ -1500,13 +1481,13 @@
                     adUrl: MINE_AD_URL,
                     buttonElement: button,
                     duration: 15,
+                    onStart: () => button.innerText = 'Opening Ad...',
                     onSuccess: () => {
                         state.miningAdsWatched++;
                         saveGame({ miningAdsWatched: state.miningAdsWatched });
-                        renderMineScreen();
                     },
-                    onFailure: () => {
-                        renderMineScreen(); // Just re-render to reset the button text
+                    onComplete: () => {
+                        renderMineScreen(); // Always re-render to update UI
                     }
                 });
             });
@@ -1541,7 +1522,6 @@
                 container.innerHTML = '';
                 const specialAdCard = document.createElement('div');
                 specialAdCard.className = 'option-card';
-                // --- TEXT CHANGE HERE ---
                 specialAdCard.innerHTML = `<h3>Special Offer (18+)</h3><p>Watch a special video to earn a <strong>15 🪙</strong> reward!</p><button id="watch-18plus-ad-btn" class="action-button" style="background-color:#c0392b;">18+</button>`;
                 container.appendChild(specialAdCard);
                 if (state.myReferralC) {
@@ -1578,6 +1558,7 @@
                         adUrl: 'https://www.profitableratecpm.com/uhnqngyf?key=d467c8e5498339a61ae6addd69e30d9e',
                         buttonElement: button,
                         duration: 30, // Longer duration for special ad
+                        onStart: () => button.innerText = 'Opening Ad...',
                         onSuccess: () => {
                             state.score += 15;
                             updateDisplay();
@@ -1608,13 +1589,13 @@
                         adUrl: task.url,
                         buttonElement: button,
                         duration: 15,
+                        onStart: () => button.innerText = 'Opening Ad...',
                         onSuccess: () => {
                             state[taskId + 'Progress']++;
                             saveGame({ [taskId + 'Progress']: state[taskId + 'Progress'] });
-                            renderVideoTasks(); // Re-render to show progress
                         },
-                        onFailure: () => {
-                            renderVideoTasks(); // Re-render to reset button state
+                        onComplete: () => {
+                            renderVideoTasks(); // Always re-render
                         }
                     });
                 }
@@ -1742,13 +1723,13 @@
                         adUrl: 'https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315',
                         buttonElement: button,
                         duration: 15,
+                        onStart: () => button.innerText = 'Opening Ad...',
                         onSuccess: () => {
                             state.withdrawalAdClicks++;
                             saveGame({ withdrawalAdClicks: state.withdrawalAdClicks });
-                            renderWalletScreen(); // Re-render to update progress
                         },
-                        onFailure: () => {
-                            renderWalletScreen(); // Re-render to reset button
+                        onComplete: () => {
+                            renderWalletScreen(); // Always re-render
                         }
                     });
                 }
@@ -1762,6 +1743,7 @@
                     adUrl: 'https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6',
                     buttonElement: button,
                     duration: 15,
+                    onStart: () => button.innerText = 'Opening Ad...',
                     onSuccess: () => {
                         state.score += 10;
                         updateDisplay();
@@ -1797,12 +1779,12 @@
                     adUrl: 'https://www.profitableratecpm.com/d4cku5ewnn?key=a29645f253b4d6eb62da85d3f5105d02',
                     buttonElement: button,
                     duration: 30,
+                    onStart: () => button.innerText = 'Opening Ad...',
                     onSuccess: () => {
                         state.longTermAdProgress++;
                         saveGame({ longTermAdProgress: state.longTermAdProgress });
-                        renderLongTermAdTask();
                     },
-                    onFailure: () => {
+                    onComplete: () => {
                         renderLongTermAdTask();
                     }
                 });
@@ -2083,6 +2065,7 @@
                     adUrl: 'https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315',
                     buttonElement: button,
                     duration: 15,
+                    onStart: () => button.innerText = 'Opening Ad...',
                     onSuccess: () => {
                         state.fastRecoveryAdsWatched++;
                         let dataToSave = { fastRecoveryAdsWatched: state.fastRecoveryAdsWatched };
@@ -2093,10 +2076,9 @@
                             elements.fastEnergyRecoveryBtn.style.display = 'none';
                         }
                         saveGame(dataToSave);
-                        checkEnergyCooldown();
                     },
-                    onFailure: () => {
-                        checkEnergyCooldown(); // Just re-render the button
+                    onComplete: () => {
+                        checkEnergyCooldown(); // Always re-render
                     }
                 });
             });
@@ -2187,6 +2169,7 @@
                     adUrl: 'https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6',
                     buttonElement: button,
                     duration: 15,
+                    onStart: () => button.innerText = 'Opening Ad...',
                     onSuccess: () => {
                         state.loveCoins++;
                         saveGame({ loveCoins: state.loveCoins });
