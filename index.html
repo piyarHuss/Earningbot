@@ -149,6 +149,29 @@
         .nav-icon{font-size:28px}
         .nav-text{font-size:14px}
         
+        /* --- NEW & MODIFIED: ANIMATION FOR OFFER BUTTON --- */
+        #offer-nav-button {
+            border-radius: 12px;
+            background-color: rgba(243, 156, 18, 0.2);
+            animation: pulse-offer-button 2.5s infinite ease-in-out;
+            transform-origin: center center;
+        }
+        @keyframes pulse-offer-button {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 5px rgba(243, 156, 18, 0.3);
+            }
+            50% {
+                transform: scale(1.08);
+                box-shadow: 0 0 20px rgba(243, 156, 18, 0.8);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 5px rgba(243, 156, 18, 0.3);
+            }
+        }
+        /* --- END OF NEW & MODIFIED --- */
+
         h2, h3{font-size:32px;margin-bottom:10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.7);}
         h3 {font-size: 28px;}
         p{font-size:18px;margin:5px 0}
@@ -231,23 +254,6 @@
         .flappy-popup-content h2 { margin-top: 0; color: #ff5858; font-size: 2.5em; }
         .flappy-popup-content p { font-size: 1.3em; }
         .flappy-reward-message { font-size: 1.2em; color: #ffeb3b; font-weight: bold; margin: 15px 0; }
-
-        /* MINING STYLES */
-        #mining-pickaxe-icon { font-size: 120px; margin: 20px 0; text-shadow: 3px 5px 15px rgba(0,0,0,0.4); }
-        .swinging { animation: pickaxe-swing 1.5s ease-in-out infinite; }
-        @keyframes pickaxe-swing {
-            0% { transform: rotate(15deg); }
-            50% { transform: rotate(-30deg); }
-            100% { transform: rotate(15deg); }
-        }
-        .mine-stats-container { display: flex; flex-direction: column; align-items: center; gap: 15px; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 15px; width: 90%; max-width: 400px; margin-bottom: 20px;}
-        .mine-stat { text-align: center; }
-        .mine-stat p { margin: 0; font-size: 16px; opacity: 0.8; }
-        .mine-stat span { font-size: 24px; font-weight: 700; color: #ffdd57; }
-        
-        #mine-buttons-container { display: flex; flex-direction: column; align-items: center; width: 90%; max-width: 400px; gap: 10px; }
-        .claim-button { background-color: #2ecc71; }
-        .upgrade-button { background-color: #3498db; }
         
         /* EVENT/TOURNAMENT CARD STYLE */
         .tournament-card {
@@ -687,34 +693,8 @@
                 </div>
             </div>
         </div>
-
-        <div id="mine-screen" class="screen hidden">
-            <h2>⛏️ Auto-Miner ⛏️</h2>
-            <div id="mining-pickaxe-icon">⛏️</div>
-            <div class="mine-stats-container">
-                <div class="mine-stat">
-                    <p>Potential Reward</p>
-                    <span id="mining-rate-display">+0 🪙</span>
-                </div>
-                 <div class="mine-stat">
-                    <p>Ads Watched</p>
-                    <span id="mining-ads-watched-display">0</span>
-                </div>
-                <div class="mine-stat">
-                    <p>Accumulated / Time Left</p>
-                    <span id="mining-timer-display">--:--:--</span>
-                </div>
-            </div>
-            <div id="mine-buttons-container">
-                <button id="start-mining-button" class="action-button" style="display: none;">Start Mining Now</button>
-                <div id="mine-watch-ad-wrapper" style="width: 100%; text-align: center;">
-                    <button id="watch-ad-button" class="action-button upgrade-button">Watch Ad</button>
-                    <p class="ad-minimum-watch-note">Minimum ads watch: 15</p>
-                </div>
-                <button id="claim-mine-button" class="action-button claim-button" style="display: none;">Claim</button>
-            </div>
-            <button class="back-button" data-screen="game-screen">Back to Game</button>
-        </div>
+        
+        <!-- REMOVED: The entire #mine-screen div has been deleted. -->
 
         <div id="games-screen" class="screen scrollable-screen hidden">
             <div class="coin-flip-container">
@@ -816,10 +796,11 @@
         
         <div class="nav-container">
             <div class="nav-button active" data-screen="game-screen"><span class="nav-icon">🏠</span><span class="nav-text">Home</span></div>
-            <div class="nav-button" data-screen="mine-screen"><span class="nav-icon">⛏️</span><span class="nav-text">Mine</span></div>
+            <!-- REMOVED: The "Mine" button was here. -->
             <div class="nav-button" data-screen="games-screen"><span class="nav-icon">🎮</span><span class="nav-text">Games</span></div>
             <div class="nav-button" data-screen="tournament-screen"><span class="nav-icon">🏆</span><span class="nav-text">All</span></div>
-            <div class="nav-button" data-screen="offer-wall-screen"><span class="nav-icon">🎁</span><span class="nav-text">Offer</span></div>
+            <!-- MODIFIED: Added an ID to the Offer button for animation styling -->
+            <div class="nav-button" id="offer-nav-button" data-screen="offer-wall-screen"><span class="nav-icon">🎁</span><span class="nav-text">Offer</span></div>
             <div class="nav-button" data-screen="tasks-screen"><span class="nav-icon">📝</span><span class="nav-text">Tasks</span></div>
             <div class="nav-button" data-screen="video-screen"><span class="nav-icon">🎥</span><span class="nav-text">Video</span></div>
             <div class="nav-button" data-screen="wallet-screen"><span class="nav-icon">👛</span><span class="nav-text">Wallet</span></div>
@@ -1068,14 +1049,7 @@
                 tasksOptionsContainer: document.getElementById('tasks-options-container'),
                 videoTasksContainer: document.getElementById('video-tasks-container'),
                 withdrawalAdTaskContainer: document.getElementById('withdrawal-ad-task-container'),
-                watchAdButton: document.getElementById('watch-ad-button'),
-                mineWatchAdWrapper: document.getElementById('mine-watch-ad-wrapper'),
-                startMiningButton: document.getElementById('start-mining-button'),
-                claimMineButton: document.getElementById('claim-mine-button'),
-                miningPickaxeIcon: document.getElementById('mining-pickaxe-icon'),
-                miningRateDisplay: document.getElementById('mining-rate-display'),
-                miningAdsWatchedDisplay: document.getElementById('mining-ads-watched-display'),
-                miningTimerDisplay: document.getElementById('mining-timer-display'),
+                /* REMOVED: Mining-related elements are gone */
                 notificationBell: document.getElementById('notification-bell'),
                 notificationDot: document.getElementById('notification-dot'),
                 notificationPopup: document.getElementById('notification-popup'),
@@ -1114,10 +1088,7 @@
                 videoTask1Claimed: false, videoTask2Claimed: false, videoTask3Claimed: false,
                 withdrawalAdClicks: 0,
                 isAdTimerActive: false,
-                miningAdsWatched: 0,
-                miningSessionTier: 0, 
-                miningStartTime: 0,
-                miningEndTime: 0,
+                /* REMOVED: Mining state variables are gone */
                 tapCounter: 0,
                 longTermAdProgress: 0,
                 longTermAdClaimed: false,
@@ -1420,132 +1391,7 @@
             elements.tournamentAdCancelBtn.addEventListener('click', closeTournamentPopup);
             elements.tournamentJoinPopupClose.addEventListener('click', closeTournamentPopup);
 
-            const MINE_AD_URL = 'https://www.profitableratecpm.com/pk9fkd5v8?key=1afa6b8e3d8f61558b90095a0c9a2c44';
-            const MINING_TIERS = {
-                0: { ads: 0, totalReward: 0, duration: 0 },
-                1: { ads: 1, totalReward: 50, duration: 1 * 60 * 60 * 1000 },
-                2: { ads: 2, totalReward: 100, duration: 1 * 60 * 60 * 1000 },
-                3: { ads: 20, totalReward: 2000, duration: 3 * 60 * 60 * 1000 },
-            };
-            function getEligibleMiningTier() {
-                if (state.miningAdsWatched >= MINING_TIERS[3].ads) return 3;
-                if (state.miningAdsWatched >= MINING_TIERS[2].ads) return 2;
-                if (state.miningAdsWatched >= MINING_TIERS[1].ads) return 1;
-                return 0;
-            }
-            function resetMiningState() {
-                state.miningAdsWatched = 0; state.miningSessionTier = 0; state.miningStartTime = 0; state.miningEndTime = 0;
-                saveGame({ miningAdsWatched: 0, miningSessionTier: 0, miningStartTime: 0, miningEndTime: 0 });
-            }
-            function renderMineScreen() {
-                const now = Date.now();
-                const isSessionActive = state.miningStartTime > 0;
-                if (isSessionActive) {
-                    const isClaimable = now >= state.miningEndTime;
-                    elements.mineWatchAdWrapper.style.display = 'none';
-                    elements.startMiningButton.style.display = 'none';
-                    if (isClaimable) {
-                        elements.miningPickaxeIcon.classList.remove('swinging');
-                        elements.claimMineButton.style.display = 'block';
-                        elements.claimMineButton.disabled = false;
-                        const tierInfo = MINING_TIERS[state.miningSessionTier];
-                        elements.claimMineButton.innerText = `Claim ${tierInfo.totalReward.toLocaleString()} 🪙`;
-                    } else {
-                        elements.miningPickaxeIcon.classList.add('swinging');
-                        elements.claimMineButton.style.display = 'block';
-                        elements.claimMineButton.disabled = true;
-                        elements.claimMineButton.innerText = 'Mining...';
-                    }
-                } else { 
-                    elements.miningPickaxeIcon.classList.remove('swinging');
-                    elements.claimMineButton.style.display = 'none';
-                    elements.mineWatchAdWrapper.style.display = 'block';
-                    elements.watchAdButton.disabled = false;
-                    const eligibleTier = getEligibleMiningTier();
-                    let nextTierGoal = 1;
-                    if (eligibleTier === 1) nextTierGoal = 2;
-                    else if (eligibleTier === 2) nextTierGoal = 20;
-                    if (eligibleTier >= 3) {
-                         elements.watchAdButton.innerText = 'Max Tier Reached';
-                         elements.watchAdButton.disabled = true;
-                    } else {
-                         elements.watchAdButton.innerText = `Watch Ad (${state.miningAdsWatched}/${nextTierGoal})`;
-                    }
-                    if (state.miningAdsWatched > 0) {
-                        elements.startMiningButton.style.display = 'block';
-                    } else {
-                        elements.startMiningButton.style.display = 'none';
-                    }
-                }
-                const eligibleTier = getEligibleMiningTier();
-                const tierInfo = MINING_TIERS[eligibleTier];
-                elements.miningRateDisplay.innerText = `+${tierInfo.totalReward.toLocaleString()} 🪙`;
-                elements.miningAdsWatchedDisplay.innerText = state.miningAdsWatched;
-                updateMiningTimerDisplay();
-            }
-            function updateMiningTimerDisplay() {
-                if (state.miningStartTime === 0) {
-                    elements.miningTimerDisplay.innerText = "Inactive"; return;
-                }
-                const now = Date.now();
-                if (now >= state.miningEndTime) {
-                    elements.miningTimerDisplay.innerText = "Finished!"; return;
-                }
-                const remaining = state.miningEndTime - now;
-                const hours = Math.floor((remaining / (1000 * 60 * 60)) % 24).toString().padStart(2, '0');
-                const minutes = Math.floor((remaining / (1000 * 60)) % 60).toString().padStart(2, '0');
-                const seconds = Math.floor((remaining / 1000) % 60).toString().padStart(2, '0');
-                const elapsed = now - state.miningStartTime;
-                const duration = state.miningEndTime - state.miningStartTime;
-                const progress = elapsed / duration;
-                const accumulated = MINING_TIERS[state.miningSessionTier].totalReward * progress;
-                elements.miningTimerDisplay.innerText = `${Math.floor(accumulated).toLocaleString()} 🪙 / ${hours}:${minutes}:${seconds}`;
-            }
-            elements.watchAdButton.addEventListener('click', () => {
-                if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
-                state.isAdTimerActive = true;
-                window.open(MINE_AD_URL, '_blank');
-                elements.watchAdButton.disabled = true;
-                let countdown = 10;
-                elements.watchAdButton.innerText = `Wait (${countdown}s)`;
-                const adInterval = setInterval(() => {
-                    countdown--;
-                    elements.watchAdButton.innerText = `Wait (${countdown}s)`;
-                    if(countdown <= 0) {
-                        clearInterval(adInterval);
-                        state.isAdTimerActive = false;
-                        state.miningAdsWatched++;
-                        saveGame({ miningAdsWatched: state.miningAdsWatched });
-                        renderMineScreen();
-                    }
-                }, 1000);
-            });
-            elements.startMiningButton.addEventListener('click', () => {
-                const eligibleTier = getEligibleMiningTier();
-                if (eligibleTier === 0) {
-                    alert("You must watch at least one ad to start mining!"); return;
-                }
-                const tierInfo = MINING_TIERS[eligibleTier];
-                state.miningSessionTier = eligibleTier;
-                state.miningStartTime = Date.now();
-                state.miningEndTime = state.miningStartTime + tierInfo.duration;
-                saveGame({
-                    miningSessionTier: state.miningSessionTier, miningStartTime: state.miningStartTime, miningEndTime: state.miningEndTime,
-                });
-                renderMineScreen();
-            });
-            elements.claimMineButton.addEventListener('click', () => {
-                const now = Date.now();
-                if (state.miningStartTime > 0 && now >= state.miningEndTime) {
-                    const tierInfo = MINING_TIERS[state.miningSessionTier];
-                    const claimedAmount = tierInfo.totalReward;
-                    state.score += claimedAmount;
-                    alert(`You claimed ${claimedAmount.toLocaleString()} coins!`);
-                    updateDisplay();
-                    resetMiningState(); 
-                    renderMineScreen();
-                }
-            });
+            // REMOVED: All mining functions (getEligibleMiningTier, resetMiningState, renderMineScreen, updateMiningTimerDisplay) and their event listeners have been deleted.
 
             function renderVideoTasks() {
                 const container = elements.videoTasksContainer;
@@ -1915,7 +1761,7 @@
                 else if (screenId === 'offer-wall-screen') { loadAndDisplayAppOffers(); } // Call the new function
                 else if (screenId === 'tasks-screen') { loadAndDisplayOffers(); } 
                 else if (screenId === 'video-screen') { renderVideoTasks(); } 
-                else if (screenId === 'mine-screen') { renderMineScreen(); } 
+                /* REMOVED: else if for mine-screen */
                 else if (screenId === 'tournament-screen') { loadAndDisplayTournaments(); } 
                 else if (screenId === 'airdrop-screen') { renderAirdropScreen(); }
             }
@@ -1944,10 +1790,7 @@
                             state[task.id + 'Claimed'] = data[task.id + 'Claimed'] || false;
                         });
                         state.withdrawalAdClicks = data.withdrawalAdClicks || 0;
-                        state.miningAdsWatched = data.miningAdsWatched || 0;
-                        state.miningSessionTier = data.miningSessionTier || 0;
-                        state.miningStartTime = data.miningStartTime || 0;
-                        state.miningEndTime = data.miningEndTime || 0;
+                        /* REMOVED: Loading mining state */
                         state.longTermAdProgress = data.longTermAdProgress || 0;
                         state.longTermAdClaimed = data.longTermAdClaimed || false;
                         state.tapCounter = data.tapCounter || 0;
@@ -1957,12 +1800,7 @@
                         state.loveCoins = data.loveCoins || 0;
                         state.joinedTournaments = data.joinedTournaments || {};
 
-                        if (state.miningStartTime > 0 && Date.now() > state.miningEndTime) {
-                           if (state.miningSessionTier > 0) { 
-                             console.log("Unclaimed mining rewards expired. Resetting.");
-                             resetMiningState();
-                           }
-                        }
+                        /* REMOVED: Logic to check for expired mining sessions */
 
                     } else {
                         const newCode = generateReferralCode();
@@ -2255,7 +2093,7 @@
             showScreen('game-screen');
             flappyGame.init();
             setInterval(() => {
-                updateMiningTimerDisplay();
+                /* REMOVED: updateMiningTimerDisplay(); */
                 checkEnergyCooldown();
             }, 1000);
             elements.withdrawPopup.style.display = 'none'; 
