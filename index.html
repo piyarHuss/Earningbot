@@ -576,6 +576,72 @@
         .join-now-button:active { transform: translateY(0); }
         /* ===== END: MODERN TOURNAMENT CARD STYLES ===== */
 
+        /* --- OFFER WALL STYLES --- */
+        #offer-wall-screen {
+            background-color: #f8f9fa; /* Light grey background */
+            justify-content: flex-start;
+            padding-top: 30px;
+        }
+        .offer-wall-container {
+            width: 95%;
+            max-width: 500px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .offer-wall-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 1px solid #eeeeee;
+        }
+        .offer-wall-item:last-child {
+            border-bottom: none;
+        }
+        .offer-wall-item img {
+            width: 45px;
+            height: 45px;
+            margin-right: 15px;
+            flex-shrink: 0;
+            border-radius: 8px;
+        }
+        .offer-wall-text {
+            flex-grow: 1;
+        }
+        .offer-wall-text h3 {
+            font-family: 'Poppins', sans-serif;
+            margin: 0 0 2px 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: #212529;
+            text-shadow: none;
+        }
+        .offer-wall-text p {
+            margin: 0;
+            font-size: 14px;
+            color: #6c757d;
+        }
+        .offer-wall-button {
+            background-color: #f3f0ff;
+            color: #6f42c1;
+            border: 1px solid #e0d7f5;
+            padding: 8px 22px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .offer-wall-button:hover {
+            background-color: #e9e1fc;
+            transform: translateY(-1px);
+        }
+
     </style>
 </head>
 <body>
@@ -687,24 +753,26 @@
             </div>
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
-
-        <div id="boost-screen" class="screen hidden">
-            <h2>🚀 Boosts 🚀</h2>
-            <div class="options-container">
-                <div class="option-card">
-                    <h3>Tap Power x2</h3>
-                    <p>Get 2 coins for every tap.</p>
-                    <button id="boost-tap-1" class="action-button">Cost: 1,000 🪙</button>
+        
+        <!-- NEW: OFFER WALL SCREEN -->
+        <div id="offer-wall-screen" class="screen hidden">
+            <div class="offer-wall-container">
+                <div class="offer-wall-item">
+                    <img src="https://i.imgur.com/uFwLgMD.png" alt="PB Task Icon">
+                    <div class="offer-wall-text">
+                        <h3>PB Tasks</h3>
+                        <p>Complete Task</p>
+                    </div>
+                    <a href="https://appverification.net/cl/i/5k9x91" target="_blank" class="offer-wall-button">Start</a>
                 </div>
-                <div class="option-card">
-                    <h3>Tap Power x3</h3>
-                    <p>Get 3 coins for every tap.</p>
-                    <button id="boost-tap-2" class="action-button">Cost: 5,000 🪙</button>
-                </div>
-                <div class="option-card">
-                    <h3>Tap Power x10</h3>
-                    <p>Get 10 coins for every tap.</p>
-                    <button id="boost-tap-3" class="action-button">Cost: 100,000 🪙</button>
+                <div class="offer-wall-item">
+                    <img src="https://i.imgur.com/pYqfE6F.png" alt="FY Task Icon">
+                    <div class="offer-wall-text">
+                        <h3>FY Tasks</h3>
+                        <p>Complete Task</p>
+                    </div>
+                    <!-- IMPORTANT: Replace # with your actual link for FY Tasks -->
+                    <a href="#" target="_blank" class="offer-wall-button">Start</a>
                 </div>
             </div>
             <button class="back-button" data-screen="game-screen">Back to Game</button>
@@ -765,7 +833,7 @@
             <div class="nav-button" data-screen="mine-screen"><span class="nav-icon">⛏️</span><span class="nav-text">Mine</span></div>
             <div class="nav-button" data-screen="games-screen"><span class="nav-icon">🎮</span><span class="nav-text">Games</span></div>
             <div class="nav-button" data-screen="tournament-screen"><span class="nav-icon">🏆</span><span class="nav-text">All</span></div>
-            <div class="nav-button" data-screen="boost-screen"><span class="nav-icon">🚀</span><span class="nav-text">Boost</span></div>
+            <div class="nav-button" data-screen="offer-wall-screen"><span class="nav-icon">🎁</span><span class="nav-text">Offer</span></div>
             <div class="nav-button" data-screen="tasks-screen"><span class="nav-icon">📝</span><span class="nav-text">Tasks</span></div>
             <div class="nav-button" data-screen="video-screen"><span class="nav-icon">🎥</span><span class="nav-text">Video</span></div>
             <div class="nav-button" data-screen="wallet-screen"><span class="nav-icon">👛</span><span class="nav-text">Wallet</span></div>
@@ -1007,7 +1075,6 @@
                 popupCloseButton: document.getElementById('popup-close-button'), upiWithdrawButton: document.getElementById('upi-withdraw-button'),
                 popupWithdrawalAmount: document.getElementById('popup-withdrawal-amount'), popupWithdrawalValueInr: document.getElementById('popup-withdrawal-value-inr'),
                 withdrawalNameInput: document.getElementById('withdrawal-name-input'), withdrawalUpiInput: document.getElementById('withdrawal-upi-input'),
-                boostTap1Button: document.getElementById('boost-tap-1'), boostTap2Button: document.getElementById('boost-tap-2'), boostTap3Button: document.getElementById('boost-tap-3'),
                 headsButton: document.getElementById('heads-button'), tailsButton: document.getElementById('tails-button'), flipResult: document.getElementById('flip-result'),
                 betSelectionContainer: document.getElementById('bet-selection-container'), tapSound: document.getElementById('tap-sound'), withdrawalHistoryList: document.getElementById('withdrawal-history-list'),
                 nameChangePopup: document.getElementById('name-change-popup'), newNameInput: document.getElementById('new-name-input'),
@@ -1803,7 +1870,7 @@
                     if (flappyGame.gameRunning) { flappyGame.endGame(); }
                 }
                 elements.screens.forEach(s => s.classList.add('hidden'));
-                document.querySelectorAll('.nav-button[data-screen]').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.nav-button').forEach(b => b.classList.remove('active'));
                 
                 const targetScreen = document.getElementById(screenId);
                 if(targetScreen) {
@@ -1817,7 +1884,6 @@
                 if (button) button.classList.add('active');
 
                 if (screenId === 'wallet-screen') { renderWalletScreen(); } 
-                else if (screenId === 'boost-screen') { updateBoostButtons(); } 
                 else if (screenId === 'tasks-screen') { loadAndDisplayOffers(); } 
                 else if (screenId === 'video-screen') { renderVideoTasks(); } 
                 else if (screenId === 'mine-screen') { renderMineScreen(); } 
@@ -1925,14 +1991,7 @@
                 }
             }
             function updatePlayerNameDisplay() { elements.playerNameDisplay.innerText = state.playerName; }
-            function updateBoostButtons() {
-                elements.boostTap1Button.disabled = state.tapUpgradeLevel >= 1;
-                elements.boostTap1Button.innerText = state.tapUpgradeLevel >= 1 ? 'Bought ✅' : 'Cost: 1,000 🪙';
-                elements.boostTap2Button.disabled = state.tapUpgradeLevel < 1 || state.tapUpgradeLevel >= 2;
-                elements.boostTap2Button.innerText = state.tapUpgradeLevel >= 2 ? 'Bought ✅' : 'Cost: 5,000 🪙';
-                elements.boostTap3Button.disabled = state.tapUpgradeLevel < 2 || state.tapUpgradeLevel >= 3;
-                elements.boostTap3Button.innerText = state.tapUpgradeLevel >= 3 ? 'Bought ✅' : 'Cost: 100,000 🪙';
-            }
+            
             function showFloatingText(event) {
                 const floatingText = document.createElement('div');
                 const powerToShow = isAdBoostActive ? state.tapPower * 2 : state.tapPower;
@@ -2094,10 +2153,7 @@
             });
             elements.withdrawButton.addEventListener('click', () => { if (state.score >= 2000) { const amountToWithdraw = state.score; const amountInRupees = (amountToWithdraw / 1000).toFixed(2); elements.popupWithdrawalAmount.innerText = `${amountToWithdraw.toLocaleString()} 🪙`; elements.popupWithdrawalValueInr.innerText = `Value: ₹${amountInRupees} INR`; elements.withdrawPopup.style.display = 'flex'; } else { alert(`You need at least 2000 coins (₹2) to make a withdrawal.`); } });
             elements.popupCloseButton.addEventListener('click', () => elements.withdrawPopup.style.display = 'none');
-            function buyBoost(cost, newTapPower, requiredLevel, newUpgradeLevel) { if (state.tapUpgradeLevel === requiredLevel && state.score >= cost) { state.score -= cost; state.tapPower = newTapPower; state.tapUpgradeLevel = newUpgradeLevel; alert('Upgrade Successful!'); saveGame({ score: state.score, Totalearning: state.score, tapPower: state.tapPower, tapUpgradeLevel: state.tapUpgradeLevel }); updateDisplay(); updateBoostButtons(); } else if (state.tapUpgradeLevel !== requiredLevel) { alert('You must purchase the previous upgrades first!'); } else { alert('Not enough coins!'); } }
-            elements.boostTap1Button.addEventListener('click', () => buyBoost(1000, 2, 0, 1));
-            elements.boostTap2Button.addEventListener('click', () => buyBoost(5000, 3, 1, 2));
-            elements.boostTap3Button.addEventListener('click', () => buyBoost(100000, 10, 2, 3));
+            
             elements.betSelectionContainer.addEventListener('click', (e) => { if (e.target.classList.contains('bet-button')) { elements.betSelectionContainer.querySelectorAll('.bet-button').forEach(btn => btn.classList.remove('active')); e.target.classList.add('active'); currentBetAmount = parseInt(e.target.dataset.bet, 10); } });
             function playCoinFlip(playerChoice) {
                 if (state.score < currentBetAmount) {
@@ -2165,6 +2221,7 @@
                     }
                 }, 1000);
             });
+            
             loadGame();
             showScreen('game-screen');
             flappyGame.init();
