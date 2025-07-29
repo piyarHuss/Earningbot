@@ -581,6 +581,7 @@
             background-color: #f8f9fa; /* Light grey background */
             justify-content: flex-start;
             padding-top: 30px;
+            color: #000; /* Set text color to black for readability on white BG */
         }
         .offer-wall-container {
             width: 95%;
@@ -754,26 +755,11 @@
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
         
-        <!-- NEW: OFFER WALL SCREEN -->
+        <!-- OFFER WALL SCREEN -->
         <div id="offer-wall-screen" class="screen hidden">
-            <div class="offer-wall-container">
-                <div class="offer-wall-item">
-                    <img src="https://i.imgur.com/uFwLgMD.png" alt="PB Task Icon">
-                    <div class="offer-wall-text">
-                        <h3>PB Tasks</h3>
-                        <p>Complete Task</p>
-                    </div>
-                    <a href="https://appverification.net/cl/i/5k9x91" target="_blank" class="offer-wall-button">Start</a>
-                </div>
-                <div class="offer-wall-item">
-                    <img src="https://i.imgur.com/pYqfE6F.png" alt="FY Task Icon">
-                    <div class="offer-wall-text">
-                        <h3>FY Tasks</h3>
-                        <p>Complete Task</p>
-                    </div>
-                    <!-- IMPORTANT: Replace # with your actual link for FY Tasks -->
-                    <a href="#" target="_blank" class="offer-wall-button">Start</a>
-                </div>
+             <!-- The container is now empty. JS will fill it. -->
+            <div id="offer-wall-container" class="offer-wall-container">
+                 <p style="color: #6c757d; text-align: center;">Loading offers...</p>
             </div>
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
@@ -1117,6 +1103,7 @@
                 airdropScreen: document.getElementById('airdrop-screen'),
                 loveCoinBalanceDisplay: document.getElementById('love-coin-balance-display'),
                 watchAdForLoveCoinBtn: document.getElementById('watch-ad-for-love-coin-btn'),
+                offerWallContainer: document.getElementById('offer-wall-container'),
             };
 
             let state = {
@@ -1151,6 +1138,47 @@
                 adsRequired: 5,
                 adUrl: 'https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6'
             };
+            
+            // NEW: Function to load and display app offers from Firebase
+            function loadAndDisplayAppOffers() {
+                const offersRef = database.ref('appOffers');
+                const container = elements.offerWallContainer;
+                container.innerHTML = '<p style="color: #6c757d; text-align: center;">Loading offers...</p>';
+
+                offersRef.once('value').then(snapshot => {
+                    container.innerHTML = ''; // Clear loading indicator
+                    let activeOffersFound = false;
+                    if (snapshot.exists()) {
+                        snapshot.forEach(childSnapshot => {
+                            const offerData = childSnapshot.val();
+                            if (offerData && offerData.isActive) {
+                                activeOffersFound = true;
+                                const offerElement = document.createElement('div');
+                                offerElement.className = 'offer-wall-item';
+                                // Create the HTML for the offer item using data from Firebase
+                                offerElement.innerHTML = `
+                                    <img src="${offerData.icon}" alt="${offerData.title} Icon">
+                                    <div class="offer-wall-text">
+                                        <h3>${offerData.title}</h3>
+                                        <p>${offerData.description}</p>
+                                    </div>
+                                    <a href="${offerData.link}" target="_blank" class="offer-wall-button">Start</a>
+                                `;
+                                container.appendChild(offerElement);
+                            }
+                        });
+                    }
+                    
+                    if (!activeOffersFound) {
+                        container.innerHTML = '<p style="color: #6c757d; text-align: center;">No offers available right now. Check back later!</p>';
+                    }
+
+                }).catch(error => {
+                    console.error("Error loading app offers:", error);
+                    container.innerHTML = '<p style="color: red; text-align: center;">Could not load offers.</p>';
+                });
+            }
+
 
             function loadAndDisplayTournaments() {
                 const tournamentsRef = database.ref('tournaments');
@@ -1884,6 +1912,7 @@
                 if (button) button.classList.add('active');
 
                 if (screenId === 'wallet-screen') { renderWalletScreen(); } 
+                else if (screenId === 'offer-wall-screen') { loadAndDisplayAppOffers(); } // Call the new function
                 else if (screenId === 'tasks-screen') { loadAndDisplayOffers(); } 
                 else if (screenId === 'video-screen') { renderVideoTasks(); } 
                 else if (screenId === 'mine-screen') { renderMineScreen(); } 
