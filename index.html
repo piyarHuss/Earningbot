@@ -149,7 +149,6 @@
         .nav-icon{font-size:28px}
         .nav-text{font-size:14px}
         
-        /* --- NEW & MODIFIED: ANIMATION FOR OFFER BUTTON --- */
         #offer-nav-button {
             border-radius: 12px;
             background-color: rgba(243, 156, 18, 0.2);
@@ -157,20 +156,10 @@
             transform-origin: center center;
         }
         @keyframes pulse-offer-button {
-            0% {
-                transform: scale(1);
-                box-shadow: 0 0 5px rgba(243, 156, 18, 0.3);
-            }
-            50% {
-                transform: scale(1.08);
-                box-shadow: 0 0 20px rgba(243, 156, 18, 0.8);
-            }
-            100% {
-                transform: scale(1);
-                box-shadow: 0 0 5px rgba(243, 156, 18, 0.3);
-            }
+            0% { transform: scale(1); box-shadow: 0 0 5px rgba(243, 156, 18, 0.3); }
+            50% { transform: scale(1.08); box-shadow: 0 0 20px rgba(243, 156, 18, 0.8); }
+            100% { transform: scale(1); box-shadow: 0 0 5px rgba(243, 156, 18, 0.3); }
         }
-        /* --- END OF NEW & MODIFIED --- */
 
         h2, h3{font-size:32px;margin-bottom:10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.7);}
         h3 {font-size: 28px;}
@@ -255,7 +244,6 @@
         .flappy-popup-content p { font-size: 1.3em; }
         .flappy-reward-message { font-size: 1.2em; color: #ffeb3b; font-weight: bold; margin: 15px 0; }
         
-        /* EVENT/TOURNAMENT CARD STYLE */
         .tournament-card {
             background-color: rgba(255, 255, 255, 0.05);
             border: 2px solid #f39c12;
@@ -269,7 +257,6 @@
             gap: 10px;
             transition: opacity 0.3s;
         }
-        /* **** NEW: Style for finished tournaments **** */
         .tournament-card.finished {
             opacity: 0.6;
             border-color: #7f8c8d;
@@ -351,7 +338,6 @@
             gap: 15px;
         }
 
-        /* **** NEW: Room Info Container **** */
         .room-info-container {
             background-color: rgba(46, 204, 113, 0.1);
             border: 1px solid #2ecc71;
@@ -426,26 +412,23 @@
             border: 1px solid #27ae60;
         }
         
-        /* NEW: Style for ad note */
         .ad-minimum-watch-note {
             font-size: 12px;
-            color: #f1c40f; /* Yellow/gold color for emphasis */
+            color: #f1c40f;
             opacity: 0.8;
             margin-top: 8px;
             text-align: center;
             font-weight: 600;
         }
         
-        /* NEW: Style for ad failure message */
         .ad-failure-note {
             font-size: 12px;
-            color: #e74c3c; /* Red for error */
+            color: #e74c3c;
             margin-top: 8px;
             text-align: center;
             font-weight: 600;
         }
 
-        /* ===== START: MODERN TOURNAMENT CARD STYLES ===== */
         .screen.tournament-bg {
             background: url('https://images.unsplash.com/photo-1581888224555-93d6a8f1b333?q=80&w=1932&auto=format&fit=crop') no-repeat center center/cover;
             position: relative;
@@ -589,14 +572,12 @@
             box-shadow: 0 0 20px rgba(243, 156, 18, 0.9), 0 0 40px rgba(255, 107, 107, 0.7);
         }
         .join-now-button:active { transform: translateY(0); }
-        /* ===== END: MODERN TOURNAMENT CARD STYLES ===== */
 
-        /* --- OFFER WALL STYLES --- */
         #offer-wall-screen {
-            background-color: #f8f9fa; /* Light grey background */
+            background-color: #f8f9fa; 
             justify-content: flex-start;
             padding-top: 30px;
-            color: #000; /* Set text color to black for readability on white BG */
+            color: #000;
         }
         .offer-wall-container {
             width: 95%;
@@ -698,7 +679,6 @@
                 <div id="energy-timer-display" style="display: none; text-align: center; margin-top: 10px; font-size: 16px;"></div>
                 <div id="fast-recovery-wrapper" style="display: none; width: 100%; text-align: center;">
                     <button id="fast-energy-recovery-btn" class="action-button" style="margin-top: 10px; width: 100%; background-color: #e67e22;">Watch Ad for Faster Refill</button>
-                    <!-- MODIFIED: Added failure note placeholder -->
                     <p class="ad-failure-note" style="display:none;"></p>
                 </div>
             </div>
@@ -743,7 +723,6 @@
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
         
-        <!-- OFFER WALL SCREEN -->
         <div id="offer-wall-screen" class="screen hidden">
             <div id="offer-wall-container" class="offer-wall-container">
                  <p style="color: #6c757d; text-align: center;">Loading offers...</p>
@@ -796,7 +775,6 @@
                 <p>Watch a short ad to receive 1 Love Coin instantly!</p>
                 <button id="watch-ad-for-love-coin-btn" class="action-button" style="background-color: #e91e63;">Watch Ad (+1 💝)</button>
                 <p class="ad-minimum-watch-note">Watch for at least 10 seconds</p>
-                <!-- MODIFIED: Added failure note placeholder -->
                 <p class="ad-failure-note" style="display:none;"></p>
             </div>
             <button class="back-button" data-screen="game-screen">Back to Game</button>
@@ -860,7 +838,6 @@
                 <p>Progress: <strong id="tournament-ad-progress">0 / 5</strong></p>
                 <button id="tournament-watch-ad-btn" class="action-button" style="background-color: #f39c12; margin-top: 15px;">Watch Ad</button>
                 <p class="ad-minimum-watch-note">Watch for at least 10 seconds</p>
-                <!-- MODIFIED: Added failure note placeholder -->
                 <p class="ad-failure-note" style="display:none;"></p>
                 <button id="tournament-ad-cancel-btn" class="action-button" style="background-color: #e74c3c; margin-top: 10px;">Cancel</button>
             </div>
@@ -919,7 +896,6 @@
                 navigator.clipboard.writeText(text).then(() => {
                     alert('Invite link copied to your clipboard!');
                 }).catch(err => {
-                    console.error('Modern copy failed, trying fallback: ', err);
                     fallbackCopyTextToClipboard(text);
                 });
             } else {
@@ -944,7 +920,6 @@
                     alert('Could not copy the link. Please copy it manually.');
                 }
             } catch (err) {
-                console.error('Fallback copy failed: ', err);
                 alert('Could not copy the link. Please copy it manually.');
             }
             document.body.removeChild(textArea);
@@ -973,7 +948,6 @@
                         }
                         return userData;
                     });
-                    console.log(`Credited 700 coins to referrer ${referrerId}`);
                 }
             });
         }
@@ -1018,20 +992,21 @@
             endGame() {
                 if (!this.gameRunning) return;
                 
-                // MODIFIED: Use the new ad handling logic
+                const successCallback = () => {
+                    this.gameRunning = false;
+                    cancelAnimationFrame(this.gameLoop);
+                    if (this.rewardInterval) { clearInterval(this.rewardInterval); this.rewardInterval = null; }
+                    this.finalScoreDisplay.innerText = this.score;
+                    this.gameOverPopup.style.display = 'flex';
+                    this.startButton.style.display = 'block';
+                    this.restartButton.innerText = 'Play Again';
+                };
+
                 handleAdWatch(
                     'https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315', 
-                    this.restartButton, // The button to show status on
-                    () => { // Success callback
-                        this.gameRunning = false;
-                        cancelAnimationFrame(this.gameLoop);
-                        if (this.rewardInterval) { clearInterval(this.rewardInterval); this.rewardInterval = null; }
-                        this.finalScoreDisplay.innerText = this.score;
-                        this.gameOverPopup.style.display = 'flex';
-                        this.startButton.style.display = 'block';
-                        this.restartButton.innerText = 'Play Again';
-                    },
-                    this.gameOverPopup.querySelector('.ad-failure-note') // The element to show failure message in
+                    this.restartButton,
+                    successCallback, 
+                    this.gameOverPopup.querySelector('.ad-failure-note')
                 );
             },
             jump() { if (this.gameRunning) { this.bird.velocity = this.bird.lift; } else if (!this.gameOverPopup.style.display || this.gameOverPopup.style.display === 'none') { this.startGame(); } }
@@ -1114,7 +1089,7 @@
                 joinedTournaments: {},
             };
             
-            // --- NEW: Central Ad Handling Logic ---
+            // --- MODIFIED: Central Ad Handling Logic with Popup Blocker Detection ---
             let isAdFlowActive = false;
             const MIN_WATCH_TIME = 10000; // 10 seconds in milliseconds
 
@@ -1129,13 +1104,24 @@
                 buttonElement.disabled = true;
                 buttonElement.innerText = 'Ad Loading...';
 
-                // Hide any previous failure message
                 if (failureNoteElement) {
                     failureNoteElement.style.display = 'none';
                 }
 
                 const adStartTime = Date.now();
-                window.open(adUrl, '_blank');
+                // --- KEY CHANGE: Check if the window was blocked ---
+                const adWindow = window.open(adUrl, '_blank');
+
+                if (!adWindow || adWindow.closed || typeof adWindow.closed == 'undefined') {
+                    // This means the popup was blocked
+                    alert('Your browser blocked the ad. Please allow pop-ups for this site and try again.');
+                    buttonElement.disabled = false;
+                    buttonElement.innerText = originalButtonText; // Restore original button text
+                    isAdFlowActive = false;
+                    return; // Stop the function here
+                }
+                // --- END OF KEY CHANGE ---
+
 
                 const handleVisibilityChange = () => {
                     if (document.visibilityState === 'visible') {
@@ -1143,11 +1129,9 @@
                         const timeElapsed = Date.now() - adStartTime;
 
                         if (timeElapsed >= MIN_WATCH_TIME) {
-                            // SUCCESS
                             successCallback();
-                            buttonElement.innerText = originalButtonText; // Restore original text on success
+                            buttonElement.innerText = originalButtonText;
                         } else {
-                            // FAILURE
                             buttonElement.innerText = 'Try Again';
                             if (failureNoteElement) {
                                 failureNoteElement.innerText = 'Minimum ads watch: 10 seconds';
@@ -1162,7 +1146,6 @@
                 
                 document.addEventListener('visibilitychange', handleVisibilityChange);
             }
-            // --- END: Central Ad Handling Logic ---
 
 
             let currentBetAmount = 100;
@@ -1444,7 +1427,6 @@
                 const container = elements.videoTasksContainer;
                 container.innerHTML = '';
 
-                // Card 1: Watch & Earn (+10 coins)
                 const watchAndEarnCard = document.createElement('div');
                 watchAndEarnCard.className = 'option-card';
                 watchAndEarnCard.innerHTML = `
@@ -1456,7 +1438,6 @@
                 `;
                 container.appendChild(watchAndEarnCard);
                 
-                // Card 2: Ad Marathon
                 const marathonCard = document.createElement('div');
                 marathonCard.className = 'option-card';
                 let marathonButtonHtml;
@@ -1479,7 +1460,6 @@
                 `;
                 container.appendChild(marathonCard);
             
-                // Original tasks from the function
                 const specialAdCard = document.createElement('div');
                 specialAdCard.className = 'option-card';
                 specialAdCard.innerHTML = `<h3>Special Offer (18+)</h3><p>Watch a special video to earn a <strong>15 🪙</strong> reward!</p><button id="watch-18plus-ad-btn" class="action-button" style="background-color:#c0392b;">18+</button><p class="ad-minimum-watch-note">Watch for at least 10 seconds</p><p class="ad-failure-note" style="display:none;"></p>`;
