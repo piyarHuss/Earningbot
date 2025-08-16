@@ -1660,31 +1660,30 @@
                     });
                 });
             }
-            
-            // ===================================================================
-            // ===== MODIFIED FUNCTION TO LOCK WITHDRAWAL ========================
-            // ===================================================================
             function renderWalletScreen() {
                 elements.walletScore.innerText = state.score.toLocaleString();
                 const rupeeValue = (state.score / 1000).toFixed(2);
                 elements.rupeeValue.innerText = `Value: ₹${rupeeValue} INR`;
 
-                // Hide the container for watching ads to unlock withdrawals
-                elements.withdrawalAdTaskContainer.style.display = 'none';
-                
-                // Show the withdrawal button
-                elements.withdrawButton.style.display = 'block';
-                // Disable the button so it cannot be clicked
-                elements.withdrawButton.disabled = true;
-                // Change the button text to show the new message
-                elements.withdrawButton.innerText = '🔒 Withdrawals Available Every Sunday';
-                
-                // Load and display the withdrawal history as usual
+                const goal = 20; 
+                if (state.withdrawalAdClicks >= goal) {
+                    elements.withdrawalAdTaskContainer.style.display = 'none';
+                    elements.withdrawButton.style.display = 'block';
+                } else {
+                    elements.withdrawalAdTaskContainer.style.display = 'flex';
+                    elements.withdrawButton.style.display = 'none';
+                    elements.withdrawalAdTaskContainer.innerHTML = `
+                        <div class="option-card">
+                            <h3>Unlock Withdrawals</h3>
+                            <p>Watch 20 ads to enable the withdrawal button.</p>
+                            <p><strong>Progress: ${state.withdrawalAdClicks} / ${goal}</strong></p>
+                            <button id="watch-ad-for-withdrawal" class="action-button">Watch Ad</button>
+                            <p class="ad-minimum-watch-note">Minimum ads watch: 15</p>
+                        </div>
+                    `;
+                }
                 renderWithdrawalHistory();
             }
-            // ===================================================================
-            // ===== END OF MODIFIED FUNCTION ====================================
-            // ===================================================================
 
             elements.withdrawalAdTaskContainer.addEventListener('click', (e) => {
                 if(e.target.id === 'watch-ad-for-withdrawal') {
