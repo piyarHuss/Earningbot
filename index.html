@@ -631,6 +631,24 @@
             font-size: 14px;
             color: #6c757d;
         }
+        .offer-wall-action {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px; /* Space between reward and button */
+            flex-shrink: 0;
+            margin-left: 10px;
+        }
+        .offer-wall-reward {
+            font-size: 16px;
+            font-weight: 700;
+            color: #e67e22; /* Orange color for coins */
+            background-color: #fdf3e6;
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid #fbe2c4;
+            white-space: nowrap;
+        }
         .offer-wall-button {
             background-color: #f3f0ff;
             color: #6f42c1;
@@ -1126,14 +1144,21 @@
                                 activeOffersFound = true;
                                 const offerElement = document.createElement('div');
                                 offerElement.className = 'offer-wall-item';
+
                                 // Create the HTML for the offer item using data from Firebase
+                                // **MODIFIED HTML STRUCTURE HERE**
                                 offerElement.innerHTML = `
                                     <img src="${offerData.icon}" alt="${offerData.title} Icon">
                                     <div class="offer-wall-text">
                                         <h3>${offerData.title}</h3>
                                         <p>${offerData.description}</p>
                                     </div>
-                                    <a href="${offerData.link}" target="_blank" class="offer-wall-button">Start</a>
+                                    <div class="offer-wall-action">
+                                        <div class="offer-wall-reward">
+                                            <strong>+${new Intl.NumberFormat().format(offerData.reward || 0)}</strong> 🪙
+                                        </div>
+                                        <a href="${offerData.link}" target="_blank" class="offer-wall-button">Start</a>
+                                    </div>
                                 `;
                                 container.appendChild(offerElement);
                             }
