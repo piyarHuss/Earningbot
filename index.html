@@ -149,7 +149,6 @@
         .nav-icon{font-size:28px}
         .nav-text{font-size:14px}
         
-        /* --- NEW & MODIFIED: ANIMATION FOR OFFER BUTTON --- */
         #offer-nav-button {
             border-radius: 12px;
             background-color: rgba(243, 156, 18, 0.2);
@@ -157,27 +156,97 @@
             transform-origin: center center;
         }
         @keyframes pulse-offer-button {
-            0% {
-                transform: scale(1);
-                box-shadow: 0 0 5px rgba(243, 156, 18, 0.3);
-            }
-            50% {
-                transform: scale(1.08);
-                box-shadow: 0 0 20px rgba(243, 156, 18, 0.8);
-            }
-            100% {
-                transform: scale(1);
-                box-shadow: 0 0 5px rgba(243, 156, 18, 0.3);
-            }
+            0% { transform: scale(1); box-shadow: 0 0 5px rgba(243, 156, 18, 0.3); }
+            50% { transform: scale(1.08); box-shadow: 0 0 20px rgba(243, 156, 18, 0.8); }
+            100% { transform: scale(1); box-shadow: 0 0 5px rgba(243, 156, 18, 0.3); }
         }
-        /* --- END OF NEW & MODIFIED --- */
+
+        /* --- BUTTON STYLE (MODIFIED FOR SPIN) --- */
+        #spin-earn-button {
+            position: absolute;
+            top: 130px; 
+            left: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #e74c3c, #f39c12);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 30px;
+            color: white;
+            cursor: pointer;
+            z-index: 10;
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.5);
+            transition: transform 0.2s, box-shadow 0.2s;
+            animation: pulse-boost 2s infinite;
+        }
+        #spin-earn-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(243, 156, 18, 0.7);
+        }
+        @keyframes pulse-boost {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* --- NEW: SPIN WHEEL STYLES --- */
+        .wheel-container {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .wheel-pointer {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 30px solid #f39c12;
+            z-index: 10;
+        }
+        #wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 8px solid #c8a443;
+            background-color: #e0ac00;
+            position: relative;
+            overflow: hidden;
+            transition: transform 5s cubic-bezier(.2, .9, .3, 1);
+        }
+        .wheel-segment {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .segment-text {
+            transform: rotate(90deg);
+            font-size: 20px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
 
         h2, h3{font-size:32px;margin-bottom:10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.7);}
         h3 {font-size: 28px;}
         p{font-size:18px;margin:5px 0}
         .back-button{background-color:#4CAF50;color:#fff;border:none;padding:15px 30px;font-size:18px;border-radius:10px;cursor:pointer;font-family:'Poppins',sans-serif; margin-top: 20px;}
         .popup{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.7);display:none;justify-content:center;align-items:center;z-index:1000}
-        .popup-content{background-color:#2c3e50;padding:30px;border-radius:15px;text-align:center;width:80%;max-width:350px;position:relative}
+        .popup-content{background-color:#2c3e50;padding:30px;border-radius:15px;text-align:center;width:90%;max-width:380px;position:relative}
         .popup-content h3{margin-top:0}
         .popup-close{position:absolute;top:10px;right:15px;font-size:30px;cursor:pointer}
         .withdraw-options{display:flex;flex-direction:column;gap:15px;margin-top:20px}
@@ -255,7 +324,6 @@
         .flappy-popup-content p { font-size: 1.3em; }
         .flappy-reward-message { font-size: 1.2em; color: #ffeb3b; font-weight: bold; margin: 15px 0; }
         
-        /* EVENT/TOURNAMENT CARD STYLE */
         .tournament-card {
             background-color: rgba(255, 255, 255, 0.05);
             border: 2px solid #f39c12;
@@ -269,7 +337,6 @@
             gap: 10px;
             transition: opacity 0.3s;
         }
-        /* **** NEW: Style for finished tournaments **** */
         .tournament-card.finished {
             opacity: 0.6;
             border-color: #7f8c8d;
@@ -351,7 +418,6 @@
             gap: 15px;
         }
 
-        /* **** NEW: Room Info Container **** */
         .room-info-container {
             background-color: rgba(46, 204, 113, 0.1);
             border: 1px solid #2ecc71;
@@ -370,7 +436,7 @@
         }
 
         .participant-display-container {
-            display: none; /* Hidden by default, shown by JS if players exist */
+            display: none;
             justify-content: space-around;
             align-items: flex-start;
             margin-top: 20px;
@@ -426,17 +492,15 @@
             border: 1px solid #27ae60;
         }
         
-        /* NEW: Style for ad note */
         .ad-minimum-watch-note {
             font-size: 12px;
-            color: #f1c40f; /* Yellow/gold color for emphasis */
+            color: #f1c40f;
             opacity: 0.8;
             margin-top: 8px;
             text-align: center;
             font-weight: 600;
         }
 
-        /* ===== START: MODERN TOURNAMENT CARD STYLES ===== */
         .screen.tournament-bg {
             background: url('https://images.unsplash.com/photo-1581888224555-93d6a8f1b333?q=80&w=1932&auto=format&fit=crop') no-repeat center center/cover;
             position: relative;
@@ -580,14 +644,12 @@
             box-shadow: 0 0 20px rgba(243, 156, 18, 0.9), 0 0 40px rgba(255, 107, 107, 0.7);
         }
         .join-now-button:active { transform: translateY(0); }
-        /* ===== END: MODERN TOURNAMENT CARD STYLES ===== */
 
-        /* --- OFFER WALL STYLES --- */
         #offer-wall-screen {
-            background-color: #f8f9fa; /* Light grey background */
+            background-color: #f8f9fa;
             justify-content: flex-start;
             padding-top: 30px;
-            color: #000; /* Set text color to black for readability on white BG */
+            color: #000;
         }
         .offer-wall-container {
             width: 95%;
@@ -635,14 +697,14 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 5px; /* Space between reward and button */
+            gap: 5px;
             flex-shrink: 0;
             margin-left: 10px;
         }
         .offer-wall-reward {
             font-size: 16px;
             font-weight: 700;
-            color: #e67e22; /* Orange color for coins */
+            color: #e67e22;
             background-color: #fdf3e6;
             padding: 4px 10px;
             border-radius: 20px;
@@ -667,6 +729,72 @@
             transform: translateY(-1px);
         }
 
+        /* --- EARN BOX STYLES --- */
+        #earn-box-list-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .earn-box-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(0,0,0,0.2);
+            border: 2px solid #8e44ad;
+            padding: 15px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        .earn-box-item-info {
+            text-align: left;
+        }
+        .earn-box-item-info h4 {
+            margin: 0 0 5px 0;
+            font-size: 18px;
+            color: #fff;
+        }
+        .earn-box-item-info p {
+            margin: 0;
+            font-size: 16px;
+            color: #f1c40f;
+            font-weight: bold;
+        }
+        .earn-box-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            min-width: 120px;
+            text-align: center;
+        }
+        .earn-box-item.locked {
+            opacity: 0.5;
+            border-color: #7f8c8d;
+            background-color: rgba(0,0,0,0.1);
+        }
+        .earn-box-item.locked .earn-box-button {
+            background-color: #7f8c8d;
+            cursor: not-allowed;
+        }
+        .earn-box-item.claimed {
+            border-color: #27ae60;
+            background-color: rgba(46, 204, 113, 0.1);
+        }
+        .earn-box-item.claimed .earn-box-button {
+            background-color: #27ae60;
+            cursor: default;
+        }
+        .lucky-box-item {
+            border-color: #e67e22;
+            background: linear-gradient(45deg, rgba(230, 126, 34, 0.2), rgba(243, 156, 18, 0.2));
+        }
+        .lucky-box-item .earn-box-item-info h4 {
+            color: #f39c12;
+        }
+        .lucky-box-progress {
+            font-size: 14px;
+            color: #ccc;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
@@ -692,6 +820,9 @@
         </div>
 
         <div id="game-screen" class="screen">
+             <!-- MODIFIED: Button ID changed for clarity -->
+            <div id="spin-earn-button">🚀</div>
+
             <div class="stats-container" style="margin-top: 60px;">
                 <h1 id="score-display">0</h1>
                 <div id="level-display">Level 1</div>
@@ -712,8 +843,6 @@
             </div>
         </div>
         
-        <!-- REMOVED: The entire #mine-screen div has been deleted. -->
-
         <div id="games-screen" class="screen scrollable-screen hidden">
             <div class="coin-flip-container">
                 <h2>🎲 Coin Flip Game 🎲</h2>
@@ -745,6 +874,15 @@
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
 
+        <div id="earn-box-screen" class="screen scrollable-screen hidden">
+            <h2>☀️ Daily Earn Box ☀️</h2>
+            <p style="font-size: 16px; text-align: center; max-width: 350px;">Complete tasks daily to earn rewards. Progress resets every day!</p>
+            <div id="earn-box-list-container" class="options-container" style="margin-top: 20px;">
+                <!-- JS will populate this -->
+            </div>
+            <button class="back-button" data-screen="game-screen">Back to Game</button>
+        </div>
+
         <div id="tournament-screen" class="screen scrollable-screen hidden tournament-bg">
             <h2>🏆 All Events & Games 🏆</h2>
             <div id="tournament-list-container" class="options-container">
@@ -753,9 +891,7 @@
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
         
-        <!-- OFFER WALL SCREEN -->
         <div id="offer-wall-screen" class="screen hidden">
-             <!-- The container is now empty. JS will fill it. -->
             <div id="offer-wall-container" class="offer-wall-container">
                  <p style="color: #6c757d; text-align: center;">Loading offers...</p>
             </div>
@@ -765,7 +901,6 @@
         <div id="tasks-screen" class="screen hidden">
             <h2>📝 Offers & Tasks 📝</h2>
             <div id="tasks-container-all" class="options-container">
-                <!-- Ad tasks have been moved to the Video screen -->
                 <div id="tasks-options-container"></div>
             </div>
             <button class="back-button" data-screen="game-screen">Back to Game</button>
@@ -814,11 +949,10 @@
         
         <div class="nav-container">
             <div class="nav-button active" data-screen="game-screen"><span class="nav-icon">🏠</span><span class="nav-text">Home</span></div>
-            <!-- REMOVED: The "Mine" button was here. -->
             <div class="nav-button" data-screen="games-screen"><span class="nav-icon">🎮</span><span class="nav-text">Games</span></div>
+            <div class="nav-button" data-screen="earn-box-screen"><span class="nav-icon">🎁</span><span class="nav-text">Earn</span></div>
             <div class="nav-button" data-screen="tournament-screen"><span class="nav-icon">🏆</span><span class="nav-text">All</span></div>
-            <!-- MODIFIED: Added an ID to the Offer button for animation styling -->
-            <div class="nav-button" id="offer-nav-button" data-screen="offer-wall-screen"><span class="nav-icon">🎁</span><span class="nav-text">Offer</span></div>
+            <div class="nav-button" id="offer-nav-button" data-screen="offer-wall-screen"><span class="nav-icon">📲</span><span class="nav-text">Offer</span></div>
             <div class="nav-button" data-screen="tasks-screen"><span class="nav-icon">📝</span><span class="nav-text">Tasks</span></div>
             <div class="nav-button" data-screen="video-screen"><span class="nav-icon">🎥</span><span class="nav-text">Video</span></div>
             <div class="nav-button" data-screen="wallet-screen"><span class="nav-icon">👛</span><span class="nav-text">Wallet</span></div>
@@ -833,6 +967,24 @@
             <div id="notification-list">
                 <p>No new messages.</p>
             </div>
+        </div>
+    </div>
+
+    <!-- NEW: SPIN WHEEL POPUP -->
+    <div id="spin-wheel-popup" class="popup">
+        <div class="popup-content">
+            <span class="popup-close" id="spin-wheel-popup-close">×</span>
+            <h3>Spin to Earn!</h3>
+            <div class="wheel-container">
+                <div class="wheel-pointer"></div>
+                <div id="wheel">
+                    <!-- Segments will be added by JS -->
+                </div>
+            </div>
+            <button id="spin-button" class="action-button" style="background-color: #f39c12; width: 100%; padding: 15px; font-size: 20px;">
+                Watch Ad to Spin
+            </button>
+            <p class="ad-minimum-watch-note">Minimum ads watch: 15</p>
         </div>
     </div>
 
@@ -1067,7 +1219,6 @@
                 tasksOptionsContainer: document.getElementById('tasks-options-container'),
                 videoTasksContainer: document.getElementById('video-tasks-container'),
                 withdrawalAdTaskContainer: document.getElementById('withdrawal-ad-task-container'),
-                /* REMOVED: Mining-related elements are gone */
                 notificationBell: document.getElementById('notification-bell'),
                 notificationDot: document.getElementById('notification-dot'),
                 notificationPopup: document.getElementById('notification-popup'),
@@ -1096,6 +1247,14 @@
                 loveCoinBalanceDisplay: document.getElementById('love-coin-balance-display'),
                 watchAdForLoveCoinBtn: document.getElementById('watch-ad-for-love-coin-btn'),
                 offerWallContainer: document.getElementById('offer-wall-container'),
+                earnBoxScreen: document.getElementById('earn-box-screen'),
+                earnBoxListContainer: document.getElementById('earn-box-list-container'),
+                spinEarnButton: document.getElementById('spin-earn-button'),
+                // NEW: Spin wheel elements
+                spinWheelPopup: document.getElementById('spin-wheel-popup'),
+                spinWheelPopupClose: document.getElementById('spin-wheel-popup-close'),
+                wheel: document.getElementById('wheel'),
+                spinButton: document.getElementById('spin-button'),
             };
 
             let state = {
@@ -1106,7 +1265,6 @@
                 videoTask1Claimed: false, videoTask2Claimed: false, videoTask3Claimed: false,
                 withdrawalAdClicks: 0,
                 isAdTimerActive: false,
-                /* REMOVED: Mining state variables are gone */
                 tapCounter: 0,
                 longTermAdProgress: 0,
                 longTermAdClaimed: false,
@@ -1116,10 +1274,14 @@
                 fastRecoveryAdsWatched: 0,
                 loveCoins: 0,
                 joinedTournaments: {},
+                earnBoxProgress: 0,
+                earnBoxLastReset: new Date().toDateString(),
+                luckyBoxAdProgress: 0,
+                luckyBoxClaimed: false,
             };
             
             let currentBetAmount = 100;
-            let isAdBoostActive = false;
+            let isSpinning = false; // Flag to prevent multiple spins
 
             let currentTournamentJoinProcess = {
                 details: null,
@@ -1128,14 +1290,138 @@
                 adUrl: 'https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6'
             };
             
-            // NEW: Function to load and display app offers from Firebase
+            // --- NEW: SPIN WHEEL LOGIC ---
+            const spinPrizes = [
+                { text: '3 🪙', type: 'coin', value: 3, chance: 35, color: '#2ecc71' },
+                { text: '2 🪙', type: 'coin', value: 2, chance: 30, color: '#3498db' },
+                { text: '5 🪙', type: 'coin', value: 5, chance: 15, color: '#9b59b6' },
+                { text: '1 💝', type: 'lovecoin', value: 1, chance: 10, color: '#e91e63' },
+                { text: '8 🪙', type: 'coin', value: 8, chance: 10, color: '#e67e22' }
+            ];
+
+            function setupSpinWheel() {
+                const wheel = elements.wheel;
+                wheel.innerHTML = '';
+                let gradientString = 'conic-gradient(';
+                let cumulativePercent = 0;
+
+                const segmentAngle = 360 / spinPrizes.length;
+
+                spinPrizes.forEach((prize, index) => {
+                    const startPercent = cumulativePercent;
+                    const endPercent = cumulativePercent + (100 / spinPrizes.length);
+                    gradientString += `${prize.color} ${startPercent}% ${endPercent}%, `;
+                    cumulativePercent = endPercent;
+
+                    const textAngle = (index * segmentAngle) + (segmentAngle / 2);
+                    
+                    const segmentDiv = document.createElement('div');
+                    segmentDiv.className = 'wheel-segment';
+                    segmentDiv.style.transform = `rotate(${textAngle}deg)`;
+                    
+                    const textDiv = document.createElement('div');
+                    textDiv.className = 'segment-text';
+                    textDiv.innerText = prize.text;
+                    // Adjust text position to be inside the wheel
+                    textDiv.style.marginLeft = '100px';
+
+                    segmentDiv.appendChild(textDiv);
+                    wheel.appendChild(segmentDiv);
+                });
+
+                gradientString = gradientString.slice(0, -2) + ')'; // Remove last comma and space
+                wheel.style.background = gradientString;
+            }
+
+            function getWinningPrize() {
+                const rand = Math.random() * 100;
+                let cumulativeChance = 0;
+                for (const prize of spinPrizes) {
+                    cumulativeChance += prize.chance;
+                    if (rand < cumulativeChance) {
+                        return prize;
+                    }
+                }
+                return spinPrizes[0]; // Fallback
+            }
+
+            elements.spinEarnButton.addEventListener('click', () => {
+                elements.spinWheelPopup.style.display = 'flex';
+            });
+
+            elements.spinWheelPopupClose.addEventListener('click', () => {
+                elements.spinWheelPopup.style.display = 'none';
+            });
+            
+            elements.spinButton.addEventListener('click', () => {
+                if (isSpinning || state.isAdTimerActive) return;
+
+                state.isAdTimerActive = true;
+                const adUrl = 'https://www.profitableratecpm.com/qshhszvnad?key=4761223a00e52bd9f2e24d515e6be228';
+                window.open(adUrl, '_blank');
+
+                const button = elements.spinButton;
+                button.disabled = true;
+                let countdown = 15;
+                button.innerText = `Wait (${countdown}s)`;
+
+                const countdownInterval = setInterval(() => {
+                    countdown--;
+                    button.innerText = `Wait (${countdown}s)`;
+                    if (countdown <= 0) {
+                        clearInterval(countdownInterval);
+                        state.isAdTimerActive = false;
+                        button.innerText = "Spinning...";
+                        
+                        isSpinning = true;
+                        const winningPrize = getWinningPrize();
+                        const winningIndex = spinPrizes.indexOf(winningPrize);
+                        
+                        const segmentAngle = 360 / spinPrizes.length;
+                        const randomOffset = Math.random() * (segmentAngle * 0.8) - (segmentAngle * 0.4);
+                        const finalAngle = (360 * 5) - (winningIndex * segmentAngle) - (segmentAngle / 2) + randomOffset;
+                        
+                        elements.wheel.style.transform = `rotate(${finalAngle}deg)`;
+
+                        setTimeout(() => {
+                            let dataToSave = {};
+                            if (winningPrize.type === 'coin') {
+                                state.score += winningPrize.value;
+                                dataToSave = { score: state.score, Totalearning: state.score };
+                            } else {
+                                state.loveCoins++;
+                                dataToSave = { loveCoins: state.loveCoins };
+                            }
+                            
+                            saveGame(dataToSave);
+                            updateDisplay();
+                            renderAirdropScreen();
+                            alert(`Congratulations! You won ${winningPrize.text}`);
+
+                            isSpinning = false;
+                            button.disabled = false;
+                            button.innerText = "Watch Ad to Spin";
+
+                            // Reset wheel for next spin
+                            elements.wheel.style.transition = 'none';
+                            elements.wheel.style.transform = `rotate(0deg)`;
+                            setTimeout(() => {
+                                elements.wheel.style.transition = 'transform 5s cubic-bezier(.2, .9, .3, 1)';
+                            }, 50);
+
+                        }, 5100); // Wait for animation to finish
+                    }
+                }, 1000);
+            });
+
+
             function loadAndDisplayAppOffers() {
                 const offersRef = database.ref('appOffers');
                 const container = elements.offerWallContainer;
                 container.innerHTML = '<p style="color: #6c757d; text-align: center;">Loading offers...</p>';
 
                 offersRef.once('value').then(snapshot => {
-                    container.innerHTML = ''; // Clear loading indicator
+                    container.innerHTML = ''; 
                     let activeOffersFound = false;
                     if (snapshot.exists()) {
                         snapshot.forEach(childSnapshot => {
@@ -1144,9 +1430,6 @@
                                 activeOffersFound = true;
                                 const offerElement = document.createElement('div');
                                 offerElement.className = 'offer-wall-item';
-
-                                // Create the HTML for the offer item using data from Firebase
-                                // **MODIFIED HTML STRUCTURE HERE**
                                 offerElement.innerHTML = `
                                     <img src="${offerData.icon}" alt="${offerData.title} Icon">
                                     <div class="offer-wall-text">
@@ -1175,6 +1458,175 @@
                 });
             }
 
+            function checkAndResetEarnBox() {
+                const today = new Date().toDateString();
+                if (state.earnBoxLastReset !== today) {
+                    console.log("New day detected. Resetting daily earn box.");
+                    state.earnBoxProgress = 0;
+                    state.luckyBoxAdProgress = 0;
+                    state.luckyBoxClaimed = false;
+                    state.earnBoxLastReset = today;
+                    saveGame({
+                        earnBoxProgress: 0,
+                        luckyBoxAdProgress: 0,
+                        luckyBoxClaimed: false,
+                        earnBoxLastReset: today
+                    });
+                }
+            }
+            
+            function renderEarnBoxScreen() {
+                const container = elements.earnBoxListContainer;
+                container.innerHTML = '';
+                const TOTAL_TASKS = 200;
+                const LUCKY_BOX_ADS_REQUIRED = 100;
+                const LUCKY_BOX_REWARD = 3000;
+
+                for (let i = 1; i <= TOTAL_TASKS; i++) {
+                    const taskEl = document.createElement('div');
+                    taskEl.classList.add('earn-box-item');
+
+                    const reward = (i % 2 !== 0) ? 12 : 15;
+                    let status = 'locked';
+                    let buttonText = 'Locked';
+                    let buttonDisabled = true;
+
+                    if (i - 1 < state.earnBoxProgress) {
+                        status = 'claimed';
+                        buttonText = 'Claimed ✔️';
+                        buttonDisabled = true;
+                    } else if (i - 1 === state.earnBoxProgress) {
+                        status = 'available';
+                        buttonText = 'Watch Ad';
+                        buttonDisabled = false;
+                    }
+
+                    taskEl.classList.add(status);
+
+                    taskEl.innerHTML = `
+                        <div class="earn-box-item-info">
+                            <h4>Task #${i}</h4>
+                            <p>+ ${reward} 🪙</p>
+                        </div>
+                        <button
+                            class="action-button earn-box-button"
+                            data-task-id="${i}"
+                            data-reward="${reward}"
+                            ${buttonDisabled ? 'disabled' : ''}
+                        >${buttonText}</button>
+                    `;
+                    container.appendChild(taskEl);
+                }
+
+                const luckyBoxEl = document.createElement('div');
+                luckyBoxEl.classList.add('earn-box-item', 'lucky-box-item');
+                let luckyBoxStatus = 'locked';
+                let luckyBoxButtonText = 'Locked';
+                let luckyBoxButtonDisabled = true;
+                let progressText = '';
+
+                if (state.earnBoxProgress >= TOTAL_TASKS) {
+                    if (state.luckyBoxClaimed) {
+                        luckyBoxStatus = 'claimed';
+                        luckyBoxButtonText = 'Claimed ✔️';
+                        luckyBoxButtonDisabled = true;
+                    } else {
+                        luckyBoxStatus = 'available';
+                        progressText = `<p class="lucky-box-progress">Progress: ${state.luckyBoxAdProgress} / ${LUCKY_BOX_ADS_REQUIRED} ads</p>`;
+                        if (state.luckyBoxAdProgress >= LUCKY_BOX_ADS_REQUIRED) {
+                            luckyBoxButtonText = `Claim ${LUCKY_BOX_REWARD.toLocaleString()} 🪙`;
+                            luckyBoxButtonDisabled = false;
+                        } else {
+                            luckyBoxButtonText = 'Watch Ad';
+                            luckyBoxButtonDisabled = false;
+                        }
+                    }
+                }
+
+                luckyBoxEl.classList.add(luckyBoxStatus);
+
+                luckyBoxEl.innerHTML = `
+                    <div class="earn-box-item-info">
+                        <h4>⭐ Lucky Box ⭐</h4>
+                        <p>+ ${LUCKY_BOX_REWARD.toLocaleString()} 🪙</p>
+                        ${progressText}
+                    </div>
+                    <button
+                        class="action-button earn-box-button"
+                        data-task-id="lucky"
+                        data-reward="${LUCKY_BOX_REWARD}"
+                        ${luckyBoxButtonDisabled ? 'disabled' : ''}
+                    >${luckyBoxButtonText}</button>
+                `;
+                container.appendChild(luckyBoxEl);
+            }
+
+            elements.earnBoxListContainer.addEventListener('click', e => {
+                if (!e.target.classList.contains('earn-box-button')) return;
+
+                const button = e.target;
+                const taskId = button.dataset.taskId;
+                const reward = parseInt(button.dataset.reward, 10);
+                const AD_URL = 'https://www.profitableratecpm.com/qshhszvnad?key=4761223a00e52bd9f2e24d515e6be228';
+                const AD_WAIT_TIME = 15; 
+
+                if (state.isAdTimerActive) {
+                    alert("Another ad process is active. Please wait.");
+                    return;
+                }
+
+                if (taskId !== 'lucky') {
+                    const taskIdNum = parseInt(taskId, 10);
+                    if (taskIdNum - 1 === state.earnBoxProgress) {
+                        state.isAdTimerActive = true;
+                        window.open(AD_URL, '_blank');
+                        button.disabled = true;
+                        let countdown = AD_WAIT_TIME;
+                        button.innerText = `Wait (${countdown}s)`;
+
+                        const interval = setInterval(() => {
+                            countdown--;
+                            button.innerText = `Wait (${countdown}s)`;
+                            if (countdown <= 0) {
+                                clearInterval(interval);
+                                state.score += reward;
+                                state.earnBoxProgress++;
+                                saveGame({ score: state.score, Totalearning: state.score, earnBoxProgress: state.earnBoxProgress });
+                                updateDisplay();
+                                renderEarnBoxScreen();
+                                state.isAdTimerActive = false;
+                            }
+                        }, 1000);
+                    }
+                } else {
+                    if (state.luckyBoxAdProgress >= 100) { 
+                        state.score += reward;
+                        state.luckyBoxClaimed = true;
+                        saveGame({ score: state.score, Totalearning: state.score, luckyBoxClaimed: true });
+                        alert(`Congratulations! You've received the Lucky Box reward of ${reward.toLocaleString()} coins!`);
+                        updateDisplay();
+                        renderEarnBoxScreen();
+                    } else {
+                        state.isAdTimerActive = true;
+                        window.open(AD_URL, '_blank');
+                        button.disabled = true;
+                        let countdown = AD_WAIT_TIME;
+                        button.innerText = `Wait (${countdown}s)`;
+                        
+                        const interval = setInterval(() => {
+                            countdown--;
+                            button.innerText = `Wait (${countdown}s)`;
+                            if (countdown <= 0) {
+                                clearInterval(interval);
+                                state.luckyBoxAdProgress++;
+                                saveGame({ luckyBoxAdProgress: state.luckyBoxAdProgress });
+                                renderEarnBoxScreen();
+                                state.isAdTimerActive = false;
+                            }
+                        }, 1000);
+                    }
+                }
+            });
 
             function loadAndDisplayTournaments() {
                 const tournamentsRef = database.ref('tournaments');
@@ -1415,14 +1867,11 @@
             elements.tournamentJoinCancelBtn.addEventListener('click', closeTournamentPopup);
             elements.tournamentAdCancelBtn.addEventListener('click', closeTournamentPopup);
             elements.tournamentJoinPopupClose.addEventListener('click', closeTournamentPopup);
-
-            // REMOVED: All mining functions (getEligibleMiningTier, resetMiningState, renderMineScreen, updateMiningTimerDisplay) and their event listeners have been deleted.
-
+            
             function renderVideoTasks() {
                 const container = elements.videoTasksContainer;
                 container.innerHTML = '';
 
-                // Card 1: Watch & Earn (+10 coins)
                 const watchAndEarnCard = document.createElement('div');
                 watchAndEarnCard.className = 'option-card';
                 watchAndEarnCard.innerHTML = `
@@ -1433,7 +1882,6 @@
                 `;
                 container.appendChild(watchAndEarnCard);
                 
-                // Card 2: Ad Marathon
                 const marathonCard = document.createElement('div');
                 marathonCard.className = 'option-card';
                 let marathonButtonHtml;
@@ -1456,7 +1904,6 @@
                 `;
                 container.appendChild(marathonCard);
             
-                // Original tasks from the function
                 const specialAdCard = document.createElement('div');
                 specialAdCard.className = 'option-card';
                 specialAdCard.innerHTML = `<h3>Special Offer (18+)</h3><p>Watch a special video to earn a <strong>15 🪙</strong> reward!</p><button id="watch-18plus-ad-btn" class="action-button" style="background-color:#c0392b;">18+</button><p class="ad-minimum-watch-note">Minimum ads watch: 15</p>`;
@@ -1494,7 +1941,6 @@
             elements.videoTasksContainer.addEventListener('click', (e) => {
                 const button = e.target;
                 
-                // Logic for "+10 Coin" button
                 if (button.id === 'watch-ad-for-10-coins-btn') {
                     if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
                     state.isAdTimerActive = true;
@@ -1522,7 +1968,6 @@
                     }, 1000);
                 }
 
-                // Logic for "Ad Marathon" button
                 if (button.id === 'long-term-ad-btn') {
                     if(state.longTermAdClaimed) return;
 
@@ -1559,7 +2004,6 @@
                     }, 1000);
                 }
                 
-                // Original logic for other buttons
                 if (button.id === 'watch-18plus-ad-btn') {
                     if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
                     state.isAdTimerActive = true;
@@ -1783,12 +2227,12 @@
                 if (button) button.classList.add('active');
 
                 if (screenId === 'wallet-screen') { renderWalletScreen(); } 
-                else if (screenId === 'offer-wall-screen') { loadAndDisplayAppOffers(); } // Call the new function
+                else if (screenId === 'offer-wall-screen') { loadAndDisplayAppOffers(); }
                 else if (screenId === 'tasks-screen') { loadAndDisplayOffers(); } 
                 else if (screenId === 'video-screen') { renderVideoTasks(); } 
-                /* REMOVED: else if for mine-screen */
                 else if (screenId === 'tournament-screen') { loadAndDisplayTournaments(); } 
                 else if (screenId === 'airdrop-screen') { renderAirdropScreen(); }
+                else if (screenId === 'earn-box-screen') { renderEarnBoxScreen(); }
             }
             function loadGame() {
                 handleIncomingReferral();
@@ -1815,7 +2259,6 @@
                             state[task.id + 'Claimed'] = data[task.id + 'Claimed'] || false;
                         });
                         state.withdrawalAdClicks = data.withdrawalAdClicks || 0;
-                        /* REMOVED: Loading mining state */
                         state.longTermAdProgress = data.longTermAdProgress || 0;
                         state.longTermAdClaimed = data.longTermAdClaimed || false;
                         state.tapCounter = data.tapCounter || 0;
@@ -1824,8 +2267,13 @@
                         state.fastRecoveryAdsWatched = data.fastRecoveryAdsWatched || 0;
                         state.loveCoins = data.loveCoins || 0;
                         state.joinedTournaments = data.joinedTournaments || {};
+                        state.earnBoxProgress = data.earnBoxProgress || 0;
+                        state.earnBoxLastReset = data.earnBoxLastReset || new Date().toDateString();
+                        state.luckyBoxAdProgress = data.luckyBoxAdProgress || 0;
+                        state.luckyBoxClaimed = data.luckyBoxClaimed || false;
+                        
+                        checkAndResetEarnBox();
 
-                        /* REMOVED: Logic to check for expired mining sessions */
 
                     } else {
                         const newCode = generateReferralCode();
@@ -1884,10 +2332,9 @@
             }
             function updatePlayerNameDisplay() { elements.playerNameDisplay.innerText = state.playerName; }
             
-            function showFloatingText(event) {
+            function showFloatingText(event, power) {
                 const floatingText = document.createElement('div');
-                const powerToShow = isAdBoostActive ? state.tapPower * 2 : state.tapPower;
-                floatingText.innerText = `+${powerToShow}`;
+                floatingText.innerText = `+${power}`;
                 floatingText.className = 'floating-text';
                 const x = event.clientX || event.touches[0].clientX;
                 const y = event.clientY || event.touches[0].clientY;
@@ -1912,7 +2359,7 @@
                 state.tapCounter++;
 
                 if (state.tapCounter >= 3) {
-                    const power = isAdBoostActive ? state.tapPower * 2 : state.tapPower;
+                    const power = state.tapPower;
                     
                     if (state.currentEnergy >= power) {
                         state.currentEnergy -= power;
@@ -1942,7 +2389,7 @@
                         }
                         
                         updateDisplay();
-                        showFloatingText(event);
+                        showFloatingText(event, power);
                         saveGame(dataToSave);
                     }
                 } else {
@@ -2117,8 +2564,8 @@
             loadGame();
             showScreen('game-screen');
             flappyGame.init();
+            setupSpinWheel(); // Initialize the wheel design
             setInterval(() => {
-                /* REMOVED: updateMiningTimerDisplay(); */
                 checkEnergyCooldown();
             }, 1000);
             elements.withdrawPopup.style.display = 'none'; 
