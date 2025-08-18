@@ -68,7 +68,8 @@
             box-sizing: border-box; 
             position: relative; 
             overflow-y: auto;
-            padding-bottom: 150px;
+            /* MODIFICACIÓN: AUMENTADO EL RELLENO INFERIOR PARA MÁS DESPLAZAMIENTO */
+            padding-bottom: 250px; 
         }
         .screen.hidden{display:none}
 
@@ -162,18 +163,16 @@
         }
 
         /* --- BUTTON STYLE (MODIFIED FOR SPIN) --- */
-        #spin-earn-button {
+        #spin-earn-button, #rewards-hub-button {
             position: absolute;
-            top: 130px; 
             left: 20px;
-            width: 40px; /* Changed from 60px */
-            height: 40px; /* Changed from 60px */
-            background: linear-gradient(45deg, #e74c3c, #f39c12);
+            width: 40px; 
+            height: 40px; 
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 20px; /* Changed from 30px */
+            font-size: 20px;
             color: white;
             cursor: pointer;
             z-index: 10;
@@ -181,10 +180,25 @@
             transition: transform 0.2s, box-shadow 0.2s;
             animation: pulse-boost 2s infinite;
         }
-        #spin-earn-button:hover {
+        #spin-earn-button {
+            top: 130px; 
+            background: linear-gradient(45deg, #e74c3c, #f39c12);
+        }
+        /* --- NEW: REWARDS HUB BUTTON --- */
+        #rewards-hub-button {
+            top: 180px; /* Positioned below spin button */
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.5);
+        }
+
+        #spin-earn-button:hover, #rewards-hub-button:hover {
             transform: scale(1.1);
             box-shadow: 0 8px 25px rgba(243, 156, 18, 0.7);
         }
+         #rewards-hub-button:hover {
+            box-shadow: 0 8px 25px rgba(39, 174, 96, 0.7);
+        }
+
         @keyframes pulse-boost {
             0% { transform: scale(1); }
             50% { transform: scale(1.05); }
@@ -666,10 +680,12 @@
             padding: 10px;
             box-sizing: border-box;
         }
+        /* MODIFICACIÓN: DISEÑO VERTICAL PARA LOS ELEMENTOS DE OFERTA */
         .offer-wall-item {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
+            flex-direction: column; /* Cambiado a columna */
+            align-items: center;    /* Centra los elementos */
+            gap: 10px;              /* Espacio entre elementos */
             padding: 15px;
             border-bottom: 1px solid #eeeeee;
         }
@@ -677,14 +693,16 @@
             border-bottom: none;
         }
         .offer-wall-item img {
-            width: 45px;
-            height: 45px;
-            margin-right: 15px;
+            width: 55px; /* Ligeramente más grande */
+            height: 55px;
+            margin-right: 0; /* Eliminado el margen derecho */
+            margin-bottom: 10px; /* Añadido margen inferior */
             flex-shrink: 0;
-            border-radius: 8px;
+            border-radius: 12px;
         }
         .offer-wall-text {
             flex-grow: 1;
+            text-align: center; /* Centrado el texto */
         }
         .offer-wall-text h3 {
             font-family: 'Poppins', sans-serif;
@@ -703,9 +721,9 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 5px;
+            gap: 8px; /* Espacio aumentado */
             flex-shrink: 0;
-            margin-left: 10px;
+            margin-left: 0; /* Eliminado el margen izquierdo */
         }
         .offer-wall-reward {
             font-size: 16px;
@@ -801,6 +819,62 @@
             color: #ccc;
             margin-top: 5px;
         }
+        /* --- NEW: REWARDS HUB TASK STYLES --- */
+        .reward-task-card {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .reward-task-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        .reward-task-buttons .action-button,
+        .reward-task-buttons .join-telegram-button {
+            flex: 1;
+            padding: 12px;
+            font-size: 16px;
+        }
+        .join-telegram-button {
+            background-color: #0088cc;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'Poppins',sans-serif;
+            text-decoration: none;
+            text-align: center;
+            transition: background-color 0.2s;
+        }
+        .join-telegram-button:hover {
+            background-color: #0077b3;
+        }
+
+        /* --- NUEVO: ESTILO PARA EL BOTÓN DE SERVICIO AL CLIENTE --- */
+        #customer-service-btn {
+            position: absolute;
+            top: 80px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #0088cc, #00aaff);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 28px;
+            text-decoration: none;
+            box-shadow: 0 5px 15px rgba(0, 136, 204, 0.5);
+            transition: all 0.2s ease-in-out;
+            z-index: 10;
+        }
+        #customer-service-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(0, 136, 204, 0.7);
+        }
+
     </style>
 </head>
 <body>
@@ -826,8 +900,9 @@
         </div>
 
         <div id="game-screen" class="screen">
-             <!-- MODIFIED: Button ID changed for clarity -->
             <div id="spin-earn-button">🚀</div>
+            <!-- NEW: REWARDS HUB BUTTON -->
+            <div id="rewards-hub-button">🎁</div>
 
             <div class="stats-container" style="margin-top: 60px;">
                 <h1 id="score-display">0</h1>
@@ -889,6 +964,30 @@
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
 
+        <!-- NEW: REWARDS HUB SCREEN -->
+        <div id="rewards-hub-screen" class="screen scrollable-screen hidden">
+            <h2>🎁 Rewards Hub 🎁</h2>
+            <div class="options-container">
+                <div class="option-card reward-task-card">
+                    <h3>Join Our Community</h3>
+                    <p>Join our official Telegram channel for updates, announcements, and special events. Get 99 coins as a one-time reward!</p>
+                    <div class="reward-task-buttons">
+                        <a href="https://t.me/taptoearningsquid" target="_blank" id="join-telegram-link" class="join-telegram-button">Join Channel</a>
+                        <button id="claim-telegram-reward-btn" class="action-button" style="background-color:#27ae60;" disabled>Claim 99 🪙</button>
+                    </div>
+                </div>
+
+                <div class="option-card reward-task-card">
+                    <h3>Daily Bonus</h3>
+                    <p>Come back every day to claim your free 20 coins!</p>
+                    <div class="reward-task-buttons">
+                         <button id="claim-daily-bonus-btn" class="action-button" style="background-color:#e67e22;">Claim 20 🪙</button>
+                    </div>
+                </div>
+            </div>
+            <button class="back-button" data-screen="game-screen">Back to Game</button>
+        </div>
+
         <div id="tournament-screen" class="screen scrollable-screen hidden tournament-bg">
             <h2>🏆 All Events & Games 🏆</h2>
             <div id="tournament-list-container" class="options-container">
@@ -921,6 +1020,9 @@
         </div>
 
         <div id="wallet-screen" class="screen hidden">
+            <!-- AÑADIDO: BOTÓN DE SERVICIO AL CLIENTE (LINK MODIFICADO) -->
+            <a href="https://t.me/Costomer_c" target="_blank" id="customer-service-btn" title="Customer Service">💬</a>
+
             <h2>👛 My Wallet 👛</h2>
             <p>Your current balance is:</p>
             <h1 id="wallet-score">0</h1>
@@ -929,7 +1031,6 @@
             <div id="withdrawal-ad-task-container" class="options-container" style="width: 100%; margin-top: 20px;">
             </div>
 
-            <!-- MODIFIED: Added a placeholder for the withdrawal day note -->
             <p id="withdrawal-day-note" style="color: #f1c40f; font-weight: bold; margin-top: 15px; text-align: center; display: none;"></p>
             
             <button id="withdraw-button" class="back-button">Withdraw All Coins</button>
@@ -979,7 +1080,6 @@
         </div>
     </div>
 
-    <!-- NEW: SPIN WHEEL POPUP -->
     <div id="spin-wheel-popup" class="popup">
         <div class="popup-content">
             <span class="popup-close" id="spin-wheel-popup-close">×</span>
@@ -1259,13 +1359,17 @@
                 earnBoxScreen: document.getElementById('earn-box-screen'),
                 earnBoxListContainer: document.getElementById('earn-box-list-container'),
                 spinEarnButton: document.getElementById('spin-earn-button'),
-                // NEW: Spin wheel elements
                 spinWheelPopup: document.getElementById('spin-wheel-popup'),
                 spinWheelPopupClose: document.getElementById('spin-wheel-popup-close'),
                 wheel: document.getElementById('wheel'),
                 spinButton: document.getElementById('spin-button'),
-                // NEW: Element for withdrawal day note
                 withdrawalDayNote: document.getElementById('withdrawal-day-note'),
+                // NEW: Rewards Hub Elements
+                rewardsHubButton: document.getElementById('rewards-hub-button'),
+                rewardsHubScreen: document.getElementById('rewards-hub-screen'),
+                joinTelegramLink: document.getElementById('join-telegram-link'),
+                claimTelegramRewardBtn: document.getElementById('claim-telegram-reward-btn'),
+                claimDailyBonusBtn: document.getElementById('claim-daily-bonus-btn'),
             };
 
             let state = {
@@ -1289,10 +1393,13 @@
                 earnBoxLastReset: new Date().toDateString(),
                 luckyBoxAdProgress: 0,
                 luckyBoxClaimed: false,
+                // NEW: State for rewards hub
+                telegramJoinedClaimed: false,
+                lastDailyBonusClaim: null,
             };
             
             let currentBetAmount = 100;
-            let isSpinning = false; // Flag to prevent multiple spins
+            let isSpinning = false; 
 
             let currentTournamentJoinProcess = {
                 details: null,
@@ -1301,7 +1408,6 @@
                 adUrl: 'https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6'
             };
             
-            // --- NEW: SPIN WHEEL LOGIC ---
             const spinPrizes = [
                 { text: '3 🪙', type: 'coin', value: 3, chance: 35, color: '#2ecc71' },
                 { text: '2 🪙', type: 'coin', value: 2, chance: 30, color: '#3498db' },
@@ -1333,14 +1439,13 @@
                     const textDiv = document.createElement('div');
                     textDiv.className = 'segment-text';
                     textDiv.innerText = prize.text;
-                    // Adjust text position to be inside the wheel
                     textDiv.style.marginLeft = '100px';
 
                     segmentDiv.appendChild(textDiv);
                     wheel.appendChild(segmentDiv);
                 });
 
-                gradientString = gradientString.slice(0, -2) + ')'; // Remove last comma and space
+                gradientString = gradientString.slice(0, -2) + ')'; 
                 wheel.style.background = gradientString;
             }
 
@@ -1353,7 +1458,7 @@
                         return prize;
                     }
                 }
-                return spinPrizes[0]; // Fallback
+                return spinPrizes[0]; 
             }
 
             elements.spinEarnButton.addEventListener('click', () => {
@@ -1413,16 +1518,83 @@
                             button.disabled = false;
                             button.innerText = "Watch Ad to Spin";
 
-                            // Reset wheel for next spin
                             elements.wheel.style.transition = 'none';
                             elements.wheel.style.transform = `rotate(0deg)`;
                             setTimeout(() => {
                                 elements.wheel.style.transition = 'transform 5s cubic-bezier(.2, .9, .3, 1)';
                             }, 50);
 
-                        }, 5100); // Wait for animation to finish
+                        }, 5100); 
                     }
                 }, 1000);
+            });
+
+            // --- NEW: REWARDS HUB LOGIC (MODIFIED) ---
+            function renderRewardsHubScreen() {
+                // Check Telegram Reward Status
+                if (state.telegramJoinedClaimed) {
+                    elements.claimTelegramRewardBtn.disabled = true;
+                    elements.claimTelegramRewardBtn.innerText = 'Claimed ✔️';
+                } else {
+                    const joinClicked = sessionStorage.getItem('telegramJoinClicked');
+                    // Enable claim button if join has been clicked, otherwise disable it.
+                    elements.claimTelegramRewardBtn.disabled = !joinClicked;
+                    elements.claimTelegramRewardBtn.innerText = 'Claim 99 🪙';
+                }
+
+                // Check Daily Bonus Status
+                const today = new Date().toDateString();
+                if (state.lastDailyBonusClaim === today) {
+                    elements.claimDailyBonusBtn.disabled = true;
+                    elements.claimDailyBonusBtn.innerText = 'Claimed Today ✔️';
+                } else {
+                    elements.claimDailyBonusBtn.disabled = false;
+                    elements.claimDailyBonusBtn.innerText = 'Claim 20 🪙';
+                }
+            }
+
+            elements.rewardsHubButton.addEventListener('click', () => {
+                showScreen('rewards-hub-screen');
+            });
+            
+            // Event listener for the "Join Channel" link
+            elements.joinTelegramLink.addEventListener('click', () => {
+                if (!state.telegramJoinedClaimed) {
+                    // Enable the claim button and store that the link was clicked
+                    elements.claimTelegramRewardBtn.disabled = false;
+                    sessionStorage.setItem('telegramJoinClicked', 'true');
+                }
+            });
+
+            elements.claimTelegramRewardBtn.addEventListener('click', () => {
+                if (state.telegramJoinedClaimed) {
+                    alert('You have already claimed this reward.');
+                    return;
+                }
+                
+                state.score += 99; // MODIFIED: Reward is 99
+                state.telegramJoinedClaimed = true;
+                
+                saveGame({ score: state.score, Totalearning: state.score, telegramJoinedClaimed: true });
+                updateDisplay();
+                renderRewardsHubScreen();
+                alert('Congratulations! You received 99 coins for joining the community!'); // MODIFIED: Alert text
+            });
+
+            elements.claimDailyBonusBtn.addEventListener('click', () => {
+                const today = new Date().toDateString();
+                if (state.lastDailyBonusClaim === today) {
+                    alert('You have already claimed your daily bonus. Come back tomorrow!');
+                    return;
+                }
+
+                state.score += 20;
+                state.lastDailyBonusClaim = today;
+
+                saveGame({ score: state.score, Totalearning: state.score, lastDailyBonusClaim: today });
+                updateDisplay();
+                renderRewardsHubScreen();
+                alert('You have claimed your daily bonus of 20 coins!');
             });
 
 
@@ -2141,37 +2313,34 @@
                 });
             }
             
-            // --- MODIFIED FUNCTION ---
             function renderWalletScreen() {
                 elements.walletScore.innerText = state.score.toLocaleString();
                 const rupeeValue = (state.score / 1000).toFixed(2);
                 elements.rupeeValue.innerText = `Value: ₹${rupeeValue} INR`;
 
                 const today = new Date();
-                const dayOfWeek = today.getDay(); // 0 is Sunday, 1 is Monday, etc.
+                const dayOfWeek = today.getDay(); 
                 const isSunday = dayOfWeek === 0;
 
                 const goal = 20;
                 const adsWatchedSufficiently = state.withdrawalAdClicks >= goal;
 
                 if (!isSunday) {
-                    // It's NOT Sunday, so lock withdrawal regardless of other conditions
                     elements.withdrawButton.disabled = true;
                     elements.withdrawButton.innerText = "Unavailable (Sundays Only)";
                     elements.withdrawalDayNote.innerText = "Withdrawal is available only on Sundays.";
                     elements.withdrawalDayNote.style.display = 'block';
-                    elements.withdrawalAdTaskContainer.style.display = 'none'; // Hide ad task, it's irrelevant now
+                    elements.withdrawalAdTaskContainer.style.display = 'none'; 
                 } else {
-                    // It IS Sunday, proceed with the ad-watching check
                     elements.withdrawalDayNote.style.display = 'none';
                     elements.withdrawButton.innerText = "Withdraw All Coins";
 
                     if (adsWatchedSufficiently) {
                         elements.withdrawalAdTaskContainer.style.display = 'none';
-                        elements.withdrawButton.disabled = false; // UNLOCK the button
+                        elements.withdrawButton.disabled = false; 
                     } else {
                         elements.withdrawalAdTaskContainer.style.display = 'flex';
-                        elements.withdrawButton.disabled = true; // LOCK the button
+                        elements.withdrawButton.disabled = true; 
                         elements.withdrawalAdTaskContainer.innerHTML = `
                             <div class="option-card">
                                 <h3>Unlock Withdrawals</h3>
@@ -2266,6 +2435,7 @@
                 else if (screenId === 'tournament-screen') { loadAndDisplayTournaments(); } 
                 else if (screenId === 'airdrop-screen') { renderAirdropScreen(); }
                 else if (screenId === 'earn-box-screen') { renderEarnBoxScreen(); }
+                else if (screenId === 'rewards-hub-screen') { renderRewardsHubScreen(); }
             }
             function loadGame() {
                 handleIncomingReferral();
@@ -2304,6 +2474,9 @@
                         state.earnBoxLastReset = data.earnBoxLastReset || new Date().toDateString();
                         state.luckyBoxAdProgress = data.luckyBoxAdProgress || 0;
                         state.luckyBoxClaimed = data.luckyBoxClaimed || false;
+                        // NEW: Load rewards hub data
+                        state.telegramJoinedClaimed = data.telegramJoinedClaimed || false;
+                        state.lastDailyBonusClaim = data.lastDailyBonusClaim || null;
                         
                         checkAndResetEarnBox();
 
@@ -2597,7 +2770,7 @@
             loadGame();
             showScreen('game-screen');
             flappyGame.init();
-            setupSpinWheel(); // Initialize the wheel design
+            setupSpinWheel(); 
             setInterval(() => {
                 checkEnergyCooldown();
             }, 1000);
