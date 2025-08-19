@@ -2625,9 +2625,9 @@
                         elements.energyTimerDisplay.style.display = 'block';
                         elements.energyText.style.display = 'none';
                         elements.energyBarFill.parentElement.style.display = 'none';
-                        if (state.fastRecoveryAdsWatched < 30) {
+                        if (state.fastRecoveryAdsWatched < 150) { // MODIFIED: Changed 30 to 150
                             elements.fastRecoveryWrapper.style.display = 'block';
-                            elements.fastEnergyRecoveryBtn.innerText = `Watch Ad (${state.fastRecoveryAdsWatched}/30) for 30min Refill`;
+                            elements.fastEnergyRecoveryBtn.innerText = `Watch Ad (${state.fastRecoveryAdsWatched}/150) for 30min Refill`; // MODIFIED: Changed 30 to 150
                         } else {
                             elements.fastRecoveryWrapper.style.display = 'none'; 
                         }
@@ -2641,7 +2641,7 @@
             }
             elements.fastEnergyRecoveryBtn.addEventListener('click', () => {
                 if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
-                if (state.fastRecoveryAdsWatched >= 30) { alert("You have already watched enough ads."); return; }
+                if (state.fastRecoveryAdsWatched >= 150) { alert("You have already watched enough ads."); return; } // MODIFIED: Changed 30 to 150
                 state.isAdTimerActive = true;
                 window.open('https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315', '_blank');
                 const button = elements.fastEnergyRecoveryBtn;
@@ -2657,7 +2657,7 @@
                         button.disabled = false;
                         state.fastRecoveryAdsWatched++;
                         let dataToSave = { fastRecoveryAdsWatched: state.fastRecoveryAdsWatched };
-                        if (state.fastRecoveryAdsWatched >= 30) {
+                        if (state.fastRecoveryAdsWatched >= 150) { // MODIFIED: Changed 30 to 150
                             state.energyRecoveryDuration = 30 * 60 * 1000; 
                             dataToSave.energyRecoveryDuration = state.energyRecoveryDuration;
                             alert("Success! Energy will now refill in 30 minutes from when it ran out.");
