@@ -68,7 +68,6 @@
             box-sizing: border-box; 
             position: relative; 
             overflow-y: auto;
-            /* MODIFICACIÓN: AUMENTADO EL RELLENO INFERIOR PARA MÁS DESPLAZAMIENTO */
             padding-bottom: 250px; 
         }
         .screen.hidden{display:none}
@@ -85,7 +84,7 @@
         #player-name-display { font-size: 16px; font-weight: 600; }
         
         #airdrop-button {
-            position: absolute; top: 15px; right: 65px; /* Make space for the bell */
+            position: absolute; top: 15px; right: 65px;
             z-index: 11; font-size: 28px; cursor: pointer;
             padding: 8px; background-color: rgba(0,0,0,0.3);
             border-radius: 50%; width: 30px; height: 30px;
@@ -162,7 +161,6 @@
             100% { transform: scale(1); box-shadow: 0 0 5px rgba(243, 156, 18, 0.3); }
         }
 
-        /* --- BUTTON STYLE (MODIFIED FOR SPIN) --- */
         #spin-earn-button, #rewards-hub-button {
             position: absolute;
             left: 20px;
@@ -184,9 +182,8 @@
             top: 130px; 
             background: linear-gradient(45deg, #e74c3c, #f39c12);
         }
-        /* --- NEW: REWARDS HUB BUTTON --- */
         #rewards-hub-button {
-            top: 180px; /* Positioned below spin button */
+            top: 180px;
             background: linear-gradient(45deg, #2ecc71, #27ae60);
             box-shadow: 0 5px 15px rgba(46, 204, 113, 0.5);
         }
@@ -205,7 +202,6 @@
             100% { transform: scale(1); }
         }
 
-        /* --- NEW: SPIN WHEEL STYLES --- */
         .wheel-container {
             position: relative;
             width: 280px;
@@ -266,7 +262,6 @@
         .withdraw-options{display:flex;flex-direction:column;gap:15px;margin-top:20px}
         .withdraw-option{background-color:#3498db;color:#fff;border:none;padding:15px;font-size:16px;border-radius:10px;cursor:pointer}
         #withdraw-button{background-color:#3498db;margin-top:10px}
-        /* Style for locked/disabled withdrawal button */
         #withdraw-button:disabled {
             background-color: #7f8c8d;
             cursor: not-allowed;
@@ -638,13 +633,13 @@
             font-family: 'Orbitron', sans-serif;
             font-size: 28px;
             font-weight: 900;
-            color: #ff4757; /* Neon red/pink */
+            color: #ff4757;
             text-shadow: 0 0 5px #ff4757, 0 0 15px #ff4757;
             animation: pulse-vs 2s infinite ease-in-out;
         }
         @keyframes pulse-vs { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
         .join-now-button {
-            background: linear-gradient(45deg, #f39c12, #ff6b6b); /* Orange-red gradient */
+            background: linear-gradient(45deg, #f39c12, #ff6b6b);
             color: #fff;
             border: none;
             padding: 15px;
@@ -664,81 +659,82 @@
             box-shadow: 0 0 20px rgba(243, 156, 18, 0.9), 0 0 40px rgba(255, 107, 107, 0.7);
         }
         .join-now-button:active { transform: translateY(0); }
-
+        
+        /* === UPDATED OFFER PAGE STYLE START === */
         #offer-wall-screen {
-            background-color: #f8f9fa;
+            background-color: #121212; /* Dark background */
             justify-content: flex-start;
             padding-top: 30px;
-            color: #000;
+            color: #ffffff; /* Default text color to white */
         }
         .offer-wall-container {
             width: 95%;
             max-width: 500px;
-            background-color: #ffffff;
+            background-color: #1e1e2d; /* Dark container */
             border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 0 15px rgba(155, 89, 182, 0.3); /* Purple glow */
+            border: 1px solid rgba(255, 255, 255, 0.1);
             padding: 10px;
             box-sizing: border-box;
         }
-        /* MODIFICACIÓN: DISEÑO VERTICAL PARA LOS ELEMENTOS DE OFERTA */
         .offer-wall-item {
             display: flex;
-            flex-direction: column; /* Cambiado a columna */
-            align-items: center;    /* Centra los elementos */
-            gap: 10px;              /* Espacio entre elementos */
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
             padding: 15px;
-            border-bottom: 1px solid #eeeeee;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Lighter border for dark bg */
         }
         .offer-wall-item:last-child {
             border-bottom: none;
         }
         .offer-wall-item img {
-            width: 55px; /* Ligeramente más grande */
+            width: 55px;
             height: 55px;
-            margin-right: 0; /* Eliminado el margen derecho */
-            margin-bottom: 10px; /* Añadido margen inferior */
+            margin-right: 0;
+            margin-bottom: 10px;
             flex-shrink: 0;
             border-radius: 12px;
         }
         .offer-wall-text {
             flex-grow: 1;
-            text-align: center; /* Centrado el texto */
+            text-align: center;
         }
         .offer-wall-text h3 {
             font-family: 'Poppins', sans-serif;
             margin: 0 0 2px 0;
             font-size: 16px;
             font-weight: 600;
-            color: #212529;
+            color: #e0e0e0; /* Light text color */
             text-shadow: none;
         }
         .offer-wall-text p {
             margin: 0;
             font-size: 14px;
-            color: #6c757d;
+            color: #a0a0a0; /* Greyer text color */
         }
         .offer-wall-action {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px; /* Espacio aumentado */
+            gap: 8px;
             flex-shrink: 0;
-            margin-left: 0; /* Eliminado el margen izquierdo */
+            margin-left: 0;
         }
         .offer-wall-reward {
             font-size: 16px;
             font-weight: 700;
-            color: #e67e22;
-            background-color: #fdf3e6;
+            color: #f39c12; /* Orange text */
+            background-color: rgba(243, 156, 18, 0.15); /* Darker orange bg */
             padding: 4px 10px;
             border-radius: 20px;
-            border: 1px solid #fbe2c4;
+            border: 1px solid rgba(243, 156, 18, 0.5);
             white-space: nowrap;
         }
         .offer-wall-button {
-            background-color: #f3f0ff;
-            color: #6f42c1;
-            border: 1px solid #e0d7f5;
+            background-color: #9b59b6; /* Purple button */
+            color: #ffffff;
+            border: none; /* Removed border */
             padding: 8px 22px;
             border-radius: 50px;
             text-decoration: none;
@@ -749,11 +745,11 @@
             white-space: nowrap;
         }
         .offer-wall-button:hover {
-            background-color: #e9e1fc;
+            background-color: #8e44ad; /* Darker purple on hover */
             transform: translateY(-1px);
         }
+        /* === UPDATED OFFER PAGE STYLE END === */
 
-        /* --- EARN BOX STYLES --- */
         #earn-box-list-container {
             display: flex;
             flex-direction: column;
@@ -819,7 +815,6 @@
             color: #ccc;
             margin-top: 5px;
         }
-        /* --- NEW: REWARDS HUB TASK STYLES --- */
         .reward-task-card {
             display: flex;
             flex-direction: column;
@@ -851,7 +846,6 @@
             background-color: #0077b3;
         }
 
-        /* --- NUEVO: ESTILO PARA EL BOTÓN DE SERVICIO AL CLIENTE --- */
         #customer-service-btn {
             position: absolute;
             top: 80px;
@@ -873,6 +867,18 @@
         #customer-service-btn:hover {
             transform: scale(1.1);
             box-shadow: 0 8px 25px rgba(0, 136, 204, 0.7);
+        }
+        
+        /* Style for new floating ad emojis */
+        .floating-ad-emoji {
+            position: absolute;
+            font-size: 40px;
+            cursor: pointer;
+            z-index: 50;
+            user-select: none;
+            -webkit-user-select: none;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+            will-change: transform; /* Performance optimization */
         }
 
     </style>
@@ -901,7 +907,6 @@
 
         <div id="game-screen" class="screen">
             <div id="spin-earn-button">🚀</div>
-            <!-- NEW: REWARDS HUB BUTTON -->
             <div id="rewards-hub-button">🎁</div>
 
             <div class="stats-container" style="margin-top: 60px;">
@@ -958,13 +963,10 @@
         <div id="earn-box-screen" class="screen scrollable-screen hidden">
             <h2>☀️ Daily Earn Box ☀️</h2>
             <p style="font-size: 16px; text-align: center; max-width: 350px;">Complete tasks daily to earn rewards. Progress resets every day!</p>
-            <div id="earn-box-list-container" class="options-container" style="margin-top: 20px;">
-                <!-- JS will populate this -->
-            </div>
+            <div id="earn-box-list-container" class="options-container" style="margin-top: 20px;"></div>
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
 
-        <!-- NEW: REWARDS HUB SCREEN -->
         <div id="rewards-hub-screen" class="screen scrollable-screen hidden">
             <h2>🎁 Rewards Hub 🎁</h2>
             <div class="options-container">
@@ -990,9 +992,7 @@
 
         <div id="tournament-screen" class="screen scrollable-screen hidden tournament-bg">
             <h2>🏆 All Events & Games 🏆</h2>
-            <div id="tournament-list-container" class="options-container">
-                 <!-- Dynamic cards will be loaded here. -->
-            </div>
+            <div id="tournament-list-container" class="options-container"></div>
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
         
@@ -1013,23 +1013,19 @@
         
         <div id="video-screen" class="screen scrollable-screen hidden">
             <h2>🎥 Refer & Watch 🎥</h2>
-            <div id="video-tasks-container" class="options-container">
-                <!-- All video/ad tasks will be dynamically loaded here by JavaScript -->
-            </div>
+            <div id="video-tasks-container" class="options-container"></div>
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
 
         <div id="wallet-screen" class="screen hidden">
-            <!-- AÑADIDO: BOTÓN DE SERVICIO AL CLIENTE (LINK MODIFICADO) -->
-            <a href="https://t.me/Costomer_c" target="_blank" id="customer-service-btn" title="Customer Service">💬</a>
+            <a href="https://t.me/Costomer_c" target="_blank" id="customer-service-btn" title="Contact">🎧</a>
 
             <h2>👛 My Wallet 👛</h2>
             <p>Your current balance is:</p>
             <h1 id="wallet-score">0</h1>
             <p id="rupee-value">Value: ₹0.00 INR</p>
             
-            <div id="withdrawal-ad-task-container" class="options-container" style="width: 100%; margin-top: 20px;">
-            </div>
+            <div id="withdrawal-ad-task-container" class="options-container" style="width: 100%; margin-top: 20px;"></div>
 
             <p id="withdrawal-day-note" style="color: #f1c40f; font-weight: bold; margin-top: 15px; text-align: center; display: none;"></p>
             
@@ -1069,7 +1065,6 @@
         </div>
     </div>
     
-    <!-- Popups -->
     <div id="notification-popup" class="popup">
         <div class="popup-content">
             <span class="popup-close" id="close-notification-btn">×</span>
@@ -1086,9 +1081,7 @@
             <h3>Spin to Earn!</h3>
             <div class="wheel-container">
                 <div class="wheel-pointer"></div>
-                <div id="wheel">
-                    <!-- Segments will be added by JS -->
-                </div>
+                <div id="wheel"></div>
             </div>
             <button id="spin-button" class="action-button" style="background-color: #f39c12; width: 100%; padding: 15px; font-size: 20px;">
                 Watch Ad to Spin
@@ -1364,12 +1357,18 @@
                 wheel: document.getElementById('wheel'),
                 spinButton: document.getElementById('spin-button'),
                 withdrawalDayNote: document.getElementById('withdrawal-day-note'),
-                // NEW: Rewards Hub Elements
                 rewardsHubButton: document.getElementById('rewards-hub-button'),
                 rewardsHubScreen: document.getElementById('rewards-hub-screen'),
                 joinTelegramLink: document.getElementById('join-telegram-link'),
                 claimTelegramRewardBtn: document.getElementById('claim-telegram-reward-btn'),
                 claimDailyBonusBtn: document.getElementById('claim-daily-bonus-btn'),
+            };
+
+            // NEW: Global object for game settings
+            let gameSettings = {
+                withdrawalsLocked: false,
+                withdrawalButtonText: 'Withdraw All Coins',
+                isWithdrawalForceUnlocked: false,
             };
 
             let state = {
@@ -1393,7 +1392,6 @@
                 earnBoxLastReset: new Date().toDateString(),
                 luckyBoxAdProgress: 0,
                 luckyBoxClaimed: false,
-                // NEW: State for rewards hub
                 telegramJoinedClaimed: false,
                 lastDailyBonusClaim: null,
             };
@@ -1529,20 +1527,16 @@
                 }, 1000);
             });
 
-            // --- NEW: REWARDS HUB LOGIC (MODIFIED) ---
             function renderRewardsHubScreen() {
-                // Check Telegram Reward Status
                 if (state.telegramJoinedClaimed) {
                     elements.claimTelegramRewardBtn.disabled = true;
                     elements.claimTelegramRewardBtn.innerText = 'Claimed ✔️';
                 } else {
                     const joinClicked = sessionStorage.getItem('telegramJoinClicked');
-                    // Enable claim button if join has been clicked, otherwise disable it.
                     elements.claimTelegramRewardBtn.disabled = !joinClicked;
                     elements.claimTelegramRewardBtn.innerText = 'Claim 99 🪙';
                 }
 
-                // Check Daily Bonus Status
                 const today = new Date().toDateString();
                 if (state.lastDailyBonusClaim === today) {
                     elements.claimDailyBonusBtn.disabled = true;
@@ -1557,10 +1551,8 @@
                 showScreen('rewards-hub-screen');
             });
             
-            // Event listener for the "Join Channel" link
             elements.joinTelegramLink.addEventListener('click', () => {
                 if (!state.telegramJoinedClaimed) {
-                    // Enable the claim button and store that the link was clicked
                     elements.claimTelegramRewardBtn.disabled = false;
                     sessionStorage.setItem('telegramJoinClicked', 'true');
                 }
@@ -1572,13 +1564,13 @@
                     return;
                 }
                 
-                state.score += 99; // MODIFIED: Reward is 99
+                state.score += 99;
                 state.telegramJoinedClaimed = true;
                 
                 saveGame({ score: state.score, Totalearning: state.score, telegramJoinedClaimed: true });
                 updateDisplay();
                 renderRewardsHubScreen();
-                alert('Congratulations! You received 99 coins for joining the community!'); // MODIFIED: Alert text
+                alert('Congratulations! You received 99 coins for joining the community!');
             });
 
             elements.claimDailyBonusBtn.addEventListener('click', () => {
@@ -2313,10 +2305,33 @@
                 });
             }
             
+            // MODIFIED: Function updated to use gameSettings
             function renderWalletScreen() {
                 elements.walletScore.innerText = state.score.toLocaleString();
                 const rupeeValue = (state.score / 1000).toFixed(2);
                 elements.rupeeValue.innerText = `Value: ₹${rupeeValue} INR`;
+
+                // Set button text from global settings
+                elements.withdrawButton.innerText = gameSettings.withdrawalButtonText;
+                
+                // If globally locked by admin, show locked state and return
+                if (gameSettings.withdrawalsLocked) {
+                    elements.withdrawButton.disabled = true;
+                    elements.withdrawButton.innerText = "Withdrawals are paused";
+                    elements.withdrawalDayNote.style.display = 'none';
+                    elements.withdrawalAdTaskContainer.style.display = 'none';
+                    renderWithdrawalHistory();
+                    return;
+                }
+
+                // If force-unlocked by admin, bypass all other checks
+                if (gameSettings.isWithdrawalForceUnlocked) {
+                    elements.withdrawButton.disabled = false;
+                    elements.withdrawalDayNote.style.display = 'none';
+                    elements.withdrawalAdTaskContainer.style.display = 'none';
+                    renderWithdrawalHistory();
+                    return;
+                }
 
                 const today = new Date();
                 const dayOfWeek = today.getDay(); 
@@ -2333,7 +2348,7 @@
                     elements.withdrawalAdTaskContainer.style.display = 'none'; 
                 } else {
                     elements.withdrawalDayNote.style.display = 'none';
-                    elements.withdrawButton.innerText = "Withdraw All Coins";
+                    elements.withdrawButton.innerText = gameSettings.withdrawalButtonText;
 
                     if (adsWatchedSufficiently) {
                         elements.withdrawalAdTaskContainer.style.display = 'none';
@@ -2352,7 +2367,6 @@
                         `;
                     }
                 }
-
                 renderWithdrawalHistory();
             }
 
@@ -2437,8 +2451,26 @@
                 else if (screenId === 'earn-box-screen') { renderEarnBoxScreen(); }
                 else if (screenId === 'rewards-hub-screen') { renderRewardsHubScreen(); }
             }
+
+            // NEW: Function to listen for global game settings
+            function listenForGameSettings() {
+                const settingsRef = database.ref('gameSettings');
+                settingsRef.on('value', (snapshot) => {
+                    const settings = snapshot.val() || {};
+                    gameSettings.withdrawalsLocked = settings.withdrawalsLocked === true;
+                    gameSettings.withdrawalButtonText = settings.withdrawalButtonText || 'Withdraw All Coins';
+                    gameSettings.isWithdrawalForceUnlocked = settings.isWithdrawalForceUnlocked === true;
+                    
+                    // If the wallet screen is currently visible, re-render it with the new settings
+                    if (!document.getElementById('wallet-screen').classList.contains('hidden')) {
+                        renderWalletScreen();
+                    }
+                });
+            }
+
             function loadGame() {
                 handleIncomingReferral();
+                listenForGameSettings(); // Start listening for settings right away
                 const userRef = database.ref(`Users/${userId}`);
                 userRef.once('value', (snapshot) => {
                     const data = snapshot.val();
@@ -2474,7 +2506,6 @@
                         state.earnBoxLastReset = data.earnBoxLastReset || new Date().toDateString();
                         state.luckyBoxAdProgress = data.luckyBoxAdProgress || 0;
                         state.luckyBoxClaimed = data.luckyBoxClaimed || false;
-                        // NEW: Load rewards hub data
                         state.telegramJoinedClaimed = data.telegramJoinedClaimed || false;
                         state.lastDailyBonusClaim = data.lastDailyBonusClaim || null;
                         
@@ -2625,9 +2656,9 @@
                         elements.energyTimerDisplay.style.display = 'block';
                         elements.energyText.style.display = 'none';
                         elements.energyBarFill.parentElement.style.display = 'none';
-                        if (state.fastRecoveryAdsWatched < 150) { // MODIFIED: Changed 30 to 150
+                        if (state.fastRecoveryAdsWatched < 150) {
                             elements.fastRecoveryWrapper.style.display = 'block';
-                            elements.fastEnergyRecoveryBtn.innerText = `Watch Ad (${state.fastRecoveryAdsWatched}/150) for 30min Refill`; // MODIFIED: Changed 30 to 150
+                            elements.fastEnergyRecoveryBtn.innerText = `Watch Ad (${state.fastRecoveryAdsWatched}/150) for 30min Refill`;
                         } else {
                             elements.fastRecoveryWrapper.style.display = 'none'; 
                         }
@@ -2641,7 +2672,7 @@
             }
             elements.fastEnergyRecoveryBtn.addEventListener('click', () => {
                 if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
-                if (state.fastRecoveryAdsWatched >= 150) { alert("You have already watched enough ads."); return; } // MODIFIED: Changed 30 to 150
+                if (state.fastRecoveryAdsWatched >= 150) { alert("You have already watched enough ads."); return; }
                 state.isAdTimerActive = true;
                 window.open('https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315', '_blank');
                 const button = elements.fastEnergyRecoveryBtn;
@@ -2657,7 +2688,7 @@
                         button.disabled = false;
                         state.fastRecoveryAdsWatched++;
                         let dataToSave = { fastRecoveryAdsWatched: state.fastRecoveryAdsWatched };
-                        if (state.fastRecoveryAdsWatched >= 150) { // MODIFIED: Changed 30 to 150
+                        if (state.fastRecoveryAdsWatched >= 150) {
                             state.energyRecoveryDuration = 30 * 60 * 1000; 
                             dataToSave.energyRecoveryDuration = state.energyRecoveryDuration;
                             alert("Success! Energy will now refill in 30 minutes from when it ran out.");
@@ -2767,6 +2798,56 @@
                 }, 1000);
             });
             
+            // --- NEW FEATURE: FLOATING AD EMOJIS ---
+            function createFlyingAdEmoji() {
+                const gameScreen = document.getElementById('game-screen');
+                if (!gameScreen || document.hidden) return; 
+
+                const emoji = document.createElement('div');
+                emoji.className = 'floating-ad-emoji';
+                emoji.innerText = '💸';
+
+                const startX = -60;
+                const startY = Math.random() * (gameScreen.clientHeight * 0.8);
+                const endX = gameScreen.clientWidth + 60;
+                const endY = Math.random() * (gameScreen.clientHeight * 0.8);
+                const duration = Math.random() * 6 + 7; // 7 to 13 seconds
+
+                emoji.style.left = `${startX}px`;
+                emoji.style.top = `${startY}px`;
+                emoji.style.transition = `transform ${duration}s linear`;
+                
+                gameScreen.appendChild(emoji);
+
+                setTimeout(() => {
+                    const rotation = (Math.random() - 0.5) * 720;
+                    emoji.style.transform = `translate(${endX - startX}px, ${endY - startY}px) rotate(${rotation}deg)`;
+                }, 100);
+                
+                // === AD LINK UPDATED HERE ===
+                const adUrl = 'https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6';
+                
+                const handleClick = (e) => {
+                    e.stopPropagation(); // Prevent taps from reaching the coin
+                    window.open(adUrl, '_blank');
+                    emoji.remove();
+                    setTimeout(createFlyingAdEmoji, Math.random() * 5000 + 3000); 
+                };
+                emoji.addEventListener('click', handleClick);
+                emoji.addEventListener('touchend', handleClick);
+
+                emoji.addEventListener('transitionend', () => {
+                    emoji.remove();
+                    setTimeout(createFlyingAdEmoji, Math.random() * 2000);
+                });
+            }
+
+            // Initial creation of the floating ads
+            for (let i = 0; i < 3; i++) {
+                setTimeout(createFlyingAdEmoji, i * 3000); // Stagger initial appearance
+            }
+            // --- END OF NEW FEATURE ---
+
             loadGame();
             showScreen('game-screen');
             flappyGame.init();
