@@ -880,6 +880,62 @@
             text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
             will-change: transform; /* Performance optimization */
         }
+        
+        /* === ESTILOS PARA LA NUEVA SECCIÓN DE OFERTAS === */
+        .offer-submission-prompt {
+            width: 95%;
+            max-width: 500px;
+            background-color: rgba(155, 89, 182, 0.15);
+            border: 1px solid #9b59b6;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+        .offer-submission-prompt p {
+            font-size: 14px;
+            color: #ddd;
+            margin: 0 0 15px 0;
+            line-height: 1.5;
+        }
+        .user-id-container {
+            background-color: rgba(0,0,0,0.3);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 15px;
+            margin-bottom: 15px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .user-id-container strong {
+            color: #f39c12;
+            font-family: monospace;
+        }
+        .copy-id-btn {
+            cursor: pointer;
+            font-size: 20px;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+        .copy-id-btn:hover {
+            opacity: 1;
+        }
+        .send-screenshot-btn {
+            display: inline-block;
+            background-color: #0088cc; /* Telegram Blue */
+            color: #ffffff;
+            padding: 10px 25px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+            transition: background-color 0.2s ease;
+        }
+        .send-screenshot-btn:hover {
+            background-color: #0077b3;
+        }
 
     </style>
 </head>
@@ -996,7 +1052,18 @@
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
         
-        <div id="offer-wall-screen" class="screen hidden">
+        <div id="offer-wall-screen" class="screen scrollable-screen hidden">
+            <!-- === NUEVA SECCIÓN AÑADIDA AQUÍ === -->
+            <div class="offer-submission-prompt">
+                <p>After completing any offer, send a screenshot with your User ID to our support for verification.</p>
+                <div class="user-id-container">
+                    Your User ID: <strong id="user-id-display-offer"></strong> 
+                    <span class="copy-id-btn" title="Copy User ID">📋</span>
+                </div>
+                <a href="https://t.me/Costomer_c" target="_blank" class="send-screenshot-btn">Send Offer Screenshot</a>
+            </div>
+            <!-- === FIN DE LA NUEVA SECCIÓN === -->
+
             <div id="offer-wall-container" class="offer-wall-container">
                  <p style="color: #6c757d; text-align: center;">Loading offers...</p>
             </div>
@@ -1180,7 +1247,7 @@
         function copyTextToClipboard(text) {
             if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(text).then(() => {
-                    alert('Invite link copied to your clipboard!');
+                    alert('Copied to your clipboard!');
                 }).catch(err => {
                     console.error('Modern copy failed, trying fallback: ', err);
                     fallbackCopyTextToClipboard(text);
@@ -1202,13 +1269,13 @@
             try {
                 const successful = document.execCommand('copy');
                 if (successful) {
-                    alert('Invite link copied to your clipboard!');
+                    alert('Copied to your clipboard!');
                 } else {
-                    alert('Could not copy the link. Please copy it manually.');
+                    alert('Could not copy. Please copy it manually.');
                 }
             } catch (err) {
                 console.error('Fallback copy failed: ', err);
-                alert('Could not copy the link. Please copy it manually.');
+                alert('Could not copy. Please copy it manually.');
             }
             document.body.removeChild(textArea);
         }
@@ -1362,7 +1429,32 @@
                 joinTelegramLink: document.getElementById('join-telegram-link'),
                 claimTelegramRewardBtn: document.getElementById('claim-telegram-reward-btn'),
                 claimDailyBonusBtn: document.getElementById('claim-daily-bonus-btn'),
+                userIdDisplayOffer: document.getElementById('user-id-display-offer'),
             };
+
+            // Event listener for the new copy button
+            document.querySelector('.copy-id-btn').addEventListener('click', () => {
+                if (userId) {
+                    const originalAlert = window.alert;
+                    window.alert = function(msg) {
+                        if (msg.includes('Copied to your clipboard!')) {
+                            originalAlert('User ID Copied!');
+                        } else {
+                            originalAlert(msg);
+                        }
+                    };
+                    copyTextToClipboard(userId);
+                    window.alert = originalAlert;
+                    
+                    const copyBtn = document.querySelector('.copy-id-btn');
+                    const originalIcon = copyBtn.textContent;
+                    copyBtn.textContent = '✅';
+                    setTimeout(() => {
+                        copyBtn.textContent = originalIcon;
+                    }, 1500);
+                }
+            });
+
 
             // NEW: Global object for game settings
             let gameSettings = {
@@ -2529,6 +2621,11 @@
                     updateDisplay();
                     updatePlayerNameDisplay();
                     checkEnergyCooldown(); 
+
+                    // Update the User ID display on the offer screen
+                    if (elements.userIdDisplayOffer) {
+                        elements.userIdDisplayOffer.textContent = userId;
+                    }
                     
                     database.ref(`Users/${userId}/messages`).on('child_added', (snapshot) => {
                         const msg = snapshot.val();
