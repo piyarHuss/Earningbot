@@ -937,6 +937,50 @@
             background-color: #0077b3;
         }
 
+        /* --- NEW: AD FRAME STYLES --- */
+        #ad-frame-wrapper {
+            position: fixed; inset: 0; display: grid; grid-template-rows: auto 1fr auto;
+            background:#0b0f13; color:#fff; z-index: 9999;
+        }
+        #ad-frame-wrapper header {
+            padding: 12px 16px; display:flex; align-items:center; gap:12px; background:#0f141a;
+            border-bottom: 1px solid #1f2937;
+        }
+        #ad-frame-wrapper .badge {
+            font-size: 12px; padding: 4px 8px; border:1px solid #334155; border-radius: 999px; opacity:.9;
+        }
+        #ad-container {
+            width: 100%; height: 100%; display: flex;
+            justify-content: center; align-items: center; overflow: auto;
+        }
+        #ad-container iframe {
+            width: 100%; height: 100%; border: none;
+        }
+        #ad-frame-wrapper .overlay {
+            position: absolute; top:16px; right:16px; display:flex; align-items:center; gap:8px;
+            background: rgba(0,0,0,.55); border:1px solid #334155; padding:8px 12px; border-radius: 999px;
+            backdrop-filter: blur(4px);
+            z-index: 10;
+            pointer-events: none;
+        }
+        #ad-frame-wrapper .timer {
+            font-variant-numeric: tabular-nums; font-weight: 700;
+        }
+        #ad-frame-wrapper .closeBtn {
+            pointer-events: auto; appearance:none; border:1px solid #334155; background:#111827; color:#9ca3af;
+            padding:6px 10px; border-radius: 999px; cursor:not-allowed; opacity:.6;
+            transition: all .2s ease;
+        }
+        #ad-frame-wrapper .closeBtn.enabled {
+            background:#16a34a; border-color:#16a34a; color:#fff; cursor:pointer; opacity:1;
+        }
+        #ad-frame-wrapper footer {
+            padding: 10px 16px; font-size:12px; color:#94a3b8; background:#0f141a; border-top:1px solid #1f2937;
+            display:flex; justify-content:space-between; align-items:center; gap:8px;
+        }
+        #ad-frame-wrapper .stage { position: relative; height: 100%; }
+        /* --- END AD FRAME STYLES --- */
+
     </style>
 </head>
 <body>
@@ -980,7 +1024,6 @@
                 <div id="energy-timer-display" style="display: none; text-align: center; margin-top: 10px; font-size: 16px;"></div>
                 <div id="fast-recovery-wrapper" style="display: none; width: 100%; text-align: center;">
                     <button id="fast-energy-recovery-btn" class="action-button" style="margin-top: 10px; width: 100%; background-color: #e67e22;">Watch Ad for Faster Refill</button>
-                    <p class="ad-minimum-watch-note">Minimum ads watch: 15</p>
                 </div>
             </div>
         </div>
@@ -1115,7 +1158,6 @@
                 <h3>Earn Love Coins</h3>
                 <p>Watch a short ad to receive 1 Love Coin instantly!</p>
                 <button id="watch-ad-for-love-coin-btn" class="action-button" style="background-color: #e91e63;">Watch Ad (+1 💝)</button>
-                <p class="ad-minimum-watch-note">Minimum ads watch: 15</p>
             </div>
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
@@ -1153,7 +1195,6 @@
             <button id="spin-button" class="action-button" style="background-color: #f39c12; width: 100%; padding: 15px; font-size: 20px;">
                 Watch Ad to Spin
             </button>
-            <p class="ad-minimum-watch-note">Minimum ads watch: 15</p>
         </div>
     </div>
 
@@ -1192,7 +1233,6 @@
                 <p style="font-size: 16px; margin-top: 15px;">You must watch 5 ads to proceed.</p>
                 <p>Progress: <strong id="tournament-ad-progress">0 / 5</strong></p>
                 <button id="tournament-watch-ad-btn" class="action-button" style="background-color: #f39c12; margin-top: 15px;">Watch Ad</button>
-                <p class="ad-minimum-watch-note">Minimum ads watch: 15</p>
                 <button id="tournament-ad-cancel-btn" class="action-button" style="background-color: #e74c3c; margin-top: 10px;">Cancel</button>
             </div>
     
@@ -1218,6 +1258,31 @@
 
     <audio id="tap-sound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_2b4065a46d.mp3" preload="auto"></audio>
     
+    <!-- ======================================================= -->
+    <!-- NEW: AD FRAME HTML (Initially hidden) -->
+    <!-- ======================================================= -->
+    <div id="ad-frame-wrapper" style="display: none;">
+        <header>
+            <div class="badge">Ad</div>
+            <div>Watch at least <strong>15s</strong> to continue</div>
+        </header>
+        <div class="stage">
+            <div class="overlay">
+                <span>Close in</span>
+                <span class="timer" id="ad-timer">15s</span>
+                <button id="ad-close-btn" class="closeBtn" disabled>Close</button>
+            </div>
+            <div id="ad-container">
+                <!-- Ad iframe will be inserted here by JavaScript -->
+            </div>
+        </div>
+        <footer>
+            <div>Minimum watch time enforced.</div>
+            <div id="ad-status">Locked</div>
+        </footer>
+    </div>
+    <!-- ======================================================= -->
+    
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -1234,6 +1299,78 @@
         };
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
+
+        // =====================================================================
+        // NEW: AD FRAME LOGIC
+        // =====================================================================
+        const adFrameWrapper = document.getElementById('ad-frame-wrapper');
+        const adTimerEl = document.getElementById('ad-timer');
+        const adStatusEl = document.getElementById('ad-status');
+        const adCloseBtn = document.getElementById('ad-close-btn');
+        const adContainer = document.getElementById('ad-container');
+        let adCanClose = false;
+        let adCountdownInterval;
+
+        function showAdFrame(adUrl, onCompleteCallback) {
+            adCanClose = false;
+            let remaining = 15;
+
+            // Reset UI
+            adTimerEl.textContent = remaining + 's';
+            adStatusEl.textContent = 'Locked';
+            adCloseBtn.setAttribute('disabled', 'true');
+            adCloseBtn.classList.remove('enabled');
+            adCloseBtn.onclick = null;
+
+            // Load ad in iframe
+            adContainer.innerHTML = ''; // Clear previous ad
+            const iframe = document.createElement('iframe');
+            iframe.src = adUrl;
+            adContainer.appendChild(iframe);
+            
+            // Show the ad frame
+            adFrameWrapper.style.display = 'grid';
+
+            // Block back button
+            history.pushState(null, '', location.href);
+            const blockBack = () => {
+                if (!adCanClose) {
+                    history.pushState(null, '', location.href);
+                }
+            };
+            window.addEventListener('popstate', blockBack);
+
+            // Unlock function
+            function unlock() {
+                adCanClose = true;
+                adStatusEl.textContent = 'Unlocked';
+                adCloseBtn.removeAttribute('disabled');
+                adCloseBtn.classList.add('enabled');
+                adCloseBtn.onclick = () => {
+                    adFrameWrapper.style.display = 'none';
+                    adContainer.innerHTML = ''; // Clean up iframe
+                    window.removeEventListener('popstate', blockBack);
+                    if (onCompleteCallback && typeof onCompleteCallback === 'function') {
+                        onCompleteCallback();
+                    }
+                };
+            }
+
+            // Countdown logic
+            adCountdownInterval = setInterval(() => {
+                remaining -= 1;
+                if (remaining <= 0) {
+                    clearInterval(adCountdownInterval);
+                    unlock();
+                }
+                adTimerEl.textContent = (remaining > 0 ? remaining : 0) + 's';
+            }, 1000);
+
+            // Safety unlock
+            setTimeout(() => { if (!adCanClose) unlock(); }, (15 + 1) * 1000);
+        }
+        // =====================================================================
+
 
         function generateReferralCode() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -1347,14 +1484,19 @@
             startGame() { if (this.gameRunning) return; this.resetGame(); this.gameRunning = true; this.startButton.style.display = 'none'; this.rewardInterval = setInterval(() => { if (this.gameRunning) { state.score += 50; updateDisplay(); saveGame({ score: state.score }); } }, 10000); this.loop(); },
             endGame() {
                 if (!this.gameRunning) return;
-                window.open('https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315', '_blank');
+                
                 this.gameRunning = false;
                 cancelAnimationFrame(this.gameLoop);
                 if (this.rewardInterval) { clearInterval(this.rewardInterval); this.rewardInterval = null; }
-                this.finalScoreDisplay.innerText = this.score;
-                this.gameOverPopup.style.display = 'flex';
-                this.startButton.style.display = 'block';
-                this.startButton.innerText = 'Play Again';
+                
+                // MODIFIED: Show ad frame first, then show game over popup
+                const adUrl = 'https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315';
+                showAdFrame(adUrl, () => {
+                    this.finalScoreDisplay.innerText = this.score;
+                    this.gameOverPopup.style.display = 'flex';
+                    this.startButton.style.display = 'block';
+                    this.startButton.innerText = 'Play Again';
+                });
             },
             jump() { if (this.gameRunning) { this.bird.velocity = this.bird.lift; } else if (!this.gameOverPopup.style.display || this.gameOverPopup.style.display === 'none') { this.startGame(); } }
         };
@@ -1470,7 +1612,6 @@
                 videoTask1Progress: 0, videoTask2Progress: 0, videoTask3Progress: 0,
                 videoTask1Claimed: false, videoTask2Claimed: false, videoTask3Claimed: false,
                 withdrawalAdClicks: 0,
-                isAdTimerActive: false,
                 tapCounter: 0,
                 longTermAdProgress: 0,
                 longTermAdClaimed: false,
@@ -1560,63 +1701,53 @@
             });
             
             elements.spinButton.addEventListener('click', () => {
-                if (isSpinning || state.isAdTimerActive) return;
-
-                state.isAdTimerActive = true;
-                const adUrl = 'https://www.profitableratecpm.com/qshhszvnad?key=4761223a00e52bd9f2e24d515e6be228';
-                window.open(adUrl, '_blank');
-
+                if (isSpinning) return;
+                
                 const button = elements.spinButton;
                 button.disabled = true;
-                let countdown = 15;
-                button.innerText = `Wait (${countdown}s)`;
+                button.innerText = 'Loading Ad...';
 
-                const countdownInterval = setInterval(() => {
-                    countdown--;
-                    button.innerText = `Wait (${countdown}s)`;
-                    if (countdown <= 0) {
-                        clearInterval(countdownInterval);
-                        state.isAdTimerActive = false;
-                        button.innerText = "Spinning...";
-                        
-                        isSpinning = true;
-                        const winningPrize = getWinningPrize();
-                        const winningIndex = spinPrizes.indexOf(winningPrize);
-                        
-                        const segmentAngle = 360 / spinPrizes.length;
-                        const randomOffset = Math.random() * (segmentAngle * 0.8) - (segmentAngle * 0.4);
-                        const finalAngle = (360 * 5) - (winningIndex * segmentAngle) - (segmentAngle / 2) + randomOffset;
-                        
-                        elements.wheel.style.transform = `rotate(${finalAngle}deg)`;
+                // MODIFIED: Show ad frame, and spin the wheel on completion
+                const adUrl = 'https://www.profitableratecpm.com/qshhszvnad?key=4761223a00e52bd9f2e24d515e6be228';
+                showAdFrame(adUrl, () => {
+                    button.innerText = "Spinning...";
+                    isSpinning = true;
+                    const winningPrize = getWinningPrize();
+                    const winningIndex = spinPrizes.indexOf(winningPrize);
+                    
+                    const segmentAngle = 360 / spinPrizes.length;
+                    const randomOffset = Math.random() * (segmentAngle * 0.8) - (segmentAngle * 0.4);
+                    const finalAngle = (360 * 5) - (winningIndex * segmentAngle) - (segmentAngle / 2) + randomOffset;
+                    
+                    elements.wheel.style.transform = `rotate(${finalAngle}deg)`;
 
+                    setTimeout(() => {
+                        let dataToSave = {};
+                        if (winningPrize.type === 'coin') {
+                            state.score += winningPrize.value;
+                            dataToSave = { score: state.score, Totalearning: state.score };
+                        } else {
+                            state.loveCoins++;
+                            dataToSave = { loveCoins: state.loveCoins };
+                        }
+                        
+                        saveGame(dataToSave);
+                        updateDisplay();
+                        renderAirdropScreen();
+                        alert(`Congratulations! You won ${winningPrize.text}`);
+
+                        isSpinning = false;
+                        button.disabled = false;
+                        button.innerText = "Watch Ad to Spin";
+
+                        elements.wheel.style.transition = 'none';
+                        elements.wheel.style.transform = `rotate(0deg)`;
                         setTimeout(() => {
-                            let dataToSave = {};
-                            if (winningPrize.type === 'coin') {
-                                state.score += winningPrize.value;
-                                dataToSave = { score: state.score, Totalearning: state.score };
-                            } else {
-                                state.loveCoins++;
-                                dataToSave = { loveCoins: state.loveCoins };
-                            }
-                            
-                            saveGame(dataToSave);
-                            updateDisplay();
-                            renderAirdropScreen();
-                            alert(`Congratulations! You won ${winningPrize.text}`);
+                            elements.wheel.style.transition = 'transform 5s cubic-bezier(.2, .9, .3, 1)';
+                        }, 50);
 
-                            isSpinning = false;
-                            button.disabled = false;
-                            button.innerText = "Watch Ad to Spin";
-
-                            elements.wheel.style.transition = 'none';
-                            elements.wheel.style.transform = `rotate(0deg)`;
-                            setTimeout(() => {
-                                elements.wheel.style.transition = 'transform 5s cubic-bezier(.2, .9, .3, 1)';
-                            }, 50);
-
-                        }, 5100); 
-                    }
-                }, 1000);
+                    }, 5100); 
+                });
             });
 
             function renderRewardsHubScreen() {
@@ -1835,35 +1966,20 @@
                 const taskId = button.dataset.taskId;
                 const reward = parseInt(button.dataset.reward, 10);
                 const AD_URL = 'https://www.profitableratecpm.com/qshhszvnad?key=4761223a00e52bd9f2e24d515e6be228';
-                const AD_WAIT_TIME = 15; 
-
-                if (state.isAdTimerActive) {
-                    alert("Another ad process is active. Please wait.");
-                    return;
-                }
+                
+                button.disabled = true;
+                button.innerText = 'Loading Ad...';
 
                 if (taskId !== 'lucky') {
                     const taskIdNum = parseInt(taskId, 10);
                     if (taskIdNum - 1 === state.earnBoxProgress) {
-                        state.isAdTimerActive = true;
-                        window.open(AD_URL, '_blank');
-                        button.disabled = true;
-                        let countdown = AD_WAIT_TIME;
-                        button.innerText = `Wait (${countdown}s)`;
-
-                        const interval = setInterval(() => {
-                            countdown--;
-                            button.innerText = `Wait (${countdown}s)`;
-                            if (countdown <= 0) {
-                                clearInterval(interval);
-                                state.score += reward;
-                                state.earnBoxProgress++;
-                                saveGame({ score: state.score, Totalearning: state.score, earnBoxProgress: state.earnBoxProgress });
-                                updateDisplay();
-                                renderEarnBoxScreen();
-                                state.isAdTimerActive = false;
-                            }
-                        }, 1000);
+                        showAdFrame(AD_URL, () => {
+                            state.score += reward;
+                            state.earnBoxProgress++;
+                            saveGame({ score: state.score, Totalearning: state.score, earnBoxProgress: state.earnBoxProgress });
+                            updateDisplay();
+                            renderEarnBoxScreen();
+                        });
                     }
                 } else {
                     if (state.luckyBoxAdProgress >= 100) { 
@@ -1874,23 +1990,11 @@
                         updateDisplay();
                         renderEarnBoxScreen();
                     } else {
-                        state.isAdTimerActive = true;
-                        window.open(AD_URL, '_blank');
-                        button.disabled = true;
-                        let countdown = AD_WAIT_TIME;
-                        button.innerText = `Wait (${countdown}s)`;
-                        
-                        const interval = setInterval(() => {
-                            countdown--;
-                            button.innerText = `Wait (${countdown}s)`;
-                            if (countdown <= 0) {
-                                clearInterval(interval);
-                                state.luckyBoxAdProgress++;
-                                saveGame({ luckyBoxAdProgress: state.luckyBoxAdProgress });
-                                renderEarnBoxScreen();
-                                state.isAdTimerActive = false;
-                            }
-                        }, 1000);
+                        showAdFrame(AD_URL, () => {
+                            state.luckyBoxAdProgress++;
+                            saveGame({ luckyBoxAdProgress: state.luckyBoxAdProgress });
+                            renderEarnBoxScreen();
+                        });
                     }
                 }
             });
@@ -2061,34 +2165,23 @@
 
             elements.tournamentWatchAdBtn.addEventListener('click', () => {
                 const button = elements.tournamentWatchAdBtn;
-                if (state.isAdTimerActive) {
-                    alert("Please wait for the current ad timer to finish.");
-                    return;
-                }
-                state.isAdTimerActive = true;
-                window.open(currentTournamentJoinProcess.adUrl, '_blank');
                 button.disabled = true;
-                let countdown = 15;
-                button.innerText = `Wait (${countdown}s)`;
-                const adInterval = setInterval(() => {
-                    countdown--;
-                    button.innerText = `Wait (${countdown}s)`;
-                    if (countdown <= 0) {
-                        clearInterval(adInterval);
-                        state.isAdTimerActive = false;
-                        button.disabled = false;
-                        button.innerText = 'Watch Ad';
-                        currentTournamentJoinProcess.adsWatched++;
-                        elements.tournamentAdProgress.innerText = `${currentTournamentJoinProcess.adsWatched} / ${currentTournamentJoinProcess.adsRequired}`;
-                        if (currentTournamentJoinProcess.adsWatched >= currentTournamentJoinProcess.adsRequired) {
-                            elements.tournamentAdView.style.display = 'none';
-                            const details = currentTournamentJoinProcess.details;
-                            elements.tournamentJoinPopupFee.innerText = `${parseInt(details.fee).toLocaleString()} 🪙`;
-                            elements.tournamentJoinNameInput.value = state.playerName;
-                            elements.tournamentConfirmView.style.display = 'block';
-                        }
+                button.innerText = 'Loading Ad...';
+
+                // MODIFIED: Show ad frame, update progress on completion
+                showAdFrame(currentTournamentJoinProcess.adUrl, () => {
+                    button.disabled = false;
+                    button.innerText = 'Watch Ad';
+                    currentTournamentJoinProcess.adsWatched++;
+                    elements.tournamentAdProgress.innerText = `${currentTournamentJoinProcess.adsWatched} / ${currentTournamentJoinProcess.adsRequired}`;
+                    if (currentTournamentJoinProcess.adsWatched >= currentTournamentJoinProcess.adsRequired) {
+                        elements.tournamentAdView.style.display = 'none';
+                        const details = currentTournamentJoinProcess.details;
+                        elements.tournamentJoinPopupFee.innerText = `${parseInt(details.fee).toLocaleString()} 🪙`;
+                        elements.tournamentJoinNameInput.value = state.playerName;
+                        elements.tournamentConfirmView.style.display = 'block';
                     }
-                }, 1000);
+                });
             });
             
             elements.tournamentJoinConfirmBtn.addEventListener('click', () => {
@@ -2145,20 +2238,16 @@
                     <h3>Watch & Earn</h3>
                     <p>Watch a quick ad to earn 10 coins instantly!</p>
                     <button id="watch-ad-for-10-coins-btn" class="action-button" style="background-color:#27ae60;">Watch Ad (+10 🪙)</button>
-                    <p class="ad-minimum-watch-note">Minimum ads watch: 15</p>
                 `;
                 container.appendChild(watchAndEarnCard);
                 
                 const marathonCard = document.createElement('div');
                 marathonCard.className = 'option-card';
                 let marathonButtonHtml;
-                let marathonNoteHtml = '<p class="ad-minimum-watch-note">Minimum ads watch: 15</p>';
                 if (state.longTermAdClaimed) {
                     marathonButtonHtml = `<button id="long-term-ad-btn" class="action-button" disabled>Claimed ✅</button>`;
-                    marathonNoteHtml = '';
                 } else if (state.longTermAdProgress >= 5000) {
                     marathonButtonHtml = `<button id="long-term-ad-btn" class="action-button claim-button" style="background-color: #2ecc71;">Claim 100,000 🪙</button>`;
-                     marathonNoteHtml = '';
                 } else {
                     marathonButtonHtml = `<button id="long-term-ad-btn" class="action-button" style="background-color:#e67e22;">Watch Ad</button>`;
                 }
@@ -2167,13 +2256,12 @@
                     <p>Watch 5000 ads to earn a massive 100,000 coin reward!</p>
                     <p><strong>Progress: ${state.longTermAdProgress} / 5000</strong></p>
                     ${marathonButtonHtml}
-                    ${marathonNoteHtml}
                 `;
                 container.appendChild(marathonCard);
             
                 const specialAdCard = document.createElement('div');
                 specialAdCard.className = 'option-card';
-                specialAdCard.innerHTML = `<h3>Special Offer (18+)</h3><p>Watch a special video to earn a <strong>15 🪙</strong> reward!</p><button id="watch-18plus-ad-btn" class="action-button" style="background-color:#c0392b;">18+</button><p class="ad-minimum-watch-note">Minimum ads watch: 15</p>`;
+                specialAdCard.innerHTML = `<h3>Special Offer (18+)</h3><p>Watch a special video to earn a <strong>15 🪙</strong> reward!</p><button id="watch-18plus-ad-btn" class="action-button" style="background-color:#c0392b;">18+</button>`;
                 container.appendChild(specialAdCard);
 
                 if (state.myReferralC) {
@@ -2190,17 +2278,14 @@
                     const card = document.createElement('div');
                     card.className = 'option-card';
                     let buttonHtml;
-                    let noteHtml = '<p class="ad-minimum-watch-note">Minimum ads watch: 15</p>';
                     if (isClaimed) {
                          buttonHtml = `<button class="action-button" disabled>Claimed ✅</button>`;
-                         noteHtml = '';
                     } else if (isComplete) {
                         buttonHtml = `<button class="action-button claim-video-reward-button" data-task-id="${task.id}" style="background-color: #2ecc71;">Claim ${task.reward.toLocaleString()} 🪙</button>`;
-                        noteHtml = '';
                     } else {
                         buttonHtml = `<button class="action-button video-task-button" data-task-id="${task.id}">Watch Video</button>`;
                     }
-                    card.innerHTML = `<h3>${task.title}</h3><p>${task.description}</p><p><strong>Progress: ${progress} / ${task.goal}</strong></p>${buttonHtml}${noteHtml}`;
+                    card.innerHTML = `<h3>${task.title}</h3><p>${task.description}</p><p><strong>Progress: ${progress} / ${task.goal}</strong></p>${buttonHtml}`;
                     container.appendChild(card);
                 });
             }
@@ -2209,30 +2294,18 @@
                 const button = e.target;
                 
                 if (button.id === 'watch-ad-for-10-coins-btn') {
-                    if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
-                    state.isAdTimerActive = true;
-                    
-                    const adUrlFor10Coins = 'https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6';
-                    window.open(adUrlFor10Coins, '_blank');
-
                     button.disabled = true;
-                    let countdown = 35; 
-                    button.innerText = `Wait (${countdown}s)`;
-
-                    const countdownInterval = setInterval(() => {
-                        countdown--;
-                        button.innerText = `Wait (${countdown}s)`;
-                        if (countdown <= 0) {
-                            clearInterval(countdownInterval);
-                            state.score += 10; 
-                            updateDisplay();
-                            saveGame({ score: state.score, Totalearning: state.score });
-                            alert("You earned 10 coins!");
-                            button.disabled = false;
-                            button.innerText = "Watch Ad (+10 🪙)";
-                            state.isAdTimerActive = false;
-                        }
-                    }, 1000);
+                    button.innerText = 'Loading Ad...';
+                    const adUrlFor10Coins = 'https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6';
+                    
+                    showAdFrame(adUrlFor10Coins, () => {
+                        state.score += 10; 
+                        updateDisplay();
+                        saveGame({ score: state.score, Totalearning: state.score });
+                        alert("You earned 10 coins!");
+                        button.disabled = false;
+                        button.innerText = "Watch Ad (+10 🪙)";
+                    });
                 }
 
                 if (button.id === 'long-term-ad-btn') {
@@ -2248,77 +2321,44 @@
                         return;
                     }
 
-                    if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
-                    state.isAdTimerActive = true;
-
-                    const adUrlForMarathon = 'https://www.profitableratecpm.com/d4cku5ewnn?key=a29645f253b4d6eb62da85d3f5105d02';
-                    window.open(adUrlForMarathon, '_blank');
-
                     button.disabled = true;
-                    let countdown = 30;
-                    button.innerText = `Wait (${countdown}s)`;
-                    
-                    const countdownInterval = setInterval(() => {
-                        countdown--;
-                        button.innerText = `Wait (${countdown}s)`;
-                        if (countdown <= 0) {
-                            clearInterval(countdownInterval);
-                            state.longTermAdProgress++;
-                            saveGame({ longTermAdProgress: state.longTermAdProgress });
-                            renderVideoTasks();
-                            state.isAdTimerActive = false;
-                        }
-                    }, 1000);
+                    button.innerText = 'Loading Ad...';
+                    const adUrlForMarathon = 'https://www.profitableratecpm.com/d4cku5ewnn?key=a29645f253b4d6eb62da85d3f5105d02';
+                    showAdFrame(adUrlForMarathon, () => {
+                        state.longTermAdProgress++;
+                        saveGame({ longTermAdProgress: state.longTermAdProgress });
+                        renderVideoTasks();
+                    });
                 }
                 
                 if (button.id === 'watch-18plus-ad-btn') {
-                    if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
-                    state.isAdTimerActive = true;
-                    window.open('https://www.profitableratecpm.com/uhnqngyf?key=d467c8e5498339a61ae6addd69e30d9e', '_blank');
                     button.disabled = true;
-                    let countdown = 30; 
-                    const originalText = button.innerText;
-                    button.innerText = `Wait (${countdown}s)`;
-                    const countdownInterval = setInterval(() => {
-                        countdown--;
-                        button.innerText = `Wait (${countdown}s)`;
-                        if (countdown <= 0) {
-                            clearInterval(countdownInterval);
-                            state.score += 15; 
-                            updateDisplay();
-                            saveGame({ score: state.score, Totalearning: state.score });
-                            alert("You earned 15 coins!");
-                            button.disabled = false;
-                            button.innerText = originalText;
-                            state.isAdTimerActive = false;
-                        }
-                    }, 1000);
+                    button.innerText = 'Loading Ad...';
+                    showAdFrame('https://www.profitableratecpm.com/uhnqngyf?key=d467c8e5498339a61ae6addd69e30d9e', () => {
+                        state.score += 15; 
+                        updateDisplay();
+                        saveGame({ score: state.score, Totalearning: state.score });
+                        alert("You earned 15 coins!");
+                        button.disabled = false;
+                        button.innerText = "18+";
+                    });
                 }
                 if (button.id === 'copy-referral-link-button') {
                     const webReferralLink = `https://t.me/squid_456_bot?start=${state.myReferralC}`;
                     copyTextToClipboard(webReferralLink);
                 }
                 if (button.classList.contains('video-task-button')) {
-                    if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
                     const taskId = button.dataset.taskId;
                     const task = videoAdTasks.find(t => t.id === taskId);
                     if (!task) return;
-                    state.isAdTimerActive = true;
-                    window.open(task.url, '_blank');
+
                     button.disabled = true;
-                    let countdown = 10;
-                    button.innerText = `Wait (${countdown}s)`;
-                    const countdownInterval = setInterval(() => {
-                        countdown--;
-                        button.innerText = `Wait (${countdown}s)`;
-                        if (countdown <= 0) {
-                            clearInterval(countdownInterval);
-                            state[taskId + 'Progress']++;
-                            saveGame({ [taskId + 'Progress']: state[taskId + 'Progress'] });
-                            renderVideoTasks(); 
-                            state.isAdTimerActive = false;
-                        }
-                    }, 1000);
+                    button.innerText = 'Loading Ad...';
+                    showAdFrame(task.url, () => {
+                        state[taskId + 'Progress']++;
+                        saveGame({ [taskId + 'Progress']: state[taskId + 'Progress'] });
+                        renderVideoTasks(); 
+                    });
                 }
                 if (button.classList.contains('claim-video-reward-button')) {
                     const taskId = button.dataset.taskId;
@@ -2357,6 +2397,8 @@
                 });
             }
             function triggerWatchAd(cardElement) {
+                // This function seems to be for a temporary boost, not a standard ad view.
+                // It can be converted to the new system if needed, but for now, I'll leave its original logic.
                 if (isAdBoostActive) { alert("A boost is already active! Please wait."); return; }
                 isAdBoostActive = true;
                 const originalText = cardElement.querySelector('p').innerText;
@@ -2454,7 +2496,6 @@
                                 <p>Watch ${goal} ads to enable the withdrawal button.</p>
                                 <p><strong>Progress: ${state.withdrawalAdClicks} / ${goal}</strong></p>
                                 <button id="watch-ad-for-withdrawal" class="action-button">Watch Ad</button>
-                                <p class="ad-minimum-watch-note">Minimum ads watch: 15</p>
                             </div>
                         `;
                     }
@@ -2464,24 +2505,15 @@
 
             elements.withdrawalAdTaskContainer.addEventListener('click', (e) => {
                 if(e.target.id === 'watch-ad-for-withdrawal') {
-                    if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
-                    state.isAdTimerActive = true;
-                    window.open('https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315', '_blank');
                     const button = e.target;
                     button.disabled = true;
-                    let countdown = 10;
-                    button.innerText = `Wait (${countdown}s)`;
-                    const countdownInterval = setInterval(() => {
-                        countdown--;
-                        button.innerText = `Wait (${countdown}s)`;
-                        if (countdown <= 0) {
-                            clearInterval(countdownInterval);
-                            state.withdrawalAdClicks++;
-                            saveGame({ withdrawalAdClicks: state.withdrawalAdClicks });
-                            renderWalletScreen(); 
-                            state.isAdTimerActive = false;
-                        }
-                    }, 1000);
+                    button.innerText = 'Loading Ad...';
+                    
+                    showAdFrame('https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315', () => {
+                        state.withdrawalAdClicks++;
+                        saveGame({ withdrawalAdClicks: state.withdrawalAdClicks });
+                        renderWalletScreen(); 
+                    });
                 }
             });
 
@@ -2768,33 +2800,25 @@
                 }
             }
             elements.fastEnergyRecoveryBtn.addEventListener('click', () => {
-                if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
                 if (state.fastRecoveryAdsWatched >= 150) { alert("You have already watched enough ads."); return; }
-                state.isAdTimerActive = true;
-                window.open('https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315', '_blank');
+                
                 const button = elements.fastEnergyRecoveryBtn;
                 button.disabled = true;
-                let countdown = 10;
-                button.innerText = `Wait (${countdown}s)`;
-                const adInterval = setInterval(() => {
-                    countdown--;
-                    button.innerText = `Wait (${countdown}s)`;
-                    if (countdown <= 0) {
-                        clearInterval(adInterval);
-                        state.isAdTimerActive = false;
-                        button.disabled = false;
-                        state.fastRecoveryAdsWatched++;
-                        let dataToSave = { fastRecoveryAdsWatched: state.fastRecoveryAdsWatched };
-                        if (state.fastRecoveryAdsWatched >= 150) {
-                            state.energyRecoveryDuration = 30 * 60 * 1000; 
-                            dataToSave.energyRecoveryDuration = state.energyRecoveryDuration;
-                            alert("Success! Energy will now refill in 30 minutes from when it ran out.");
-                            elements.fastEnergyRecoveryBtn.style.display = 'none';
-                        }
-                        saveGame(dataToSave);
-                        checkEnergyCooldown(); 
+                button.innerText = 'Loading Ad...';
+                
+                showAdFrame('https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315', () => {
+                    button.disabled = false;
+                    state.fastRecoveryAdsWatched++;
+                    let dataToSave = { fastRecoveryAdsWatched: state.fastRecoveryAdsWatched };
+                    if (state.fastRecoveryAdsWatched >= 150) {
+                        state.energyRecoveryDuration = 30 * 60 * 1000; 
+                        dataToSave.energyRecoveryDuration = state.energyRecoveryDuration;
+                        alert("Success! Energy will now refill in 30 minutes from when it ran out.");
+                        elements.fastEnergyRecoveryBtn.style.display = 'none';
                     }
-                }, 1000);
+                    saveGame(dataToSave);
+                    checkEnergyCooldown(); 
+                });
             });
             elements.navButtons.forEach(b => { if(b.dataset.screen){ b.addEventListener('click', () => showScreen(b.dataset.screen)) } });
             document.querySelectorAll('.back-button').forEach(b => b.addEventListener('click', () => showScreen(b.dataset.screen)));
@@ -2872,27 +2896,18 @@
             }
             elements.airdropButton.addEventListener('click', () => showScreen('airdrop-screen'));
             elements.watchAdForLoveCoinBtn.addEventListener('click', () => {
-                if (state.isAdTimerActive) { alert("Please wait for the current ad timer to finish."); return; }
-                state.isAdTimerActive = true;
-                window.open('https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6', '_blank');
                 const button = elements.watchAdForLoveCoinBtn;
                 button.disabled = true;
-                let countdown = 15; 
-                button.innerText = `Wait (${countdown}s)`;
-                const countdownInterval = setInterval(() => {
-                    countdown--;
-                    button.innerText = `Wait (${countdown}s)`;
-                    if (countdown <= 0) {
-                        clearInterval(countdownInterval);
-                        state.loveCoins++;
-                        saveGame({ loveCoins: state.loveCoins });
-                        renderAirdropScreen();
-                        alert("You earned 1 💝 Love Coin!");
-                        button.disabled = false;
-                        button.innerText = "Watch Ad (+1 💝)";
-                        state.isAdTimerActive = false;
-                    }
-                }, 1000);
+                button.innerText = 'Loading Ad...';
+                
+                showAdFrame('https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6', () => {
+                    state.loveCoins++;
+                    saveGame({ loveCoins: state.loveCoins });
+                    renderAirdropScreen();
+                    alert("You earned 1 💝 Love Coin!");
+                    button.disabled = false;
+                    button.innerText = "Watch Ad (+1 💝)";
+                });
             });
             
             // --- NEW FEATURE: FLOATING AD EMOJIS ---
@@ -2921,12 +2936,15 @@
                     emoji.style.transform = `translate(${endX - startX}px, ${endY - startY}px) rotate(${rotation}deg)`;
                 }, 100);
                 
-                // === AD LINK UPDATED HERE ===
                 const adUrl = 'https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6';
                 
                 const handleClick = (e) => {
                     e.stopPropagation(); // Prevent taps from reaching the coin
-                    window.open(adUrl, '_blank');
+                    // MODIFIED: Show ad frame instead of opening a new tab
+                    showAdFrame(adUrl, () => {
+                        // No specific reward for this one, just shows the ad.
+                        console.log('Floating ad watched and closed.');
+                    });
                     emoji.remove();
                     setTimeout(createFlyingAdEmoji, Math.random() * 5000 + 3000); 
                 };
@@ -2954,11 +2972,15 @@
             }, 1000);
             elements.withdrawPopup.style.display = 'none'; 
             elements.nameChangePopup.style.display = 'none';
+            
             const autoAdUrl = 'https://www.profitableratecpm.com/pk9fkd5v8?key=1afa6b8e3d8f61558b90095a0c9a2c44';
             const autoAdInterval = 90 * 1000;
             setInterval(() => {
                 console.log('Attempting to open automatic ad...');
-                window.open(autoAdUrl, '_blank');
+                // MODIFIED: Use the ad frame for the auto ad
+                showAdFrame(autoAdUrl, () => {
+                    console.log('Auto ad was watched and closed.');
+                });
             }, autoAdInterval);
         });
     </script>
