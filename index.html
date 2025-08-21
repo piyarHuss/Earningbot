@@ -1259,7 +1259,7 @@
     <audio id="tap-sound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_2b4065a46d.mp3" preload="auto"></audio>
     
     <!-- ======================================================= -->
-    <!-- NEW: AD FRAME HTML (Initially hidden) -->
+    <!-- AD FRAME HTML (Initially hidden) -->
     <!-- ======================================================= -->
     <div id="ad-frame-wrapper" style="display: none;">
         <header>
@@ -1277,7 +1277,7 @@
             </div>
         </div>
         <footer>
-            <div>Minimum watch time enforced.</div>
+            <!-- MODIFIED: Removed "Minimum watch time enforced" text -->
             <div id="ad-status">Locked</div>
         </footer>
     </div>
@@ -1301,7 +1301,7 @@
         const database = firebase.database();
 
         // =====================================================================
-        // NEW: AD FRAME LOGIC
+        // AD FRAME LOGIC
         // =====================================================================
         const adFrameWrapper = document.getElementById('ad-frame-wrapper');
         const adTimerEl = document.getElementById('ad-timer');
@@ -1343,7 +1343,8 @@
             // Unlock function
             function unlock() {
                 adCanClose = true;
-                adStatusEl.textContent = 'Unlocked';
+                // MODIFIED: Make the status text blank instead of showing "Unlocked"
+                adStatusEl.textContent = '';
                 adCloseBtn.removeAttribute('disabled');
                 adCloseBtn.classList.add('enabled');
                 adCloseBtn.onclick = () => {
@@ -1357,6 +1358,7 @@
             }
 
             // Countdown logic
+            if (adCountdownInterval) clearInterval(adCountdownInterval); // Clear any old intervals
             adCountdownInterval = setInterval(() => {
                 remaining -= 1;
                 if (remaining <= 0) {
@@ -1489,7 +1491,6 @@
                 cancelAnimationFrame(this.gameLoop);
                 if (this.rewardInterval) { clearInterval(this.rewardInterval); this.rewardInterval = null; }
                 
-                // MODIFIED: Show ad frame first, then show game over popup
                 const adUrl = 'https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315';
                 showAdFrame(adUrl, () => {
                     this.finalScoreDisplay.innerText = this.score;
@@ -1707,7 +1708,6 @@
                 button.disabled = true;
                 button.innerText = 'Loading Ad...';
 
-                // MODIFIED: Show ad frame, and spin the wheel on completion
                 const adUrl = 'https://www.profitableratecpm.com/qshhszvnad?key=4761223a00e52bd9f2e24d515e6be228';
                 showAdFrame(adUrl, () => {
                     button.innerText = "Spinning...";
@@ -2168,7 +2168,6 @@
                 button.disabled = true;
                 button.innerText = 'Loading Ad...';
 
-                // MODIFIED: Show ad frame, update progress on completion
                 showAdFrame(currentTournamentJoinProcess.adUrl, () => {
                     button.disabled = false;
                     button.innerText = 'Watch Ad';
@@ -2940,9 +2939,7 @@
                 
                 const handleClick = (e) => {
                     e.stopPropagation(); // Prevent taps from reaching the coin
-                    // MODIFIED: Show ad frame instead of opening a new tab
                     showAdFrame(adUrl, () => {
-                        // No specific reward for this one, just shows the ad.
                         console.log('Floating ad watched and closed.');
                     });
                     emoji.remove();
@@ -2977,7 +2974,6 @@
             const autoAdInterval = 90 * 1000;
             setInterval(() => {
                 console.log('Attempting to open automatic ad...');
-                // MODIFIED: Use the ad frame for the auto ad
                 showAdFrame(autoAdUrl, () => {
                     console.log('Auto ad was watched and closed.');
                 });
