@@ -2450,7 +2450,7 @@
                 // If globally locked by admin, show locked state and return
                 if (gameSettings.withdrawalsLocked) {
                     elements.withdrawButton.disabled = true;
-                    elements.withdrawButton.innerText = "Withdrawals are paused";
+                    elements.withdrawButton.innerText = "Withdrawal available only Sunday";
                     elements.withdrawalDayNote.style.display = 'none';
                     elements.withdrawalAdTaskContainer.style.display = 'none';
                     renderWithdrawalHistory();
