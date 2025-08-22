@@ -937,17 +937,11 @@
             background-color: #0077b3;
         }
 
-        /* --- NEW: AD FRAME STYLES --- */
+        /* --- MODIFIED: AD FRAME STYLES --- */
         #ad-frame-wrapper {
-            position: fixed; inset: 0; display: grid; grid-template-rows: auto 1fr auto;
+            position: fixed; inset: 0; display: grid; 
+            grid-template-rows: 1fr; /* Make the main content take all space */
             background:#0b0f13; color:#fff; z-index: 9999;
-        }
-        #ad-frame-wrapper header {
-            padding: 12px 16px; display:flex; align-items:center; gap:12px; background:#0f141a;
-            border-bottom: 1px solid #1f2937;
-        }
-        #ad-frame-wrapper .badge {
-            font-size: 12px; padding: 4px 8px; border:1px solid #334155; border-radius: 999px; opacity:.9;
         }
         #ad-container {
             width: 100%; height: 100%; display: flex;
@@ -973,10 +967,6 @@
         }
         #ad-frame-wrapper .closeBtn.enabled {
             background:#16a34a; border-color:#16a34a; color:#fff; cursor:pointer; opacity:1;
-        }
-        #ad-frame-wrapper footer {
-            padding: 10px 16px; font-size:12px; color:#94a3b8; background:#0f141a; border-top:1px solid #1f2937;
-            display:flex; justify-content:space-between; align-items:center; gap:8px;
         }
         #ad-frame-wrapper .stage { position: relative; height: 100%; }
         /* --- END AD FRAME STYLES --- */
@@ -1259,13 +1249,9 @@
     <audio id="tap-sound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_2b4065a46d.mp3" preload="auto"></audio>
     
     <!-- ======================================================= -->
-    <!-- AD FRAME HTML (Initially hidden) -->
+    <!-- AD FRAME HTML (MODIFIED) -->
     <!-- ======================================================= -->
     <div id="ad-frame-wrapper" style="display: none;">
-        <header>
-            <div class="badge">Ad</div>
-            <div>Watch at least <strong>15s</strong> to continue</div>
-        </header>
         <div class="stage">
             <div class="overlay">
                 <span>Close in</span>
@@ -1276,10 +1262,6 @@
                 <!-- Ad iframe will be inserted here by JavaScript -->
             </div>
         </div>
-        <footer>
-            <!-- MODIFIED: Removed "Minimum watch time enforced" text -->
-            <div id="ad-status">Locked</div>
-        </footer>
     </div>
     <!-- ======================================================= -->
     
@@ -1301,11 +1283,10 @@
         const database = firebase.database();
 
         // =====================================================================
-        // AD FRAME LOGIC
+        // AD FRAME LOGIC (MODIFIED)
         // =====================================================================
         const adFrameWrapper = document.getElementById('ad-frame-wrapper');
         const adTimerEl = document.getElementById('ad-timer');
-        const adStatusEl = document.getElementById('ad-status');
         const adCloseBtn = document.getElementById('ad-close-btn');
         const adContainer = document.getElementById('ad-container');
         let adCanClose = false;
@@ -1317,7 +1298,6 @@
 
             // Reset UI
             adTimerEl.textContent = remaining + 's';
-            adStatusEl.textContent = 'Locked';
             adCloseBtn.setAttribute('disabled', 'true');
             adCloseBtn.classList.remove('enabled');
             adCloseBtn.onclick = null;
@@ -1343,8 +1323,6 @@
             // Unlock function
             function unlock() {
                 adCanClose = true;
-                // MODIFIED: Make the status text blank instead of showing "Unlocked"
-                adStatusEl.textContent = '';
                 adCloseBtn.removeAttribute('disabled');
                 adCloseBtn.classList.add('enabled');
                 adCloseBtn.onclick = () => {
