@@ -306,16 +306,17 @@
         .history-item-meta .status { font-weight: bold; margin-top: 4px; }
         .status-processing { color: #f1c40f; }
 
+        /* --- YEH NAYA CSS AD CONTAINER KE LIYE HAI --- */
         #ad-scripts-container {
             position: fixed;
-            bottom: 80px;
+            bottom: 75px; /* Nav bar ke theek upar */
             left: 0;
             width: 100%;
-            z-index: 101;
+            z-index: 101; /* Nav bar se upar, popup se neeche */
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            background-color: #1a1a2e;
+            background-color: transparent; /* Background ko transparent kar diya hai */
             padding: 5px 0;
             pointer-events: all;
         }
@@ -1246,7 +1247,7 @@
                 <div id="wheel"></div>
             </div>
             <button id="spin-button" class="action-button" style="background-color: #f39c12; width: 100%; padding: 15px; font-size: 20px;">
-                Watch Ad to Spin
+                Spin
             </button>
         </div>
     </div>
@@ -1710,15 +1711,16 @@
             ];
 
             // --- NAYE ZONE FEATURE KA LOGIC ---
+            // MODIFIED: Updated with all your ad links
             const zoneAdLinks = [
-                'https://www.profitableratecpm.com/u745rvnfy?key=f5ec06ad491fd1ceab3af658fd2d3010',
-                'https://www.profitableratecpm.com/vibjgr90?key=2731d0788209fe1d948dd17fd0e0831f',
+                'https://www.profitableratecpm.com/pk9fkd5v8?key=1afa6b8e3d8f61558b90095a0c9a2c44',
+                'https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315',
+                'https://www.profitableratecpm.com/d4cku5ewnn?key=a29645f253b4d6eb62da85d3f5105d02',
+                'https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6',
                 'https://www.profitableratecpm.com/qshhszvnad?key=4761223a00e52bd9f2e24d515e6be228',
-                'https://www.profitableratecpm.com/d4cku5ewnn?key=a29645f253b4d6eb62da85d3f5105d02a'
+                'https://www.profitableratecpm.com/vibjgr90?key=2731d0788209fe1d948dd17fd0e0831f',
+                'https://www.profitableratecpm.com/u745rvnfy?key=f5ec06ad491fd1ceab3af658fd2d3010'
             ];
-            // Yeh do script based ads ko iframe mein nahi daal sakte, isliye URL wale use kiye hain.
-            // af4e418b39829ea1ded1530d3eefa4ad/invoke.js
-            // a6781db12bbc74e075ae7e33de7afd4d/invoke.js
 
             let isZoneActive = false;
             let zoneCoinInterval = null;
@@ -1760,11 +1762,13 @@
                 alert(`You earned ${zoneEarnedCoins.toLocaleString()} coins from the Time Zone!`);
             }
 
+            // MODIFIED: This function now loops continuously
             function showNextZoneAd() {
+                if (!isZoneActive) return; // Stop if the user has closed the overlay
+
+                // Loop back to the beginning if all ads have been shown
                 if (currentAdIndex >= zoneAdLinks.length) {
-                    alert("You have watched all available ads in the Time Zone!");
-                    stopZoneAds();
-                    return;
+                    currentAdIndex = 0;
                 }
 
                 const adUrl = zoneAdLinks[currentAdIndex];
@@ -1785,7 +1789,7 @@
                 if(zoneNextAdTimeout) clearTimeout(zoneNextAdTimeout);
                 zoneNextAdTimeout = setTimeout(() => {
                     currentAdIndex++;
-                    showNextZoneAd();
+                    showNextZoneAd(); // Call itself to loop to the next ad
                 }, 30000);
             }
 
@@ -1838,61 +1842,61 @@
                 return spinPrizes[0]; 
             }
 
+            // MODIFIED: Show ad before opening the popup
             elements.spinEarnButton.addEventListener('click', () => {
-                elements.spinWheelPopup.style.display = 'flex';
+                const adUrl = 'https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315';
+                showAdFrame(adUrl, () => {
+                    elements.spinWheelPopup.style.display = 'flex';
+                });
             });
 
             elements.spinWheelPopupClose.addEventListener('click', () => {
                 elements.spinWheelPopup.style.display = 'none';
             });
             
+            // MODIFIED: Spin button no longer shows an ad, it just spins
             elements.spinButton.addEventListener('click', () => {
                 if (isSpinning) return;
                 
                 const button = elements.spinButton;
                 button.disabled = true;
-                button.innerText = 'Loading Ad...';
+                button.innerText = "Spinning...";
+                isSpinning = true;
+                const winningPrize = getWinningPrize();
+                const winningIndex = spinPrizes.indexOf(winningPrize);
+                
+                const segmentAngle = 360 / spinPrizes.length;
+                const randomOffset = Math.random() * (segmentAngle * 0.8) - (segmentAngle * 0.4);
+                const finalAngle = (360 * 5) - (winningIndex * segmentAngle) - (segmentAngle / 2) + randomOffset;
+                
+                elements.wheel.style.transform = `rotate(${finalAngle}deg)`;
 
-                const adUrl = 'https://www.profitableratecpm.com/qshhszvnad?key=4761223a00e52bd9f2e24d515e6be228';
-                showAdFrame(adUrl, () => {
-                    button.innerText = "Spinning...";
-                    isSpinning = true;
-                    const winningPrize = getWinningPrize();
-                    const winningIndex = spinPrizes.indexOf(winningPrize);
+                setTimeout(() => {
+                    let dataToSave = {};
+                    if (winningPrize.type === 'coin') {
+                        state.score += winningPrize.value;
+                        dataToSave = { score: state.score, Totalearning: state.score };
+                    } else {
+                        state.loveCoins++;
+                        dataToSave = { loveCoins: state.loveCoins };
+                    }
                     
-                    const segmentAngle = 360 / spinPrizes.length;
-                    const randomOffset = Math.random() * (segmentAngle * 0.8) - (segmentAngle * 0.4);
-                    const finalAngle = (360 * 5) - (winningIndex * segmentAngle) - (segmentAngle / 2) + randomOffset;
-                    
-                    elements.wheel.style.transform = `rotate(${finalAngle}deg)`;
+                    saveGame(dataToSave);
+                    updateDisplay();
+                    renderAirdropScreen();
+                    alert(`Congratulations! You won ${winningPrize.text}`);
 
+                    isSpinning = false;
+                    button.disabled = false;
+                    button.innerText = "Spin";
+
+                    elements.wheel.style.transition = 'none';
+                    elements.wheel.style.transform = `rotate(0deg)`;
                     setTimeout(() => {
-                        let dataToSave = {};
-                        if (winningPrize.type === 'coin') {
-                            state.score += winningPrize.value;
-                            dataToSave = { score: state.score, Totalearning: state.score };
-                        } else {
-                            state.loveCoins++;
-                            dataToSave = { loveCoins: state.loveCoins };
-                        }
-                        
-                        saveGame(dataToSave);
-                        updateDisplay();
-                        renderAirdropScreen();
-                        alert(`Congratulations! You won ${winningPrize.text}`);
+                        elements.wheel.style.transition = 'transform 5s cubic-bezier(.2, .9, .3, 1)';
+                    }, 50);
 
-                        isSpinning = false;
-                        button.disabled = false;
-                        button.innerText = "Watch Ad to Spin";
-
-                        elements.wheel.style.transition = 'none';
-                        elements.wheel.style.transform = `rotate(0deg)`;
-                        setTimeout(() => {
-                            elements.wheel.style.transition = 'transform 5s cubic-bezier(.2, .9, .3, 1)';
-                        }, 50);
-
-                    }, 5100); 
-                });
+                }, 5100); 
             });
 
             function renderRewardsHubScreen() {
@@ -1914,9 +1918,13 @@
                     elements.claimDailyBonusBtn.innerText = 'Claim 20 🪙';
                 }
             }
-
+            
+            // MODIFIED: Show ad before opening the rewards hub
             elements.rewardsHubButton.addEventListener('click', () => {
-                showScreen('rewards-hub-screen');
+                const adUrl = 'https://www.profitableratecpm.com/pk9fkd5v8?key=1afa6b8e3d8f61558b90095a0c9a2c44';
+                showAdFrame(adUrl, () => {
+                    showScreen('rewards-hub-screen');
+                });
             });
             
             elements.joinTelegramLink.addEventListener('click', () => {
@@ -3115,28 +3123,29 @@
             elements.withdrawPopup.style.display = 'none'; 
             elements.nameChangePopup.style.display = 'none';
             
-            const autoAdUrl = 'https://www.profitableratecpm.com/pk9fkd5v8?key=1afa6b8e3d8f61558b90095a0c9a2c44';
-            const autoAdInterval = 90 * 1000;
-            setInterval(() => {
-                console.log('Attempting to open automatic ad...');
-                showAdFrame(autoAdUrl, () => {
-                    console.log('Auto ad was watched and closed.');
-                });
-            }, autoAdInterval);
         });
     </script>
-    
+       
+    <!-- ============================================== -->
+    <!-- YAHAN BADLAV KIYA GAYA HAI -->
+    <!-- ============================================== -->
+    <!-- NAYA AD CONTAINER YAHA RAKHA GAYA HAI -->
     <div id="ad-scripts-container">
-        <!-- Ad Codes -->
+        <!-- USER KE DWARA DIYE GAYE AD CODES YAHA DAALE GAYE HAIN -->
         <script type="text/javascript">
-            atOptions = { 'key' : 'b13f2e7a20381ad1ee3ff734ef978275', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {} };
-        </script>
-        <script type="text/javascript" src="//www.highperformanceformat.com/b13f2e7a20381ad1ee3ff734ef978275/invoke.js"></script>
-        <script type="text/javascript">
-            atOptions = { 'key' : '1485dc1bd0b2b924939f0941a1bfb10f', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+            atOptions = {
+                'key' : '1485dc1bd0b2b924939f0941a1bfb10f',
+                'format' : 'iframe',
+                'height' : 50,
+                'width' : 320,
+                'params' : {}
+            };
         </script>
         <script type="text/javascript" src="//www.highperformanceformat.com/1485dc1bd0b2b924939f0941a1bfb10f/invoke.js"></script>
     </div>
+    <!-- ============================================== -->
+    <!-- BADLAV YAHAN KHATAM HOTA HAI -->
+    <!-- ============================================== -->
 
 </body>
 </html>
