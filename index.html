@@ -161,7 +161,7 @@
             100% { transform: scale(1); box-shadow: 0 0 5px rgba(243, 156, 18, 0.3); }
         }
 
-        #spin-earn-button, #rewards-hub-button {
+        #spin-earn-button, #rewards-hub-button, #zone-button {
             position: absolute;
             left: 20px;
             width: 40px; 
@@ -187,13 +187,22 @@
             background: linear-gradient(45deg, #2ecc71, #27ae60);
             box-shadow: 0 5px 15px rgba(46, 204, 113, 0.5);
         }
+        /* Naye Zone Button ka Style */
+        #zone-button {
+            top: 230px;
+            background: linear-gradient(45deg, #3498db, #9b59b6);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.5);
+        }
 
-        #spin-earn-button:hover, #rewards-hub-button:hover {
+        #spin-earn-button:hover, #rewards-hub-button:hover, #zone-button:hover {
             transform: scale(1.1);
             box-shadow: 0 8px 25px rgba(243, 156, 18, 0.7);
         }
          #rewards-hub-button:hover {
             box-shadow: 0 8px 25px rgba(39, 174, 96, 0.7);
+        }
+         #zone-button:hover {
+            box-shadow: 0 8px 25px rgba(155, 89, 182, 0.7);
         }
 
         @keyframes pulse-boost {
@@ -943,13 +952,6 @@
             grid-template-rows: 1fr; /* Make the main content take all space */
             background:#0b0f13; color:#fff; z-index: 9999;
         }
-        #ad-container {
-            width: 100%; height: 100%; display: flex;
-            justify-content: center; align-items: center; overflow: auto;
-        }
-        #ad-container iframe {
-            width: 100%; height: 100%; border: none;
-        }
         #ad-frame-wrapper .overlay {
             position: absolute; top:16px; right:16px; display:flex; align-items:center; gap:8px;
             background: rgba(0,0,0,.55); border:1px solid #334155; padding:8px 12px; border-radius: 999px;
@@ -969,7 +971,66 @@
             background:#16a34a; border-color:#16a34a; color:#fff; cursor:pointer; opacity:1;
         }
         #ad-frame-wrapper .stage { position: relative; height: 100%; }
-        /* --- END AD FRAME STYLES --- */
+        #ad-container {
+            width: 100%; height: 100%; display: flex;
+            justify-content: center; align-items: center; overflow: auto;
+        }
+        #ad-container iframe {
+            width: 100%; height: 100%; border: none;
+        }
+
+        /* --- NAYE ZONE AD OVERLAY KA STYLE --- */
+        #zone-ad-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(10, 10, 20, 0.95);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+        }
+        .zone-ad-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background-color: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .zone-ad-coins, .zone-ad-timer {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .zone-ad-coins span {
+            color: #f1c40f;
+            font-family: 'Orbitron', sans-serif;
+        }
+        #zone-close-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        .zone-ad-content {
+            flex-grow: 1;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        #zone-ad-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 10px;
+            background-color: #000;
+        }
+        /* --- NAYE STYLE KA END --- */
 
     </style>
 </head>
@@ -998,6 +1059,8 @@
         <div id="game-screen" class="screen">
             <div id="spin-earn-button">🚀</div>
             <div id="rewards-hub-button">🎁</div>
+            <div id="zone-button" title="Time Zone">⚡️</div> <!-- YEH NAYA BUTTON HAI -->
+
 
             <div class="stats-container" style="margin-top: 60px;">
                 <h1 id="score-display">0</h1>
@@ -1263,7 +1326,20 @@
             </div>
         </div>
     </div>
+
     <!-- ======================================================= -->
+    <!-- NAYA ZONE AD OVERLAY HTML -->
+    <!-- ======================================================= -->
+    <div id="zone-ad-overlay" style="display: none;">
+        <div class="zone-ad-header">
+            <div class="zone-ad-coins">Coins: <span id="zone-coin-display">0</span></div>
+            <div class="zone-ad-timer">Next Ad In: <span id="zone-next-ad-timer">30</span>s</div>
+            <button id="zone-close-btn">✖ Close</button>
+        </div>
+        <div class="zone-ad-content">
+            <iframe id="zone-ad-iframe" src="about:blank"></iframe>
+        </div>
+    </div>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -1551,6 +1627,13 @@
                 claimTelegramRewardBtn: document.getElementById('claim-telegram-reward-btn'),
                 claimDailyBonusBtn: document.getElementById('claim-daily-bonus-btn'),
                 userIdDisplayOffer: document.getElementById('user-id-display-offer'),
+                 // --- NAYE ZONE BUTTON KE ELEMENTS ---
+                zoneButton: document.getElementById('zone-button'),
+                zoneAdOverlay: document.getElementById('zone-ad-overlay'),
+                zoneCoinDisplay: document.getElementById('zone-coin-display'),
+                zoneNextAdTimer: document.getElementById('zone-next-ad-timer'),
+                zoneCloseBtn: document.getElementById('zone-close-btn'),
+                zoneAdIframe: document.getElementById('zone-ad-iframe'),
             };
 
             // Event listener for the new copy button
@@ -1625,6 +1708,90 @@
                 { text: '1 💝', type: 'lovecoin', value: 1, chance: 10, color: '#e91e63' },
                 { text: '8 🪙', type: 'coin', value: 8, chance: 10, color: '#e67e22' }
             ];
+
+            // --- NAYE ZONE FEATURE KA LOGIC ---
+            const zoneAdLinks = [
+                'https://www.profitableratecpm.com/u745rvnfy?key=f5ec06ad491fd1ceab3af658fd2d3010',
+                'https://www.profitableratecpm.com/vibjgr90?key=2731d0788209fe1d948dd17fd0e0831f',
+                'https://www.profitableratecpm.com/qshhszvnad?key=4761223a00e52bd9f2e24d515e6be228',
+                'https://www.profitableratecpm.com/d4cku5ewnn?key=a29645f253b4d6eb62da85d3f5105d02a'
+            ];
+            // Yeh do script based ads ko iframe mein nahi daal sakte, isliye URL wale use kiye hain.
+            // af4e418b39829ea1ded1530d3eefa4ad/invoke.js
+            // a6781db12bbc74e075ae7e33de7afd4d/invoke.js
+
+            let isZoneActive = false;
+            let zoneCoinInterval = null;
+            let zoneNextAdTimeout = null;
+            let zoneTimerInterval = null;
+            let currentAdIndex = 0;
+            let zoneEarnedCoins = 0;
+
+            function startZoneAds() {
+                if (isZoneActive) return;
+                isZoneActive = true;
+                currentAdIndex = 0;
+                zoneEarnedCoins = 0;
+                elements.zoneCoinDisplay.innerText = zoneEarnedCoins;
+                elements.zoneAdOverlay.style.display = 'flex';
+                
+                showNextZoneAd();
+
+                zoneCoinInterval = setInterval(() => {
+                    state.score++;
+                    zoneEarnedCoins++;
+                    elements.zoneCoinDisplay.innerText = zoneEarnedCoins.toLocaleString();
+                    updateDisplay(); // Main score bhi update hoga
+                }, 1000);
+            }
+
+            function stopZoneAds() {
+                if (!isZoneActive) return;
+                isZoneActive = false;
+                
+                clearInterval(zoneCoinInterval);
+                clearTimeout(zoneNextAdTimeout);
+                clearInterval(zoneTimerInterval);
+
+                elements.zoneAdOverlay.style.display = 'none';
+                elements.zoneAdIframe.src = 'about:blank'; // Iframe ko stop karega
+
+                saveGame({ score: state.score, Totalearning: state.score });
+                alert(`You earned ${zoneEarnedCoins.toLocaleString()} coins from the Time Zone!`);
+            }
+
+            function showNextZoneAd() {
+                if (currentAdIndex >= zoneAdLinks.length) {
+                    alert("You have watched all available ads in the Time Zone!");
+                    stopZoneAds();
+                    return;
+                }
+
+                const adUrl = zoneAdLinks[currentAdIndex];
+                elements.zoneAdIframe.src = adUrl;
+
+                // Visual timer shuru karo
+                let timeLeft = 30;
+                elements.zoneNextAdTimer.innerText = timeLeft;
+                if(zoneTimerInterval) clearInterval(zoneTimerInterval);
+                zoneTimerInterval = setInterval(() => {
+                    timeLeft--;
+                    if (timeLeft >= 0) {
+                        elements.zoneNextAdTimer.innerText = timeLeft;
+                    }
+                }, 1000);
+
+                // 30 second ke baad agla ad
+                if(zoneNextAdTimeout) clearTimeout(zoneNextAdTimeout);
+                zoneNextAdTimeout = setTimeout(() => {
+                    currentAdIndex++;
+                    showNextZoneAd();
+                }, 30000);
+            }
+
+            elements.zoneButton.addEventListener('click', startZoneAds);
+            elements.zoneCloseBtn.addEventListener('click', stopZoneAds);
+            // --- NAYE ZONE FEATURE KA LOGIC KHATAM ---
 
             function setupSpinWheel() {
                 const wheel = elements.wheel;
