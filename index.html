@@ -306,7 +306,6 @@
         .history-item-meta .status { font-weight: bold; margin-top: 4px; }
         .status-processing { color: #f1c40f; }
 
-        /* --- YEH NAYA CSS AD CONTAINER KE LIYE HAI --- */
         #ad-scripts-container {
             position: fixed;
             bottom: 75px; /* Nav bar ke theek upar */
@@ -670,7 +669,6 @@
         }
         .join-now-button:active { transform: translateY(0); }
         
-        /* === UPDATED OFFER PAGE STYLE START === */
         #offer-wall-screen {
             background-color: #121212; /* Dark background */
             justify-content: flex-start;
@@ -758,7 +756,6 @@
             background-color: #8e44ad; /* Darker purple on hover */
             transform: translateY(-1px);
         }
-        /* === UPDATED OFFER PAGE STYLE END === */
 
         #earn-box-list-container {
             display: flex;
@@ -879,7 +876,6 @@
             box-shadow: 0 8px 25px rgba(0, 136, 204, 0.7);
         }
         
-        /* Style for new floating ad emojis */
         .floating-ad-emoji {
             position: absolute;
             font-size: 40px;
@@ -891,7 +887,6 @@
             will-change: transform; /* Performance optimization */
         }
         
-        /* === ESTILOS PARA LA NUEVA SECCIÓN DE OFERTAS === */
         .offer-submission-prompt {
             width: 95%;
             max-width: 500px;
@@ -947,10 +942,9 @@
             background-color: #0077b3;
         }
 
-        /* --- MODIFIED: AD FRAME STYLES --- */
         #ad-frame-wrapper {
             position: fixed; inset: 0; display: grid; 
-            grid-template-rows: 1fr; /* Make the main content take all space */
+            grid-template-rows: 1fr;
             background:#0b0f13; color:#fff; z-index: 9999;
         }
         #ad-frame-wrapper .overlay {
@@ -980,7 +974,6 @@
             width: 100%; height: 100%; border: none;
         }
 
-        /* --- NAYE ZONE AD OVERLAY KA STYLE --- */
         #zone-ad-overlay {
             position: fixed;
             top: 0;
@@ -1031,16 +1024,168 @@
             border-radius: 10px;
             background-color: #000;
         }
-        /* --- NAYE STYLE KA END --- */
+
+    </style>
+    
+    <!-- ======================================================= -->
+    <!--     HAMSTER KOMBAT STYLE OVERRIDES - NEW CODE HERE      -->
+    <!-- ======================================================= -->
+    <style>
+        :root {
+            --hk-bg: #0d0f21;
+            --hk-glow: #00f6ff; /* Electric Cyan */
+            --hk-purple: #9b59b6;
+            --hk-card-bg: rgba(28, 32, 64, 0.7);
+            --hk-border-color: rgba(0, 246, 255, 0.3);
+        }
+
+        body, .game-container {
+            background-color: var(--hk-bg);
+            background-image: radial-gradient(circle at 50% 20%, rgba(30, 34, 77, 0.8) 0%, transparent 60%);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* --- Score and Level Display --- */
+        #score-display {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 52px;
+            color: #ffffff;
+            text-shadow: 0 0 8px #fff, 0 0 20px var(--hk-glow), 0 0 30px var(--hk-glow);
+        }
+        #level-display {
+            color: var(--hk-glow);
+            font-weight: 700;
+            text-shadow: 0 0 10px var(--hk-glow);
+        }
+
+        /* --- The Main Tappable Hamster --- */
+        #coin-css {
+            background: radial-gradient(circle at 65% 35%, #2a305e, #1a1a2e 80%);
+            border: 5px solid var(--hk-glow);
+            box-shadow: 0 0 30px var(--hk-glow), inset 0 0 20px rgba(0, 246, 255, 0.3);
+            transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+        }
+        .coin-container:active #coin-css {
+             transform: scale(0.95);
+             box-shadow: 0 0 45px var(--hk-glow), inset 0 0 25px rgba(0, 246, 255, 0.5);
+        }
+        .coin-text { display: none; } /* Hide old text */
+        #coin-css::before {
+            content: '🐹';
+            font-size: 100px;
+            border: none;
+            box-shadow: none;
+            text-shadow: 0 0 15px #fff;
+            animation: bounce-hamster 2s ease-in-out infinite;
+        }
+        @keyframes bounce-hamster {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        #coin-css::after { display: none; } /* Hide old shine effect */
+        
+        /* --- Energy Bar --- */
+        #energy-text {
+             text-shadow: 0 0 5px rgba(255,255,255,0.7);
+        }
+        .energy-bar-background {
+            background-color: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        #energy-bar-fill {
+            background: linear-gradient(90deg, #3498db, var(--hk-glow));
+            box-shadow: 0 0 8px var(--hk-glow);
+        }
+
+        /* --- Navigation Bar --- */
+        .nav-container {
+            background-color: rgba(13, 15, 33, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid var(--hk-border-color);
+            padding-bottom: env(safe-area-inset-bottom, 5px);
+            padding-top: 5px;
+        }
+        .nav-button {
+            opacity: 0.7;
+        }
+        .nav-button.active, .nav-button:hover {
+            opacity: 1;
+        }
+        .nav-button.active .nav-icon,
+        .nav-button.active .nav-text {
+            color: var(--hk-glow);
+            text-shadow: 0 0 8px var(--hk-glow);
+        }
+        .nav-icon {
+            transition: transform 0.2s;
+        }
+        .nav-button:hover .nav-icon {
+            transform: translateY(-2px);
+        }
+
+        /* --- General Buttons --- */
+        .action-button, .back-button, .join-button, .withdraw-option, .flappy-action-button {
+            background: linear-gradient(45deg, #8e44ad, var(--hk-purple));
+            border: 1px solid rgba(155, 89, 182, 0.8);
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(155, 89, 182, 0.5), inset 0 1px 1px rgba(255,255,255,0.2);
+            transition: all 0.2s ease-in-out;
+            font-weight: 700;
+        }
+        .action-button:hover:not(:disabled), .back-button:hover:not(:disabled), .join-button:hover:not(:disabled), .withdraw-option:hover:not(:disabled), .flappy-action-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 25px rgba(155, 89, 182, 0.8), inset 0 1px 1px rgba(255,255,255,0.2);
+        }
+        .action-button:disabled, .join-button:disabled {
+            background: #50586c;
+            border-color: #7f8c8d;
+            box-shadow: none;
+        }
+
+        /* --- Cards and Containers --- */
+        .option-card, .tournament-card, .coin-flip-container, .flappy-game-container, .history-container, .popup-content, .offer-submission-prompt {
+            background: var(--hk-card-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--hk-border-color);
+            border-radius: 20px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .option-card h3, h2, h3 {
+             font-family: 'Orbitron', sans-serif;
+             color: #fff;
+             text-shadow: 0 0 5px #fff, 0 0 10px var(--hk-glow);
+        }
+        .option-card p {
+            color: #ccc;
+        }
+        
+        /* --- Specific Popups & Screens --- */
+        .popup-content {
+            background: linear-gradient(135deg, #1e224d, #0d0f21);
+        }
+        #offer-wall-screen, .tournament-bg, .tournament-bg::before {
+            background: var(--hk-bg) !important;
+        }
+        .tournament-bg {
+             background-image: radial-gradient(circle at 50% 20%, rgba(30, 34, 77, 0.5) 0%, transparent 70%) !important;
+        }
+        
+        .floating-text {
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 5px var(--hk-glow);
+        }
 
     </style>
 </head>
 <body>
     <div id="loading-screen">
-        <div class="loading-bear">🐻</div>
+        <div class="loading-bear">🐹</div>
         <div class="loading-text">Loading Game...</div>
         <div id="loading-progress-bar">
-            <div id="loading-progress-fill"></div>
+            <div id="loading-progress-fill" style="background: linear-gradient(90deg, #3498db, #00f6ff);"></div>
         </div>
     </div>
 
@@ -1150,7 +1295,6 @@
         </div>
         
         <div id="offer-wall-screen" class="screen scrollable-screen hidden">
-            <!-- === NUEVA SECCIÓN AÑADIDA AQUÍ === -->
             <div class="offer-submission-prompt">
                 <p>After completing any offer, send a screenshot with your User ID to our support for verification.</p>
                 <div class="user-id-container">
@@ -1159,7 +1303,6 @@
                 </div>
                 <a href="https://t.me/Costomer_c" target="_blank" class="send-screenshot-btn">Send Offer Screenshot</a>
             </div>
-            <!-- === FIN DE LA NUEVA SECCIÓN === -->
 
             <div id="offer-wall-container" class="offer-wall-container">
                  <p style="color: #6c757d; text-align: center;">Loading offers...</p>
@@ -1312,9 +1455,6 @@
 
     <audio id="tap-sound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_2b4065a46d.mp3" preload="auto"></audio>
     
-    <!-- ======================================================= -->
-    <!-- AD FRAME HTML (MODIFIED) -->
-    <!-- ======================================================= -->
     <div id="ad-frame-wrapper" style="display: none;">
         <div class="stage">
             <div class="overlay">
@@ -1323,14 +1463,10 @@
                 <button id="ad-close-btn" class="closeBtn" disabled>Close</button>
             </div>
             <div id="ad-container">
-                <!-- Ad iframe will be inserted here by JavaScript -->
             </div>
         </div>
     </div>
 
-    <!-- ======================================================= -->
-    <!-- NAYA ZONE AD OVERLAY HTML -->
-    <!-- ======================================================= -->
     <div id="zone-ad-overlay" style="display: none;">
         <div class="zone-ad-header">
             <div class="zone-ad-coins">Coins: <span id="zone-coin-display">0</span></div>
@@ -1342,9 +1478,6 @@
         </div>
     </div>
 
-    <!-- ======================================================= -->
-    <!-- YEH AAPKE REQUEST WALA AUTOMATIC AD KA HTML HAI -->
-    <!-- ======================================================= -->
     <div id="auto-ad-overlay" style="display: none; position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.85); z-index: 99999; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box;">
         <div style="position: relative; width: 100%; max-width: 330px; height: 100%; max-height: 490px; background-color: #000; border: 2px solid #333; border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 0 25px rgba(0,0,0,0.5);">
             <div style="padding: 8px 12px; background-color: #1a1a2e; text-align: right; flex-shrink: 0;">
@@ -1358,6 +1491,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
+        // --- YOUR JAVASCRIPT CODE REMAINS EXACTLY THE SAME ---
         const firebaseConfig = {
           apiKey: "AIzaSyBJrCE4w_QfBqfF3g4O_RuCK4DbjmL9TRg",
           authDomain: "telegram-69052.firebaseapp.com",
@@ -1371,24 +1505,18 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // =====================================================================
-        // GLOBAL VARIABLE YEH TRACK KAREGA KI KOI AD CHAL RAHA HAI YA NAHI
-        // =====================================================================
         let isAdCurrentlyShowing = false; 
 
-        // =====================================================================
-        // AUTOMATIC AD KA PURA LOGIC YAHAN HAI
-        // =====================================================================
         let automaticAdTimerInterval = null;
         const autoAdOverlay = document.getElementById('auto-ad-overlay');
         const autoAdIframe = document.getElementById('auto-ad-iframe');
         const autoAdTimerDiv = document.getElementById('auto-ad-timer');
         const AUTO_AD_URL = 'https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315';
-        const AUTO_AD_INTERVAL = 28000; // 28 seconds
-        const AUTO_AD_DURATION = 6000;  // 6 seconds
+        const AUTO_AD_INTERVAL = 28000;
+        const AUTO_AD_DURATION = 6000;
 
         function showAutomaticAd() {
-            if (isAdCurrentlyShowing) return; // Dobara check karein
+            if (isAdCurrentlyShowing) return;
 
             console.log("Automatic ad dikhaya ja raha hai...");
             isAdCurrentlyShowing = true;
@@ -1420,49 +1548,37 @@
         }
 
         function tryToShowAutomaticAd() {
-            // Shart 1: Koi aur ad pehle se chal raha hai
             if (isAdCurrentlyShowing) {
                 console.log("Auto Ad Roka Gaya: Koi aur ad pehle se chal raha hai.");
                 return;
             }
 
-            // Shart 2: Flappy Ram game chal raha hai
             if (typeof flappyGame !== 'undefined' && flappyGame.gameRunning) {
                 console.log("Auto Ad Roka Gaya: Flappy Ram game active hai.");
                 return;
             }
 
-            // Shart 3: Koi popup (jaise withdrawal ya name change) khula hai
             const isPopupOpen = document.querySelector('.popup[style*="display: flex"]');
             if (isPopupOpen) {
                 console.log("Auto Ad Roka Gaya: Ek popup khula hai.");
                 return;
             }
             
-            // Shart 4: 'Time Zone' ad overlay active hai
             const isZoneOpen = document.getElementById('zone-ad-overlay').style.display !== 'none';
             if (isZoneOpen) {
                 console.log("Auto Ad Roka Gaya: Time Zone active hai.");
                 return;
             }
 
-            // Sab theek hai, ab ad dikhayein
             showAutomaticAd();
         }
 
         function startAutomaticAdTimer() {
-            if (automaticAdTimerInterval) clearInterval(automaticAdTimerInterval); // Purana timer saaf karein
+            if (automaticAdTimerInterval) clearInterval(automaticAdTimerInterval);
             automaticAdTimerInterval = setInterval(tryToShowAutomaticAd, AUTO_AD_INTERVAL);
             console.log("Automatic ad timer shuru ho gaya hai.");
         }
-        // =====================================================================
-        // AUTOMATIC AD LOGIC KHATAM
-        // =====================================================================
 
-
-        // =====================================================================
-        // AD FRAME LOGIC (MODIFIED) - Yahan `isAdCurrentlyShowing` set kiya gaya hai
-        // =====================================================================
         const adFrameWrapper = document.getElementById('ad-frame-wrapper');
         const adTimerEl = document.getElementById('ad-timer');
         const adCloseBtn = document.getElementById('ad-close-btn');
@@ -1471,26 +1587,22 @@
         let adCountdownInterval;
 
         function showAdFrame(adUrl, onCompleteCallback) {
-            isAdCurrentlyShowing = true; // AD FLAG ON KIYA GAYA
+            isAdCurrentlyShowing = true;
             adCanClose = false;
             let remaining = 15;
 
-            // Reset UI
             adTimerEl.textContent = remaining + 's';
             adCloseBtn.setAttribute('disabled', 'true');
             adCloseBtn.classList.remove('enabled');
             adCloseBtn.onclick = null;
 
-            // Load ad in iframe
-            adContainer.innerHTML = ''; // Clear previous ad
+            adContainer.innerHTML = '';
             const iframe = document.createElement('iframe');
             iframe.src = adUrl;
             adContainer.appendChild(iframe);
             
-            // Show the ad frame
             adFrameWrapper.style.display = 'grid';
 
-            // Block back button
             history.pushState(null, '', location.href);
             const blockBack = () => {
                 if (!adCanClose) {
@@ -1499,15 +1611,14 @@
             };
             window.addEventListener('popstate', blockBack);
 
-            // Unlock function
             function unlock() {
                 adCanClose = true;
                 adCloseBtn.removeAttribute('disabled');
                 adCloseBtn.classList.add('enabled');
                 adCloseBtn.onclick = () => {
-                    isAdCurrentlyShowing = false; // AD FLAG OFF KIYA GAYA
+                    isAdCurrentlyShowing = false;
                     adFrameWrapper.style.display = 'none';
-                    adContainer.innerHTML = ''; // Clean up iframe
+                    adContainer.innerHTML = '';
                     window.removeEventListener('popstate', blockBack);
                     if (onCompleteCallback && typeof onCompleteCallback === 'function') {
                         onCompleteCallback();
@@ -1515,8 +1626,7 @@
                 };
             }
 
-            // Countdown logic
-            if (adCountdownInterval) clearInterval(adCountdownInterval); // Clear any old intervals
+            if (adCountdownInterval) clearInterval(adCountdownInterval);
             adCountdownInterval = setInterval(() => {
                 remaining -= 1;
                 if (remaining <= 0) {
@@ -1526,11 +1636,8 @@
                 adTimerEl.textContent = (remaining > 0 ? remaining : 0) + 's';
             }, 1000);
 
-            // Safety unlock
             setTimeout(() => { if (!adCanClose) unlock(); }, (15 + 1) * 1000);
         }
-        // =====================================================================
-
 
         function generateReferralCode() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -1731,7 +1838,6 @@
                 claimTelegramRewardBtn: document.getElementById('claim-telegram-reward-btn'),
                 claimDailyBonusBtn: document.getElementById('claim-daily-bonus-btn'),
                 userIdDisplayOffer: document.getElementById('user-id-display-offer'),
-                 // --- NAYE ZONE BUTTON KE ELEMENTS ---
                 zoneButton: document.getElementById('zone-button'),
                 zoneAdOverlay: document.getElementById('zone-ad-overlay'),
                 zoneCoinDisplay: document.getElementById('zone-coin-display'),
@@ -1740,7 +1846,6 @@
                 zoneAdIframe: document.getElementById('zone-ad-iframe'),
             };
 
-            // Event listener for the new copy button
             document.querySelector('.copy-id-btn').addEventListener('click', () => {
                 if (userId) {
                     const originalAlert = window.alert;
@@ -1763,8 +1868,6 @@
                 }
             });
 
-
-            // NEW: Global object for game settings
             let gameSettings = {
                 withdrawalsLocked: false,
                 withdrawalButtonText: 'Withdraw All Coins',
@@ -1813,8 +1916,6 @@
                 { text: '8 🪙', type: 'coin', value: 8, chance: 10, color: '#e67e22' }
             ];
 
-            // --- NAYE ZONE FEATURE KA LOGIC ---
-            // MODIFIED: Updated with all your ad links
             const zoneAdLinks = [
                 'https://www.profitableratecpm.com/pk9fkd5v8?key=1afa6b8e3d8f61558b90095a0c9a2c44',
                 'https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315',
@@ -1834,7 +1935,7 @@
 
             function startZoneAds() {
                 if (isZoneActive) return;
-                isAdCurrentlyShowing = true; // AD FLAG ON KIYA GAYA
+                isAdCurrentlyShowing = true;
                 isZoneActive = true;
                 currentAdIndex = 0;
                 zoneEarnedCoins = 0;
@@ -1847,13 +1948,13 @@
                     state.score++;
                     zoneEarnedCoins++;
                     elements.zoneCoinDisplay.innerText = zoneEarnedCoins.toLocaleString();
-                    updateDisplay(); // Main score bhi update hoga
+                    updateDisplay();
                 }, 1000);
             }
 
             function stopZoneAds() {
                 if (!isZoneActive) return;
-                isAdCurrentlyShowing = false; // AD FLAG OFF KIYA GAYA
+                isAdCurrentlyShowing = false;
                 isZoneActive = false;
                 
                 clearInterval(zoneCoinInterval);
@@ -1861,17 +1962,15 @@
                 clearInterval(zoneTimerInterval);
 
                 elements.zoneAdOverlay.style.display = 'none';
-                elements.zoneAdIframe.src = 'about:blank'; // Iframe ko stop karega
+                elements.zoneAdIframe.src = 'about:blank';
 
                 saveGame({ score: state.score, Totalearning: state.score });
                 alert(`You earned ${zoneEarnedCoins.toLocaleString()} coins from the Time Zone!`);
             }
 
-            // MODIFIED: This function now loops continuously
             function showNextZoneAd() {
-                if (!isZoneActive) return; // Stop if the user has closed the overlay
+                if (!isZoneActive) return;
 
-                // Loop back to the beginning if all ads have been shown
                 if (currentAdIndex >= zoneAdLinks.length) {
                     currentAdIndex = 0;
                 }
@@ -1879,7 +1978,6 @@
                 const adUrl = zoneAdLinks[currentAdIndex];
                 elements.zoneAdIframe.src = adUrl;
 
-                // Visual timer shuru karo
                 let timeLeft = 30;
                 elements.zoneNextAdTimer.innerText = timeLeft;
                 if(zoneTimerInterval) clearInterval(zoneTimerInterval);
@@ -1890,18 +1988,16 @@
                     }
                 }, 1000);
 
-                // 30 second ke baad agla ad
                 if(zoneNextAdTimeout) clearTimeout(zoneNextAdTimeout);
                 zoneNextAdTimeout = setTimeout(() => {
                     currentAdIndex++;
-                    showNextZoneAd(); // Call itself to loop to the next ad
+                    showNextZoneAd();
                 }, 30000);
             }
 
             elements.zoneButton.addEventListener('click', startZoneAds);
             elements.zoneCloseBtn.addEventListener('click', stopZoneAds);
-            // --- NAYE ZONE FEATURE KA LOGIC KHATAM ---
-
+            
             function setupSpinWheel() {
                 const wheel = elements.wheel;
                 wheel.innerHTML = '';
@@ -1947,7 +2043,6 @@
                 return spinPrizes[0]; 
             }
 
-            // MODIFIED: Show ad before opening the popup
             elements.spinEarnButton.addEventListener('click', () => {
                 const adUrl = 'https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315';
                 showAdFrame(adUrl, () => {
@@ -1959,7 +2054,6 @@
                 elements.spinWheelPopup.style.display = 'none';
             });
             
-            // MODIFIED: Spin button no longer shows an ad, it just spins
             elements.spinButton.addEventListener('click', () => {
                 if (isSpinning) return;
                 
@@ -2024,7 +2118,6 @@
                 }
             }
             
-            // MODIFIED: Show ad before opening the rewards hub
             elements.rewardsHubButton.addEventListener('click', () => {
                 const adUrl = 'https://www.profitableratecpm.com/pk9fkd5v8?key=1afa6b8e3d8f61558b90095a0c9a2c44';
                 showAdFrame(adUrl, () => {
@@ -2654,8 +2747,6 @@
                 });
             }
             function triggerWatchAd(cardElement) {
-                // This function seems to be for a temporary boost, not a standard ad view.
-                // It can be converted to the new system if needed, but for now, I'll leave its original logic.
                 if (isAdBoostActive) { alert("A boost is already active! Please wait."); return; }
                 isAdBoostActive = true;
                 const originalText = cardElement.querySelector('p').innerText;
@@ -2696,16 +2787,13 @@
                 });
             }
             
-            // MODIFIED: Function updated to use gameSettings
             function renderWalletScreen() {
                 elements.walletScore.innerText = state.score.toLocaleString();
                 const rupeeValue = (state.score / 1000).toFixed(2);
                 elements.rupeeValue.innerText = `Value: ₹${rupeeValue} INR`;
 
-                // Set button text from global settings
                 elements.withdrawButton.innerText = gameSettings.withdrawalButtonText;
                 
-                // If globally locked by admin, show locked state and return
                 if (gameSettings.withdrawalsLocked) {
                     elements.withdrawButton.disabled = true;
                     elements.withdrawButton.innerText = "Withdrawal available only Sunday";
@@ -2715,7 +2803,6 @@
                     return;
                 }
 
-                // If force-unlocked by admin, bypass all other checks
                 if (gameSettings.isWithdrawalForceUnlocked) {
                     elements.withdrawButton.disabled = false;
                     elements.withdrawalDayNote.style.display = 'none';
@@ -2833,7 +2920,6 @@
                 else if (screenId === 'rewards-hub-screen') { renderRewardsHubScreen(); }
             }
 
-            // NEW: Function to listen for global game settings
             function listenForGameSettings() {
                 const settingsRef = database.ref('gameSettings');
                 settingsRef.on('value', (snapshot) => {
@@ -2842,7 +2928,6 @@
                     gameSettings.withdrawalButtonText = settings.withdrawalButtonText || 'Withdraw All Coins';
                     gameSettings.isWithdrawalForceUnlocked = settings.isWithdrawalForceUnlocked === true;
                     
-                    // If the wallet screen is currently visible, re-render it with the new settings
                     if (!document.getElementById('wallet-screen').classList.contains('hidden')) {
                         renderWalletScreen();
                     }
@@ -2851,7 +2936,7 @@
 
             function loadGame() {
                 handleIncomingReferral();
-                listenForGameSettings(); // Start listening for settings right away
+                listenForGameSettings();
                 const userRef = database.ref(`Users/${userId}`);
                 userRef.once('value', (snapshot) => {
                     const data = snapshot.val();
@@ -2911,7 +2996,6 @@
                     updatePlayerNameDisplay();
                     checkEnergyCooldown(); 
 
-                    // Update the User ID display on the offer screen
                     if (elements.userIdDisplayOffer) {
                         elements.userIdDisplayOffer.textContent = userId;
                     }
@@ -3167,7 +3251,6 @@
                 });
             });
             
-            // --- NEW FEATURE: FLOATING AD EMOJIS ---
             function createFlyingAdEmoji() {
                 const gameScreen = document.getElementById('game-screen');
                 if (!gameScreen || document.hidden) return; 
@@ -3180,7 +3263,7 @@
                 const startY = Math.random() * (gameScreen.clientHeight * 0.8);
                 const endX = gameScreen.clientWidth + 60;
                 const endY = Math.random() * (gameScreen.clientHeight * 0.8);
-                const duration = Math.random() * 6 + 7; // 7 to 13 seconds
+                const duration = Math.random() * 6 + 7;
 
                 emoji.style.left = `${startX}px`;
                 emoji.style.top = `${startY}px`;
@@ -3196,7 +3279,7 @@
                 const adUrl = 'https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6';
                 
                 const handleClick = (e) => {
-                    e.stopPropagation(); // Prevent taps from reaching the coin
+                    e.stopPropagation();
                     showAdFrame(adUrl, () => {
                         console.log('Floating ad watched and closed.');
                     });
@@ -3212,11 +3295,9 @@
                 });
             }
 
-            // Initial creation of the floating ads
             for (let i = 0; i < 3; i++) {
-                setTimeout(createFlyingAdEmoji, i * 3000); // Stagger initial appearance
+                setTimeout(createFlyingAdEmoji, i * 3000);
             }
-            // --- END OF NEW FEATURE ---
 
             loadGame();
             showScreen('game-screen');
@@ -3228,14 +3309,10 @@
             elements.withdrawPopup.style.display = 'none'; 
             elements.nameChangePopup.style.display = 'none';
             
-            // SABSE AAKHIR MEIN AUTOMATIC AD KA TIMER SHURU KARTE HAIN
             startAutomaticAdTimer();
         });
     </script>
        
-    <!-- ============================================== -->
-    <!--       ADS CODE YAHAN LAGAYA GAYA HAI        -->
-    <!-- ============================================== -->
     <div id="ad-scripts-container">
         <script type="text/javascript">
             atOptions = {
