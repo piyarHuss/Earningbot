@@ -1945,8 +1945,8 @@
                 showNextZoneAd();
 
                 zoneCoinInterval = setInterval(() => {
-                    state.score++;
-                    zoneEarnedCoins++;
+                    state.score += 2; // Yahan 1 se badhkar 2 kar diya hai
+                    zoneEarnedCoins += 2; // Isko bhi 2 kar diya hai taaki display sahi rahe
                     elements.zoneCoinDisplay.innerText = zoneEarnedCoins.toLocaleString();
                     updateDisplay();
                 }, 1000);
