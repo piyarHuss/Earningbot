@@ -1341,6 +1341,18 @@
             <iframe id="zone-ad-iframe" src="about:blank"></iframe>
         </div>
     </div>
+
+    <!-- ======================================================= -->
+    <!-- YEH AAPKE REQUEST WALA AUTOMATIC AD KA HTML HAI -->
+    <!-- ======================================================= -->
+    <div id="auto-ad-overlay" style="display: none; position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.85); z-index: 99999; justify-content: center; align-items: center; padding: 15px; box-sizing: border-box;">
+        <div style="position: relative; width: 100%; max-width: 330px; height: 100%; max-height: 490px; background-color: #000; border: 2px solid #333; border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 0 25px rgba(0,0,0,0.5);">
+            <div style="padding: 8px 12px; background-color: #1a1a2e; text-align: right; flex-shrink: 0;">
+                <span id="auto-ad-timer" style="color: white; font-size: 14px; font-weight: bold; font-family: 'Poppins', sans-serif;"></span>
+            </div>
+            <iframe id="auto-ad-iframe" style="width: 100%; height: 100%; border: none; flex-grow: 1;"></iframe>
+        </div>
+    </div>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
@@ -1360,7 +1372,96 @@
         const database = firebase.database();
 
         // =====================================================================
-        // AD FRAME LOGIC (MODIFIED)
+        // GLOBAL VARIABLE YEH TRACK KAREGA KI KOI AD CHAL RAHA HAI YA NAHI
+        // =====================================================================
+        let isAdCurrentlyShowing = false; 
+
+        // =====================================================================
+        // AUTOMATIC AD KA PURA LOGIC YAHAN HAI
+        // =====================================================================
+        let automaticAdTimerInterval = null;
+        const autoAdOverlay = document.getElementById('auto-ad-overlay');
+        const autoAdIframe = document.getElementById('auto-ad-iframe');
+        const autoAdTimerDiv = document.getElementById('auto-ad-timer');
+        const AUTO_AD_URL = 'https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315';
+        const AUTO_AD_INTERVAL = 28000; // 28 seconds
+        const AUTO_AD_DURATION = 6000;  // 6 seconds
+
+        function showAutomaticAd() {
+            if (isAdCurrentlyShowing) return; // Dobara check karein
+
+            console.log("Automatic ad dikhaya ja raha hai...");
+            isAdCurrentlyShowing = true;
+            autoAdIframe.src = AUTO_AD_URL;
+            autoAdOverlay.style.display = 'flex';
+
+            let timeLeft = AUTO_AD_DURATION / 1000;
+            
+            const updateTimerText = () => {
+                autoAdTimerDiv.textContent = `Ad will close in ${timeLeft}s`;
+            };
+            
+            updateTimerText();
+
+            const timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerText();
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                }
+            }, 1000);
+
+            setTimeout(() => {
+                autoAdOverlay.style.display = 'none';
+                autoAdIframe.src = 'about:blank';
+                isAdCurrentlyShowing = false;
+                console.log("Automatic ad band ho gaya.");
+            }, AUTO_AD_DURATION);
+        }
+
+        function tryToShowAutomaticAd() {
+            // Shart 1: Koi aur ad pehle se chal raha hai
+            if (isAdCurrentlyShowing) {
+                console.log("Auto Ad Roka Gaya: Koi aur ad pehle se chal raha hai.");
+                return;
+            }
+
+            // Shart 2: Flappy Ram game chal raha hai
+            if (typeof flappyGame !== 'undefined' && flappyGame.gameRunning) {
+                console.log("Auto Ad Roka Gaya: Flappy Ram game active hai.");
+                return;
+            }
+
+            // Shart 3: Koi popup (jaise withdrawal ya name change) khula hai
+            const isPopupOpen = document.querySelector('.popup[style*="display: flex"]');
+            if (isPopupOpen) {
+                console.log("Auto Ad Roka Gaya: Ek popup khula hai.");
+                return;
+            }
+            
+            // Shart 4: 'Time Zone' ad overlay active hai
+            const isZoneOpen = document.getElementById('zone-ad-overlay').style.display !== 'none';
+            if (isZoneOpen) {
+                console.log("Auto Ad Roka Gaya: Time Zone active hai.");
+                return;
+            }
+
+            // Sab theek hai, ab ad dikhayein
+            showAutomaticAd();
+        }
+
+        function startAutomaticAdTimer() {
+            if (automaticAdTimerInterval) clearInterval(automaticAdTimerInterval); // Purana timer saaf karein
+            automaticAdTimerInterval = setInterval(tryToShowAutomaticAd, AUTO_AD_INTERVAL);
+            console.log("Automatic ad timer shuru ho gaya hai.");
+        }
+        // =====================================================================
+        // AUTOMATIC AD LOGIC KHATAM
+        // =====================================================================
+
+
+        // =====================================================================
+        // AD FRAME LOGIC (MODIFIED) - Yahan `isAdCurrentlyShowing` set kiya gaya hai
         // =====================================================================
         const adFrameWrapper = document.getElementById('ad-frame-wrapper');
         const adTimerEl = document.getElementById('ad-timer');
@@ -1370,6 +1471,7 @@
         let adCountdownInterval;
 
         function showAdFrame(adUrl, onCompleteCallback) {
+            isAdCurrentlyShowing = true; // AD FLAG ON KIYA GAYA
             adCanClose = false;
             let remaining = 15;
 
@@ -1403,6 +1505,7 @@
                 adCloseBtn.removeAttribute('disabled');
                 adCloseBtn.classList.add('enabled');
                 adCloseBtn.onclick = () => {
+                    isAdCurrentlyShowing = false; // AD FLAG OFF KIYA GAYA
                     adFrameWrapper.style.display = 'none';
                     adContainer.innerHTML = ''; // Clean up iframe
                     window.removeEventListener('popstate', blockBack);
@@ -1731,6 +1834,7 @@
 
             function startZoneAds() {
                 if (isZoneActive) return;
+                isAdCurrentlyShowing = true; // AD FLAG ON KIYA GAYA
                 isZoneActive = true;
                 currentAdIndex = 0;
                 zoneEarnedCoins = 0;
@@ -1749,6 +1853,7 @@
 
             function stopZoneAds() {
                 if (!isZoneActive) return;
+                isAdCurrentlyShowing = false; // AD FLAG OFF KIYA GAYA
                 isZoneActive = false;
                 
                 clearInterval(zoneCoinInterval);
@@ -3123,8 +3228,26 @@
             elements.withdrawPopup.style.display = 'none'; 
             elements.nameChangePopup.style.display = 'none';
             
+            // SABSE AAKHIR MEIN AUTOMATIC AD KA TIMER SHURU KARTE HAIN
+            startAutomaticAdTimer();
         });
     </script>
        
+    <!-- ============================================== -->
+    <!--       ADS CODE YAHAN LAGAYA GAYA HAI        -->
+    <!-- ============================================== -->
+    <div id="ad-scripts-container">
+        <script type="text/javascript">
+            atOptions = {
+                'key' : '1485dc1bd0b2b924939f0941a1bfb10f',
+                'format' : 'iframe',
+                'height' : 50,
+                'width' : 320,
+                'params' : {}
+            };
+        </script>
+        <script type="text/javascript" src="//www.highperformanceformat.com/1485dc1bd0b2b924939f0941a1bfb10f/invoke.js"></script>
+    </div>
+
 </body>
 </html>
