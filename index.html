@@ -1025,6 +1025,43 @@
             background-color: #000;
         }
 
+        /* --- NEW MOVABLE AD STYLE --- */
+        #movable-ad-container {
+            position: fixed;
+            bottom: 85px; /* Nav bar ke upar */
+            right: 10px;
+            width: 300px;
+            height: 70px; /* Header + iframe */
+            background-color: #1a1a2e;
+            border: 2px solid #9b59b6;
+            border-radius: 10px;
+            z-index: 1000;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            touch-action: none; /* Dragging ke liye zaroori */
+        }
+        #movable-ad-header {
+            background-color: #9b59b6;
+            color: white;
+            padding: 2px 5px;
+            font-size: 12px;
+            text-align: center;
+            cursor: move;
+            user-select: none;
+            -webkit-user-select: none;
+            font-weight: bold;
+            height: 20px;
+            line-height: 20px;
+        }
+        #movable-ad-iframe {
+            width: 100%;
+            height: 50px; /* Standard banner size */
+            border: none;
+        }
+
+
     </style>
     
     <!-- ======================================================= -->
@@ -3328,6 +3365,81 @@
                 setTimeout(createFlyingAdEmoji, i * 3000);
             }
 
+            // --- NAYE MOVABLE AD KA CODE ---
+            const movableAdUrls = [
+                'https://www.profitableratecpm.com/pk9fkd5v8?key=1afa6b8e3d8f61558b90095a0c9a2c44',
+                'https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315',
+                'https://www.profitableratecpm.com/d4cku5ewnn?key=a29645f253b4d6eb62da85d3f5105d02',
+                'https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6',
+                'https://www.profitableratecpm.com/qshhszvnad?key=4761223a00e52bd9f2e24d515e6be228',
+                'https://www.profitableratecpm.com/vibjgr90?key=2731d0788209fe1d948dd17fd0e0831f',
+                'https://www.profitableratecpm.com/u745rvnfy?key=f5ec06ad491fd1ceab3af658fd2d3010'
+            ];
+            let currentMovableAdIndex = 0;
+
+            function cycleMovableAd() {
+                const adIframe = document.getElementById('movable-ad-iframe');
+                if (adIframe) {
+                    adIframe.src = movableAdUrls[currentMovableAdIndex];
+                    currentMovableAdIndex = (currentMovableAdIndex + 1) % movableAdUrls.length;
+                }
+            }
+
+            function makeAdDraggable() {
+                const adContainer = document.getElementById('movable-ad-container');
+                const adHeader = document.getElementById('movable-ad-header');
+                if (!adContainer || !adHeader) return;
+
+                let isDragging = false;
+                let offsetX, offsetY;
+
+                const startDrag = (e) => {
+                    isDragging = true;
+                    const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+                    const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+                    offsetX = clientX - adContainer.getBoundingClientRect().left;
+                    offsetY = clientY - adContainer.getBoundingClientRect().top;
+                    adContainer.style.cursor = 'grabbing';
+                    document.body.style.userSelect = 'none';
+                };
+
+                const onDrag = (e) => {
+                    if (!isDragging) return;
+                    e.preventDefault();
+                    const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+                    const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+                    let newX = clientX - offsetX;
+                    let newY = clientY - offsetY;
+                    const maxX = window.innerWidth - adContainer.offsetWidth;
+                    const maxY = window.innerHeight - adContainer.offsetHeight;
+                    newX = Math.max(0, Math.min(newX, maxX));
+                    newY = Math.max(0, Math.min(newY, maxY));
+                    adContainer.style.left = `${newX}px`;
+                    adContainer.style.top = `${newY}px`;
+                    adContainer.style.bottom = 'auto';
+                    adContainer.style.right = 'auto';
+                };
+
+                const stopDrag = () => {
+                    isDragging = false;
+                    adContainer.style.cursor = 'move';
+                    document.body.style.userSelect = '';
+                };
+
+                adHeader.addEventListener('mousedown', startDrag);
+                document.addEventListener('mousemove', onDrag);
+                document.addEventListener('mouseup', stopDrag);
+                adHeader.addEventListener('touchstart', startDrag, { passive: true });
+                document.addEventListener('touchmove', onDrag, { passive: false });
+                document.addEventListener('touchend', stopDrag);
+            }
+
+            // Movable ad ko shuru karna
+            cycleMovableAd(); // Pehla ad turant load kare
+            setInterval(cycleMovableAd, 60000); // Har 1 minute me ad badle
+            makeAdDraggable(); // Ise draggable banaye
+
+            // BAAKI KA CODE
             loadGame();
             showScreen('game-screen');
             flappyGame.init();
@@ -3353,6 +3465,12 @@
             };
         </script>
         <script type="text/javascript" src="//www.highperformanceformat.com/1485dc1bd0b2b924939f0941a1bfb10f/invoke.js"></script>
+    </div>
+
+    <!-- NAYA MOVABLE AD CONTAINER KA HTML -->
+    <div id="movable-ad-container">
+        <div id="movable-ad-header">Drag Me 🤏</div>
+        <iframe id="movable-ad-iframe" src="about:blank" scrolling="no"></iframe>
     </div>
 
 </body>
