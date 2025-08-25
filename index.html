@@ -1945,8 +1945,8 @@
                 showNextZoneAd();
 
                 zoneCoinInterval = setInterval(() => {
-                    state.score += 2; // Yahan 1 se badhkar 2 kar diya hai
-                    zoneEarnedCoins += 2; // Isko bhi 2 kar diya hai taaki display sahi rahe
+                    state.score++;
+                    zoneEarnedCoins++;
                     elements.zoneCoinDisplay.innerText = zoneEarnedCoins.toLocaleString();
                     updateDisplay();
                 }, 1000);
@@ -2787,16 +2787,16 @@
                 });
             }
             
-            // --- MODIFIED FUNCTION ---
             function renderWalletScreen() {
                 elements.walletScore.innerText = state.score.toLocaleString();
                 const rupeeValue = (state.score / 1000).toFixed(2);
                 elements.rupeeValue.innerText = `Value: ₹${rupeeValue} INR`;
+
                 elements.withdrawButton.innerText = gameSettings.withdrawalButtonText;
                 
                 if (gameSettings.withdrawalsLocked) {
                     elements.withdrawButton.disabled = true;
-                    elements.withdrawButton.innerText = "Withdrawals are temporarily disabled.";
+                    elements.withdrawButton.innerText = "Withdrawal available only Sunday";
                     elements.withdrawalDayNote.style.display = 'none';
                     elements.withdrawalAdTaskContainer.style.display = 'none';
                     renderWithdrawalHistory();
@@ -2811,27 +2811,39 @@
                     return;
                 }
 
-                const goal = 8; // MODIFIED: Goal changed from 20 to 8
+                const today = new Date();
+                const dayOfWeek = today.getDay(); 
+                const isSunday = dayOfWeek === 0;
+
+                const goal = 20;
                 const adsWatchedSufficiently = state.withdrawalAdClicks >= goal;
 
-                elements.withdrawalDayNote.style.display = 'none'; // REMOVED: No more Sunday check
-
-                if (adsWatchedSufficiently) {
-                    elements.withdrawalAdTaskContainer.style.display = 'none';
-                    elements.withdrawButton.disabled = false; 
+                if (!isSunday) {
+                    elements.withdrawButton.disabled = true;
+                    elements.withdrawButton.innerText = "Unavailable (Sundays Only)";
+                    elements.withdrawalDayNote.innerText = "Withdrawal is available only on Sundays.";
+                    elements.withdrawalDayNote.style.display = 'block';
+                    elements.withdrawalAdTaskContainer.style.display = 'none'; 
                 } else {
-                    elements.withdrawalAdTaskContainer.style.display = 'flex';
-                    elements.withdrawButton.disabled = true; 
-                    elements.withdrawalAdTaskContainer.innerHTML = `
-                        <div class="option-card">
-                            <h3>Unlock Withdrawals</h3>
-                            <p>Watch ${goal} ads to enable the withdrawal button.</p>
-                            <p><strong>Progress: ${state.withdrawalAdClicks} / ${goal}</strong></p>
-                            <button id="watch-ad-for-withdrawal" class="action-button">Watch Ad</button>
-                        </div>
-                    `;
+                    elements.withdrawalDayNote.style.display = 'none';
+                    elements.withdrawButton.innerText = gameSettings.withdrawalButtonText;
+
+                    if (adsWatchedSufficiently) {
+                        elements.withdrawalAdTaskContainer.style.display = 'none';
+                        elements.withdrawButton.disabled = false; 
+                    } else {
+                        elements.withdrawalAdTaskContainer.style.display = 'flex';
+                        elements.withdrawButton.disabled = true; 
+                        elements.withdrawalAdTaskContainer.innerHTML = `
+                            <div class="option-card">
+                                <h3>Unlock Withdrawals</h3>
+                                <p>Watch ${goal} ads to enable the withdrawal button.</p>
+                                <p><strong>Progress: ${state.withdrawalAdClicks} / ${goal}</strong></p>
+                                <button id="watch-ad-for-withdrawal" class="action-button">Watch Ad</button>
+                            </div>
+                        `;
+                    }
                 }
-                
                 renderWithdrawalHistory();
             }
 
@@ -2841,8 +2853,7 @@
                     button.disabled = true;
                     button.innerText = 'Loading Ad...';
                     
-                    // MODIFIED: New ad URL from your request
-                    showAdFrame('https://www.profitableratecpm.com/pk9fkd5v8?key=1afa6b8e3d8f61558b90095a0c9a2c44', () => {
+                    showAdFrame('https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315', () => {
                         state.withdrawalAdClicks++;
                         saveGame({ withdrawalAdClicks: state.withdrawalAdClicks });
                         renderWalletScreen(); 
@@ -3178,22 +3189,7 @@
                 
                 renderWalletScreen(); 
             });
-
-            // --- MODIFIED EVENT LISTENER ---
-            elements.withdrawButton.addEventListener('click', () => { 
-                // MODIFIED: Minimum changed from 2000 to 10000
-                if (state.score >= 10000) { 
-                    const amountToWithdraw = state.score; 
-                    const amountInRupees = (amountToWithdraw / 1000).toFixed(2); 
-                    elements.popupWithdrawalAmount.innerText = `${amountToWithdraw.toLocaleString()} 🪙`; 
-                    elements.popupWithdrawalValueInr.innerText = `Value: ₹${amountInRupees} INR`; 
-                    elements.withdrawPopup.style.display = 'flex'; 
-                } else { 
-                    // MODIFIED: Alert message updated
-                    alert(`You need at least 10,000 coins (₹10) to make a withdrawal.`); 
-                } 
-            });
-            
+            elements.withdrawButton.addEventListener('click', () => { if (state.score >= 2000) { const amountToWithdraw = state.score; const amountInRupees = (amountToWithdraw / 1000).toFixed(2); elements.popupWithdrawalAmount.innerText = `${amountToWithdraw.toLocaleString()} 🪙`; elements.popupWithdrawalValueInr.innerText = `Value: ₹${amountInRupees} INR`; elements.withdrawPopup.style.display = 'flex'; } else { alert(`You need at least 2000 coins (₹2) to make a withdrawal.`); } });
             elements.popupCloseButton.addEventListener('click', () => elements.withdrawPopup.style.display = 'none');
             
             elements.betSelectionContainer.addEventListener('click', (e) => { if (e.target.classList.contains('bet-button')) { elements.betSelectionContainer.querySelectorAll('.bet-button').forEach(btn => btn.classList.remove('active')); e.target.classList.add('active'); currentBetAmount = parseInt(e.target.dataset.bet, 10); } });
