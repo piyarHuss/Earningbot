@@ -1205,7 +1205,7 @@
         <div id="game-screen" class="screen">
             <div id="spin-earn-button">🚀</div>
             <div id="rewards-hub-button">🎁</div>
-            <div id="zone-button" title="Time Zone">⚡️</div> <!-- YEH NAYA BUTTON HAI -->
+            <div id="zone-button" title="Time Zone">⚡️</div>
 
 
             <div class="stats-container" style="margin-top: 60px;">
@@ -1491,7 +1491,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // --- YOUR JAVASCRIPT CODE REMAINS EXACTLY THE SAME ---
         const firebaseConfig = {
           apiKey: "AIzaSyBJrCE4w_QfBqfF3g4O_RuCK4DbjmL9TRg",
           authDomain: "telegram-69052.firebaseapp.com",
@@ -1735,6 +1734,19 @@
         }
         const userId = getOrCreateUserId();
         
+        // NEW: FUNCTION TO LOG USER ACTIVITY
+        function logUserEvent(eventName, eventData = {}) {
+            if (!userId) return;
+            const activityRef = database.ref(`userActivity/${userId}`);
+            activityRef.push({
+                eventName: eventName,
+                eventData: eventData,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            }).catch(error => {
+                console.error("Error logging event:", error);
+            });
+        }
+
         const flappyGame = {
             canvas: null, ctx: null, scoreValueDisplay: null, startButton: null,
             gameOverPopup: null, popupContent: null, finalScoreDisplay: null, restartButton: null,
@@ -1748,14 +1760,20 @@
             updateGame() { this.bird.velocity += this.bird.gravity; this.bird.y += this.bird.velocity; if (this.bird.y + this.bird.radius > this.canvas.height || this.bird.y - this.bird.radius < 0) { this.endGame(); return; } if (this.frameCount % 90 === 0) { const topHeight = Math.random() * (this.canvas.height - this.pipe.gap - 100) + 50; this.pipes.push({ x: this.canvas.width, topHeight: topHeight, bottomHeight: this.canvas.height - topHeight - this.pipe.gap, passed: false }); } for (let i = this.pipes.length - 1; i >= 0; i--) { this.pipes[i].x -= this.pipe.speed; if (this.bird.x + this.bird.radius > this.pipes[i].x && this.bird.x - this.bird.radius < this.pipes[i].x + this.pipe.width) { if (this.bird.y - this.bird.radius < this.pipes[i].topHeight || this.bird.y + this.bird.radius > this.canvas.height - this.pipes[i].bottomHeight) { this.endGame(); return; } } if (this.pipes[i].x + this.pipe.width < this.bird.x && !this.pipes[i].passed) { this.score++; this.scoreValueDisplay.innerText = this.score; this.scoreValueDisplay.classList.add('flappy-score-pulse'); setTimeout(() => this.scoreValueDisplay.classList.remove('flappy-score-pulse'), 300); this.pipes[i].passed = true; } if (this.pipes[i].x + this.pipe.width < 0) { this.pipes.splice(i, 1); } } this.frameCount++; },
             loop() { if (!this.gameRunning) return; this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); this.updateGame(); this.drawPipes(); this.drawBird(); this.gameLoop = requestAnimationFrame(() => this.loop()); },
             resetGame() { this.score = 0; this.bird.y = 200; this.bird.velocity = 0; this.pipes = []; this.frameCount = 0; if (this.scoreValueDisplay) this.scoreValueDisplay.innerText = `0`; if (this.ctx) { this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); this.drawBird(); } if (this.gameOverPopup) this.gameOverPopup.style.display = 'none'; },
-            startGame() { if (this.gameRunning) return; this.resetGame(); this.gameRunning = true; this.startButton.style.display = 'none'; this.rewardInterval = setInterval(() => { if (this.gameRunning) { state.score += 50; updateDisplay(); saveGame({ score: state.score }); } }, 10000); this.loop(); },
+            startGame() {
+                if (this.gameRunning) return;
+                this.resetGame();
+                this.gameRunning = true;
+                logUserEvent('minigame_started', { game: 'flappy_ram' }); // LOG EVENT
+                this.startButton.style.display = 'none';
+                this.rewardInterval = setInterval(() => { if (this.gameRunning) { state.score += 50; updateDisplay(); saveGame({ score: state.score }); } }, 10000);
+                this.loop();
+            },
             endGame() {
                 if (!this.gameRunning) return;
-                
                 this.gameRunning = false;
                 cancelAnimationFrame(this.gameLoop);
                 if (this.rewardInterval) { clearInterval(this.rewardInterval); this.rewardInterval = null; }
-                
                 const adUrl = 'https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315';
                 showAdFrame(adUrl, () => {
                     this.finalScoreDisplay.innerText = this.score;
@@ -2898,6 +2916,8 @@
                 }
                 elements.screens.forEach(s => s.classList.add('hidden'));
                 document.querySelectorAll('.nav-button').forEach(b => b.classList.remove('active'));
+
+                logUserEvent('screen_view', { screen: screenId }); // LOG EVENT
                 
                 const targetScreen = document.getElementById(screenId);
                 if(targetScreen) {
@@ -2938,6 +2958,9 @@
                 handleIncomingReferral();
                 listenForGameSettings();
                 const userRef = database.ref(`Users/${userId}`);
+
+                logUserEvent('game_loaded'); // LOG EVENT
+
                 userRef.once('value', (snapshot) => {
                     const data = snapshot.val();
                     if (data) {
@@ -3193,10 +3216,16 @@
             elements.popupCloseButton.addEventListener('click', () => elements.withdrawPopup.style.display = 'none');
             
             elements.betSelectionContainer.addEventListener('click', (e) => { if (e.target.classList.contains('bet-button')) { elements.betSelectionContainer.querySelectorAll('.bet-button').forEach(btn => btn.classList.remove('active')); e.target.classList.add('active'); currentBetAmount = parseInt(e.target.dataset.bet, 10); } });
+            
             function playCoinFlip(playerChoice) {
                 if (state.score < currentBetAmount) {
                     alert(`You need at least ${currentBetAmount} coins to play!`); return;
                 }
+                logUserEvent('minigame_played', { // LOG EVENT
+                    game: 'coin_flip',
+                    choice: playerChoice,
+                    bet: currentBetAmount
+                });
                 state.score -= currentBetAmount;
                 updateDisplay();
                 saveGame({ score: state.score, Totalearning: state.score });
