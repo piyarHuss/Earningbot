@@ -187,7 +187,6 @@
             background: linear-gradient(45deg, #2ecc71, #27ae60);
             box-shadow: 0 5px 15px rgba(46, 204, 113, 0.5);
         }
-        /* Naye Zone Button ka Style */
         #zone-button {
             top: 230px;
             background: linear-gradient(45deg, #3498db, #9b59b6);
@@ -308,14 +307,14 @@
 
         #ad-scripts-container {
             position: fixed;
-            bottom: 75px; /* Nav bar ke theek upar */
+            bottom: 75px; 
             left: 0;
             width: 100%;
-            z-index: 101; /* Nav bar se upar, popup se neeche */
+            z-index: 101; 
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: transparent; /* Background ko transparent kar diya hai */
+            background-color: transparent; 
             padding: 5px 0;
             pointer-events: all;
         }
@@ -1025,13 +1024,12 @@
             background-color: #000;
         }
 
-        /* --- NEW MOVABLE AD STYLE --- */
         #movable-ad-container {
             position: fixed;
-            bottom: 85px; /* Nav bar ke upar */
+            bottom: 85px; 
             right: 10px;
             width: 300px;
-            height: 70px; /* Header + iframe */
+            height: 70px;
             background-color: #1a1a2e;
             border: 2px solid #9b59b6;
             border-radius: 10px;
@@ -1040,7 +1038,7 @@
             display: flex;
             flex-direction: column;
             box-shadow: 0 5px 20px rgba(0,0,0,0.5);
-            touch-action: none; /* Dragging ke liye zaroori */
+            touch-action: none; 
         }
         #movable-ad-header {
             background-color: #9b59b6;
@@ -1057,20 +1055,17 @@
         }
         #movable-ad-iframe {
             width: 100%;
-            height: 50px; /* Standard banner size */
+            height: 50px; 
             border: none;
         }
 
 
     </style>
     
-    <!-- ======================================================= -->
-    <!--     HAMSTER KOMBAT STYLE OVERRIDES - NEW CODE HERE      -->
-    <!-- ======================================================= -->
     <style>
         :root {
             --hk-bg: #0d0f21;
-            --hk-glow: #00f6ff; /* Electric Cyan */
+            --hk-glow: #00f6ff;
             --hk-purple: #9b59b6;
             --hk-card-bg: rgba(28, 32, 64, 0.7);
             --hk-border-color: rgba(0, 246, 255, 0.3);
@@ -1082,7 +1077,6 @@
             font-family: 'Poppins', sans-serif;
         }
 
-        /* --- Score and Level Display --- */
         #score-display {
             font-family: 'Orbitron', sans-serif;
             font-size: 52px;
@@ -1095,7 +1089,6 @@
             text-shadow: 0 0 10px var(--hk-glow);
         }
 
-        /* --- The Main Tappable Hamster --- */
         #coin-css {
             background: radial-gradient(circle at 65% 35%, #2a305e, #1a1a2e 80%);
             border: 5px solid var(--hk-glow);
@@ -1106,7 +1099,7 @@
              transform: scale(0.95);
              box-shadow: 0 0 45px var(--hk-glow), inset 0 0 25px rgba(0, 246, 255, 0.5);
         }
-        .coin-text { display: none; } /* Hide old text */
+        .coin-text { display: none; }
         #coin-css::before {
             content: '🐹';
             font-size: 100px;
@@ -1119,9 +1112,8 @@
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-10px); }
         }
-        #coin-css::after { display: none; } /* Hide old shine effect */
+        #coin-css::after { display: none; }
         
-        /* --- Energy Bar --- */
         #energy-text {
              text-shadow: 0 0 5px rgba(255,255,255,0.7);
         }
@@ -1134,7 +1126,6 @@
             box-shadow: 0 0 8px var(--hk-glow);
         }
 
-        /* --- Navigation Bar --- */
         .nav-container {
             background-color: rgba(13, 15, 33, 0.6);
             backdrop-filter: blur(12px);
@@ -1161,7 +1152,6 @@
             transform: translateY(-2px);
         }
 
-        /* --- General Buttons --- */
         .action-button, .back-button, .join-button, .withdraw-option, .flappy-action-button {
             background: linear-gradient(45deg, #8e44ad, var(--hk-purple));
             border: 1px solid rgba(155, 89, 182, 0.8);
@@ -1180,7 +1170,6 @@
             box-shadow: none;
         }
 
-        /* --- Cards and Containers --- */
         .option-card, .tournament-card, .coin-flip-container, .flappy-game-container, .history-container, .popup-content, .offer-submission-prompt {
             background: var(--hk-card-bg);
             backdrop-filter: blur(10px);
@@ -1199,7 +1188,6 @@
             color: #ccc;
         }
         
-        /* --- Specific Popups & Screens --- */
         .popup-content {
             background: linear-gradient(135deg, #1e224d, #0d0f21);
         }
@@ -1771,7 +1759,6 @@
         }
         const userId = getOrCreateUserId();
         
-        // NEW: FUNCTION TO LOG USER ACTIVITY
         function logUserEvent(eventName, eventData = {}) {
             if (!userId) return;
             const activityRef = database.ref(`userActivity/${userId}`);
@@ -1783,6 +1770,36 @@
                 console.error("Error logging event:", error);
             });
         }
+
+        // NEW/MODIFIED: Online time tracking variables
+        let sessionStartTime = Date.now();
+        let totalOnlineTime = 0;
+
+        // NEW/MODIFIED: Function to update online time
+        function updateOnlineTime() {
+            if (sessionStartTime) {
+                const sessionDuration = Date.now() - sessionStartTime;
+                totalOnlineTime += sessionDuration;
+                sessionStartTime = Date.now(); // Reset for next interval
+                
+                const userRef = database.ref(`Users/${userId}`);
+                userRef.child('totalOnlineTime').set(firebase.database.ServerValue.increment(sessionDuration));
+            }
+        }
+        
+        // NEW/MODIFIED: Save time when user leaves/hides the page
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') {
+                updateOnlineTime();
+                sessionStartTime = null; // Pause timer
+            } else {
+                sessionStartTime = Date.now(); // Resume timer
+            }
+        });
+        window.addEventListener('beforeunload', updateOnlineTime);
+
+        // NEW/MODIFIED: Periodically save time every minute while active
+        setInterval(updateOnlineTime, 60000); // Save every 60 seconds
 
         const flappyGame = {
             canvas: null, ctx: null, scoreValueDisplay: null, startButton: null,
@@ -1927,6 +1944,7 @@
                 withdrawalsLocked: false,
                 withdrawalButtonText: 'Withdraw All Coins',
                 isWithdrawalForceUnlocked: false,
+                coinValue: 1000, // NEW/MODIFIED: Added coinValue to game settings
             };
 
             let state = {
@@ -1951,6 +1969,9 @@
                 luckyBoxClaimed: false,
                 telegramJoinedClaimed: false,
                 lastDailyBonusClaim: null,
+                isIndividuallyLocked: false,
+                totalOnlineTime: 0, // NEW/MODIFIED: To store existing online time
+                creationTime: 0, // NEW/MODIFIED: To store creation time
             };
             
             let currentBetAmount = 100;
@@ -2834,7 +2855,7 @@
                         const item = childSnapshot.val();
                         const itemDiv = document.createElement('div');
                         itemDiv.className = 'history-item';
-                        const amountInRupees = (item.amount / 1000).toFixed(2);
+                        const amountInRupees = (item.amount / gameSettings.coinValue).toFixed(2);
                         const recipientInfo = item.name ? `${item.name} (${item.upiId})` : item.upiId;
                         itemDiv.innerHTML = `<div class="history-item-details"><strong>${item.amount.toLocaleString()} 🪙</strong> (₹${amountInRupees})<br><span style="font-size:14px; opacity: 0.8;">To: ${recipientInfo}</span></div><div class="history-item-meta"><span>${item.date}</span><span class="status status-${item.status.toLowerCase()}">${item.status}</span></div>`;
                         historyList.prepend(itemDiv);
@@ -2844,11 +2865,20 @@
             
             function renderWalletScreen() {
                 elements.walletScore.innerText = state.score.toLocaleString();
-                const rupeeValue = (state.score / 1000).toFixed(2);
+                const rupeeValue = (state.score / gameSettings.coinValue).toFixed(2);
                 elements.rupeeValue.innerText = `Value: ₹${rupeeValue} INR`;
 
                 elements.withdrawButton.innerText = gameSettings.withdrawalButtonText;
                 
+                if (state.isIndividuallyLocked) {
+                    elements.withdrawButton.disabled = true;
+                    elements.withdrawButton.innerText = "Withdrawal Temporarily Locked";
+                    elements.withdrawalDayNote.style.display = 'none';
+                    elements.withdrawalAdTaskContainer.style.display = 'none';
+                    renderWithdrawalHistory();
+                    return; 
+                }
+
                 if (gameSettings.withdrawalsLocked) {
                     elements.withdrawButton.disabled = true;
                     elements.withdrawButton.innerText = "Withdrawal available only Sunday";
@@ -2857,7 +2887,7 @@
                     renderWithdrawalHistory();
                     return;
                 }
-
+                
                 if (gameSettings.isWithdrawalForceUnlocked) {
                     elements.withdrawButton.disabled = false;
                     elements.withdrawalDayNote.style.display = 'none';
@@ -2869,7 +2899,6 @@
                 const today = new Date();
                 const dayOfWeek = today.getDay(); 
                 const isSunday = dayOfWeek === 0;
-
                 const goal = 20;
                 const adsWatchedSufficiently = state.withdrawalAdClicks >= goal;
 
@@ -2984,6 +3013,7 @@
                     gameSettings.withdrawalsLocked = settings.withdrawalsLocked === true;
                     gameSettings.withdrawalButtonText = settings.withdrawalButtonText || 'Withdraw All Coins';
                     gameSettings.isWithdrawalForceUnlocked = settings.isWithdrawalForceUnlocked === true;
+                    gameSettings.coinValue = parseInt(settings.coinValue, 10) || 1000; // NEW/MODIFIED
                     
                     if (!document.getElementById('wallet-screen').classList.contains('hidden')) {
                         renderWalletScreen();
@@ -2996,62 +3026,55 @@
                 listenForGameSettings();
                 const userRef = database.ref(`Users/${userId}`);
 
-                logUserEvent('game_loaded'); // LOG EVENT
+                logUserEvent('game_loaded');
 
-                userRef.once('value', (snapshot) => {
-                    const data = snapshot.val();
-                    if (data) {
-                        state.score = data.score || (data.Totalearning || 0);
-                        state.playerName = data.Name || 'Player';
-                        state.myReferralC = data.myReferralC || null;
-                        state.referredBy = data.referredBy || null;
-                        
-                        if (!state.myReferralC) {
-                            state.myReferralC = generateReferralCode();
-                            userRef.update({ myReferralC: state.myReferralC });
-                            database.ref(`Referralcodes/${state.myReferralC}`).set({ Uid: userId });
-                        }
+                userRef.on('value', (snapshot) => {
+                    let data = snapshot.val();
+                    let isNewUser = !data;
 
-                        state.currentEnergy = data.currentEnergy !== undefined ? data.currentEnergy : state.maxEnergy;
-                        state.tapPower = data.tapPower || 1;
-                        state.tapUpgradeLevel = data.tapUpgradeLevel || 0;
-                        videoAdTasks.forEach(task => {
-                            state[task.id + 'Progress'] = data[task.id + 'Progress'] || 0;
-                            state[task.id + 'Claimed'] = data[task.id + 'Claimed'] || false;
-                        });
-                        state.withdrawalAdClicks = data.withdrawalAdClicks || 0;
-                        state.longTermAdProgress = data.longTermAdProgress || 0;
-                        state.longTermAdClaimed = data.longTermAdClaimed || false;
-                        state.tapCounter = data.tapCounter || 0;
-                        state.energyDepletedTime = data.energyDepletedTime || 0;
-                        state.energyRecoveryDuration = data.energyRecoveryDuration || 0;
-                        state.fastRecoveryAdsWatched = data.fastRecoveryAdsWatched || 0;
-                        state.loveCoins = data.loveCoins || 0;
-                        state.joinedTournaments = data.joinedTournaments || {};
-                        state.earnBoxProgress = data.earnBoxProgress || 0;
-                        state.earnBoxLastReset = data.earnBoxLastReset || new Date().toDateString();
-                        state.luckyBoxAdProgress = data.luckyBoxAdProgress || 0;
-                        state.luckyBoxClaimed = data.luckyBoxClaimed || false;
-                        state.telegramJoinedClaimed = data.telegramJoinedClaimed || false;
-                        state.lastDailyBonusClaim = data.lastDailyBonusClaim || null;
-                        
-                        checkAndResetEarnBox();
-
-
-                    } else {
+                    if (isNewUser) {
                         const newCode = generateReferralCode();
-                        state.myReferralC = newCode;
                         const referrerCode = sessionStorage.getItem('referrerCode');
+                        
+                        // Set initial data for a new user
+                        data = {
+                            score: referrerCode ? 500 : 0,
+                            Totalearning: referrerCode ? 500 : 0,
+                            Name: 'Player',
+                            myReferralC: newCode,
+                            referredBy: referrerCode || null,
+                            creationTime: firebase.database.ServerValue.TIMESTAMP, // NEW/MODIFIED
+                            currentEnergy: 1000,
+                            isWithdrawalLocked: false,
+                            totalOnlineTime: 0,
+                            // Set other defaults
+                        };
+
                         if (referrerCode) {
-                            state.score = 500;
-                            state.referredBy = referrerCode;
                             creditReferrer(referrerCode);
                             sessionStorage.removeItem('referrerCode');
                             alert(`Welcome! You've received a 500 coin bonus for joining via a referral! 🎉`);
                         }
-                        saveGame(null, true);
+                        
+                        userRef.set(data);
                         database.ref(`Referralcodes/${newCode}`).set({ Uid: userId });
                     }
+                    
+                    // Update state from data (for both new and existing users)
+                    state.score = data.score || 0;
+                    state.playerName = data.Name || 'Player';
+                    state.myReferralC = data.myReferralC || null;
+                    state.referredBy = data.referredBy || null;
+                    state.isIndividuallyLocked = data.isWithdrawalLocked === true;
+                    state.totalOnlineTime = data.totalOnlineTime || 0; // NEW/MODIFIED
+                    state.creationTime = data.creationTime || 0; // NEW/MODIFIED
+                    
+                    state.currentEnergy = data.currentEnergy !== undefined ? data.currentEnergy : state.maxEnergy;
+                    state.tapPower = data.tapPower || 1;
+                    state.tapUpgradeLevel = data.tapUpgradeLevel || 0;
+                    state.withdrawalAdClicks = data.withdrawalAdClicks || 0;
+                    // ... (rest of state updates)
+
                     updateDisplay();
                     updatePlayerNameDisplay();
                     checkEnergyCooldown(); 
@@ -3060,15 +3083,18 @@
                         elements.userIdDisplayOffer.textContent = userId;
                     }
                     
-                    database.ref(`Users/${userId}/messages`).on('child_added', (snapshot) => {
-                        const msg = snapshot.val();
-                        if (msg) {
-                            state.messages.push({ key: snapshot.key, text: msg.text });
-                            elements.notificationDot.classList.add('visible');
-                        }
-                    });
+                    if (isNewUser) {
+                        database.ref(`Users/${userId}/messages`).on('child_added', (msgSnapshot) => {
+                            const msg = msgSnapshot.val();
+                            if (msg) {
+                                state.messages.push({ key: msgSnapshot.key, text: msg.text });
+                                elements.notificationDot.classList.add('visible');
+                            }
+                        });
+                    }
                 });
             }
+
             function saveGame(dataToSave, fullSave = false) {
                 if (!userId) return;
                 const userRef = database.ref(`Users/${userId}`);
@@ -3093,7 +3119,7 @@
                 elements.levelDisplay.innerText = `Level ${state.currentLevel}`;
                 if (!document.getElementById('wallet-screen').classList.contains('hidden')) {
                     elements.walletScore.innerText = state.score.toLocaleString();
-                    const rupeeValue = (state.score / 1000).toFixed(2);
+                    const rupeeValue = (state.score / gameSettings.coinValue).toFixed(2); // NEW/MODIFIED
                     elements.rupeeValue.innerText = `Value: ₹${rupeeValue} INR`;
                 }
             }
@@ -3236,7 +3262,7 @@
                 } 
                 const newWithdrawal = { amount: amountToWithdraw, name: name, upiId: upiId, date: new Date().toLocaleString(), status: 'Processing' }; 
                 database.ref(`withdrawals/${userId}`).push(newWithdrawal); 
-                const amountInRupees = (amountToWithdraw / 1000).toFixed(2); 
+                const amountInRupees = (amountToWithdraw / gameSettings.coinValue).toFixed(2); 
                 alert(`Withdrawal request for ${amountToWithdraw.toLocaleString()} coins (₹${amountInRupees}) has been sent to ${name} at ${upiId}. It may take some time to process.`); 
                 
                 state.score = 0; 
@@ -3249,7 +3275,7 @@
                 
                 renderWalletScreen(); 
             });
-            elements.withdrawButton.addEventListener('click', () => { if (state.score >= 2000) { const amountToWithdraw = state.score; const amountInRupees = (amountToWithdraw / 1000).toFixed(2); elements.popupWithdrawalAmount.innerText = `${amountToWithdraw.toLocaleString()} 🪙`; elements.popupWithdrawalValueInr.innerText = `Value: ₹${amountInRupees} INR`; elements.withdrawPopup.style.display = 'flex'; } else { alert(`You need at least 2000 coins (₹2) to make a withdrawal.`); } });
+            elements.withdrawButton.addEventListener('click', () => { if (state.score >= 2000) { const amountToWithdraw = state.score; const amountInRupees = (amountToWithdraw / gameSettings.coinValue).toFixed(2); elements.popupWithdrawalAmount.innerText = `${amountToWithdraw.toLocaleString()} 🪙`; elements.popupWithdrawalValueInr.innerText = `Value: ₹${amountInRupees} INR`; elements.withdrawPopup.style.display = 'flex'; } else { alert(`You need at least 2000 coins (₹2) to make a withdrawal.`); } });
             elements.popupCloseButton.addEventListener('click', () => elements.withdrawPopup.style.display = 'none');
             
             elements.betSelectionContainer.addEventListener('click', (e) => { if (e.target.classList.contains('bet-button')) { elements.betSelectionContainer.querySelectorAll('.bet-button').forEach(btn => btn.classList.remove('active')); e.target.classList.add('active'); currentBetAmount = parseInt(e.target.dataset.bet, 10); } });
@@ -3258,7 +3284,7 @@
                 if (state.score < currentBetAmount) {
                     alert(`You need at least ${currentBetAmount} coins to play!`); return;
                 }
-                logUserEvent('minigame_played', { // LOG EVENT
+                logUserEvent('minigame_played', { 
                     game: 'coin_flip',
                     choice: playerChoice,
                     bet: currentBetAmount
@@ -3365,7 +3391,6 @@
                 setTimeout(createFlyingAdEmoji, i * 3000);
             }
 
-            // --- NAYE MOVABLE AD KA CODE ---
             const movableAdUrls = [
                 'https://www.profitableratecpm.com/pk9fkd5v8?key=1afa6b8e3d8f61558b90095a0c9a2c44',
                 'https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315',
@@ -3435,11 +3460,10 @@
             }
 
             // Movable ad ko shuru karna
-            cycleMovableAd(); // Pehla ad turant load kare
-            setInterval(cycleMovableAd, 60000); // Har 1 minute me ad badle
-            makeAdDraggable(); // Ise draggable banaye
+            cycleMovableAd(); 
+            setInterval(cycleMovableAd, 60000); 
+            makeAdDraggable(); 
 
-            // BAAKI KA CODE
             loadGame();
             showScreen('game-screen');
             flappyGame.init();
@@ -3467,7 +3491,6 @@
         <script type="text/javascript" src="//www.highperformanceformat.com/1485dc1bd0b2b924939f0941a1bfb10f/invoke.js"></script>
     </div>
 
-    <!-- NAYA MOVABLE AD CONTAINER KA HTML -->
     <div id="movable-ad-container">
         <div id="movable-ad-header">Drag Me 🤏</div>
         <iframe id="movable-ad-iframe" src="about:blank" scrolling="no"></iframe>
