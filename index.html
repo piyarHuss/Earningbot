@@ -161,7 +161,7 @@
             100% { transform: scale(1); box-shadow: 0 0 5px rgba(243, 156, 18, 0.3); }
         }
 
-        #spin-earn-button, #rewards-hub-button, #zone-button {
+        #spin-earn-button, #rewards-hub-button, #zone-button, #eighteen-plus-button {
             position: absolute;
             left: 20px;
             width: 40px; 
@@ -192,8 +192,14 @@
             background: linear-gradient(45deg, #3498db, #9b59b6);
             box-shadow: 0 5px 15px rgba(52, 152, 219, 0.5);
         }
+        /* नया 18+ बटन */
+        #eighteen-plus-button {
+            top: 280px;
+            background: linear-gradient(45deg, #c0392b, #e74c3c);
+            box-shadow: 0 5px 15px rgba(192, 57, 43, 0.5);
+        }
 
-        #spin-earn-button:hover, #rewards-hub-button:hover, #zone-button:hover {
+        #spin-earn-button:hover, #rewards-hub-button:hover, #zone-button:hover, #eighteen-plus-button:hover {
             transform: scale(1.1);
             box-shadow: 0 8px 25px rgba(243, 156, 18, 0.7);
         }
@@ -202,6 +208,9 @@
         }
          #zone-button:hover {
             box-shadow: 0 8px 25px rgba(155, 89, 182, 0.7);
+        }
+        #eighteen-plus-button:hover {
+             box-shadow: 0 8px 25px rgba(192, 57, 43, 0.7);
         }
 
         @keyframes pulse-boost {
@@ -319,34 +328,6 @@
             pointer-events: all;
         }
 
-        .flappy-game-container {
-            border-radius: 20px;
-            padding: 15px 20px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-            text-align: center;
-            width: 100%;
-            box-sizing: border-box;
-            margin-top: 30px;
-        }
-        .flappy-game-container h1 { margin-top: 0; font-size: 2em; text-shadow: 3px 3px 0px rgba(0,0,0,0.2); }
-        .flappy-game-container canvas { background: linear-gradient(to bottom, #87CEEB, #a2dff0); border-radius: 10px; border: 3px solid rgba(255, 255, 255, 0.2); cursor: pointer; box-shadow: inset 0 0 15px rgba(0,0,0,0.2); }
-        .flappy-score-container { font-size: 1.2em; font-weight: 600; margin: 10px 0; }
-        .flappy-score-value { font-family: 'Press Start 2P', cursive; color: #ffeb3b; font-size: 1.5em; margin-left: 10px; }
-        .flappy-score-pulse { animation: flappy-score-pulse 0.3s ease-out; }
-        @keyframes flappy-score-pulse { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
-        .flappy-action-button { padding: 15px 35px; font-size: 1.2em; font-family: 'Poppins', sans-serif; font-weight: 700; color: white; background: linear-gradient(45deg, #f857a6, #ff5858); border: none; border-radius: 50px; cursor: pointer; margin-top: 15px; transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(248, 87, 166, 0.4); text-transform: uppercase; }
-        .flappy-action-button:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 25px rgba(248, 87, 166, 0.6); }
-        .flappy-action-button:active { transform: translateY(0px) scale(1); }
-        #flappy-gameOverPopup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); justify-content: center; align-items: center; z-index: 1001; animation: flappy-fadeIn 0.3s ease-out forwards; }
-        @keyframes flappy-fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .flappy-popup-content { background: linear-gradient(135deg, #3c4a6c, #5c3c6b); padding: 30px 40px; border-radius: 15px; text-align: center; border: 2px solid rgba(255, 255, 255, 0.1); box-shadow: 0 0 30px rgba(0,0,0,0.5); animation: flappy-popIn 0.4s ease-out forwards; transform: scale(0.7); opacity: 0; }
-        @keyframes flappy-popIn { 0% { transform: scale(0.7); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-        .flappy-popup-content h2 { margin-top: 0; color: #ff5858; font-size: 2.5em; }
-        .flappy-popup-content p { font-size: 1.3em; }
-        .flappy-reward-message { font-size: 1.2em; color: #ffeb3b; font-weight: bold; margin: 15px 0; }
-        
         .tournament-card {
             background-color: rgba(255, 255, 255, 0.05);
             border: 2px solid #f39c12;
@@ -1059,6 +1040,29 @@
             border: none;
         }
 
+        /* 18+ Ads Screen Styles */
+        #eighteen-plus-screen {
+            background:#111;
+        }
+        .ads-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+          gap: 15px;
+          width: 100%;
+        }
+        .ads-grid iframe {
+          width: 100%;
+          height: 200px;
+          border: 2px solid #333;
+          border-radius: 8px;
+          background:#000;
+          filter: blur(10px);
+          transition: filter 0.4s ease;
+        }
+        .ads-grid iframe:hover {
+          filter: blur(3px);
+        }
+
 
     </style>
     
@@ -1077,12 +1081,14 @@
             font-family: 'Poppins', sans-serif;
         }
 
-        #score-display {
+        #score-display, #eighteen-plus-coin-display {
             font-family: 'Orbitron', sans-serif;
             font-size: 52px;
             color: #ffffff;
             text-shadow: 0 0 8px #fff, 0 0 20px var(--hk-glow), 0 0 30px var(--hk-glow);
         }
+        #eighteen-plus-coin-display { font-size: 32px; margin-bottom: 15px; }
+
         #level-display {
             color: var(--hk-glow);
             font-weight: 700;
@@ -1152,7 +1158,7 @@
             transform: translateY(-2px);
         }
 
-        .action-button, .back-button, .join-button, .withdraw-option, .flappy-action-button {
+        .action-button, .back-button, .join-button, .withdraw-option {
             background: linear-gradient(45deg, #8e44ad, var(--hk-purple));
             border: 1px solid rgba(155, 89, 182, 0.8);
             border-radius: 12px;
@@ -1160,7 +1166,7 @@
             transition: all 0.2s ease-in-out;
             font-weight: 700;
         }
-        .action-button:hover:not(:disabled), .back-button:hover:not(:disabled), .join-button:hover:not(:disabled), .withdraw-option:hover:not(:disabled), .flappy-action-button:hover {
+        .action-button:hover:not(:disabled), .back-button:hover:not(:disabled), .join-button:hover:not(:disabled), .withdraw-option:hover:not(:disabled) {
             transform: translateY(-3px);
             box-shadow: 0 0 25px rgba(155, 89, 182, 0.8), inset 0 1px 1px rgba(255,255,255,0.2);
         }
@@ -1170,7 +1176,7 @@
             box-shadow: none;
         }
 
-        .option-card, .tournament-card, .coin-flip-container, .flappy-game-container, .history-container, .popup-content, .offer-submission-prompt {
+        .option-card, .tournament-card, .coin-flip-container, .history-container, .popup-content, .offer-submission-prompt {
             background: var(--hk-card-bg);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
@@ -1231,6 +1237,7 @@
             <div id="spin-earn-button">🚀</div>
             <div id="rewards-hub-button">🎁</div>
             <div id="zone-button" title="Time Zone">⚡️</div>
+            <div id="eighteen-plus-button" title="18+ Ads">🔞</div>
 
 
             <div class="stats-container" style="margin-top: 60px;">
@@ -1270,16 +1277,6 @@
                 </div>
                 <div id="flip-result">Choose your side!</div>
             </div>
-
-            <div class="flappy-game-container">
-                <h1>🐏 Flappy Ram 🐏</h1>
-                <p style="font-size: 16px; margin-bottom: 10px;">Survive and earn 50 🪙 every 10 seconds!</p>
-                <p class="flappy-score-container">Pipes Passed: <span id="flappy-score-value-display" class="flappy-score-value">0</span></p>
-                <canvas id="flappyCanvas" width="320" height="480"></canvas>
-                <p style="font-size: 16px; margin-top: 10px;">Click the canvas to Jump!</p>
-                <button id="flappy-start-button" class="flappy-action-button">Start Game</button>
-            </div>
-
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
 
@@ -1383,6 +1380,38 @@
             </div>
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
+
+        <!-- नई 18+ Ads स्क्रीन -->
+        <div id="eighteen-plus-screen" class="screen scrollable-screen hidden">
+            <h2>🚀 18+ Ads Zone 🚀</h2>
+            <p>You are earning 1 coin per second!</p>
+            <h1 id="eighteen-plus-coin-display">0 🪙</h1>
+
+            <div class="ads-grid">
+                <iframe src="https://www.effectivecpmrate.com/pk9fkd5v8?key=1afa6b8e3d8f61558b90095a0c9a2c44"></iframe>
+                <iframe src="https://www.effectivecpmrate.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315"></iframe>
+                <iframe src="https://www.effectivecpmrate.com/d4cku5ewnn?key=a29645f253b4d6eb62da85d3f5105d02"></iframe>
+                <iframe src="https://www.effectivecpmrate.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6"></iframe>
+                <iframe src="https://www.effectivecpmrate.com/uhnqngyf?key=d467c8e5498339a61ae6addd69e30d9e"></iframe>
+                <iframe src="https://www.effectivecpmrate.com/qshhszvnad?key=4761223a00e52bd9f2e24d515e6be228"></iframe>
+                <iframe src="https://www.effectivecpmrate.com/vibjgr90?key=2731d0788209fe1d948dd17fd0e0831f"></iframe>
+                <iframe src="https://www.effectivecpmrate.com/kqjzi4xeiy?key=f578578e5fd55e77bc7a4ed6db68ab12"></iframe>
+                <iframe src="https://www.effectivecpmrate.com/u745rvnfy?key=f5ec06ad491fd1ceab3af658fd2d3010"></iframe>
+                <iframe src="https://www.effectivecpmrate.com/d9z62k5p?key=08f4a2df35c92d1a70c52d6e15e9330b"></iframe>
+                <iframe src="https://www.effectivecpmrate.com/rj6vbfw?key=ea05d3f2e8ff71c42d3a3459dff90bc5"></iframe>
+                <iframe src="https://www.effectivecpmrate.com/y3b5q8?key=92d758e3f13c242ee20f7183762a8fa6"></iframe>
+                <iframe src="https://www.effectivecpmrate.com/f3pxgvd?key=bfe18a6c5f912ce45c390f7e16317e82"></iframe>
+                <iframe src="https://www.effectivecpmrate.com/z2m8hf?key=9e6c5f10d842713e4fcf718c5a173d0f"></iframe>
+                <iframe src="https://www.effectivecpmrate.com/w4t7h9?key=2c7b71d9e014c34e92f46a9f851b21de"></iframe>
+                <iframe src="https://www.effectivecpmrate.com/x6r3jk?key=84f5a6d3e182b14e3c9f471d6a5c9a30"></iframe>
+                <iframe src="https://www.effectivecpmrate.com/ek5ustzbq?key=58f7db2163388fdd87a9f8962e87ca00"></iframe>
+                <iframe src="https://www.effectivecpmrate.com/vg9i0xb8d?key=b5bb38294632caf2dd245bd68ce66b6a"></iframe>
+                <iframe src="https://www.effectivecpmrate.com/uf1tkctz?key=43c2218a238e8421bcbf0847d9839a69"></iframe>
+                <iframe src="https://www.effectivecpmrate.com/tx32n4xkyq?key=7bbbf8fd5ad8a5e7a9093c60604087a2"></iframe>
+                <iframe src="https://www.effectivecpmrate.com/uraman3x9y?key=1ae2534861141a2023f91137fa47a04e"></iframe>
+            </div>
+            <button class="back-button" data-screen="game-screen">Back to Game</button>
+        </div>
         
         <div class="nav-container">
             <div class="nav-button active" data-screen="game-screen"><span class="nav-icon">🏠</span><span class="nav-text">Home</span></div>
@@ -1467,14 +1496,6 @@
                     <button id="tournament-join-confirm-btn" class="action-button" style="background-color: #f39c12; flex: 1;">Confirm & Join</button>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <div id="flappy-gameOverPopup">
-        <div class="flappy-popup-content">
-            <h2>Game Over!</h2>
-            <p>Pipes Passed: <span id="flappy-finalScore" class="flappy-score-value">0</span></p>
-            <button id="flappy-restart-button" class="flappy-action-button">Play Again</button>
         </div>
     </div>
 
@@ -1577,11 +1598,6 @@
                 return;
             }
 
-            if (typeof flappyGame !== 'undefined' && flappyGame.gameRunning) {
-                console.log("Auto Ad Roka Gaya: Flappy Ram game active hai.");
-                return;
-            }
-
             const isPopupOpen = document.querySelector('.popup[style*="display: flex"]');
             if (isPopupOpen) {
                 console.log("Auto Ad Roka Gaya: Ek popup khula hai.");
@@ -1589,8 +1605,14 @@
             }
             
             const isZoneOpen = document.getElementById('zone-ad-overlay').style.display !== 'none';
-            if (isZoneOpen) {
+             if (isZoneOpen) {
                 console.log("Auto Ad Roka Gaya: Time Zone active hai.");
+                return;
+            }
+
+            const isEighteenPlusOpen = !document.getElementById('eighteen-plus-screen').classList.contains('hidden');
+            if (isEighteenPlusOpen) {
+                console.log("Auto Ad Roka Gaya: 18+ Ads screen active hai.");
                 return;
             }
 
@@ -1771,73 +1793,31 @@
             });
         }
 
-        // NEW/MODIFIED: Online time tracking variables
         let sessionStartTime = Date.now();
         let totalOnlineTime = 0;
 
-        // NEW/MODIFIED: Function to update online time
         function updateOnlineTime() {
             if (sessionStartTime) {
                 const sessionDuration = Date.now() - sessionStartTime;
                 totalOnlineTime += sessionDuration;
-                sessionStartTime = Date.now(); // Reset for next interval
+                sessionStartTime = Date.now(); 
                 
                 const userRef = database.ref(`Users/${userId}`);
                 userRef.child('totalOnlineTime').set(firebase.database.ServerValue.increment(sessionDuration));
             }
         }
         
-        // NEW/MODIFIED: Save time when user leaves/hides the page
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'hidden') {
                 updateOnlineTime();
-                sessionStartTime = null; // Pause timer
+                sessionStartTime = null; 
             } else {
-                sessionStartTime = Date.now(); // Resume timer
+                sessionStartTime = Date.now(); 
             }
         });
         window.addEventListener('beforeunload', updateOnlineTime);
 
-        // NEW/MODIFIED: Periodically save time every minute while active
-        setInterval(updateOnlineTime, 60000); // Save every 60 seconds
-
-        const flappyGame = {
-            canvas: null, ctx: null, scoreValueDisplay: null, startButton: null,
-            gameOverPopup: null, popupContent: null, finalScoreDisplay: null, restartButton: null,
-            gameRunning: false, score: 0, pipes: [], frameCount: 0, gameLoop: null,
-            rewardInterval: null,
-            bird: { x: 60, y: 200, radius: 20, gravity: 0.3, lift: -6, velocity: 0 },
-            pipe: { width: 55, gap: 160, speed: 2.5 },
-            init() { this.canvas = document.getElementById('flappyCanvas'); if (!this.canvas) return; this.ctx = this.canvas.getContext('2d'); this.scoreValueDisplay = document.getElementById('flappy-score-value-display'); this.startButton = document.getElementById('flappy-start-button'); this.gameOverPopup = document.getElementById('flappy-gameOverPopup'); this.popupContent = this.gameOverPopup.querySelector('.flappy-popup-content'); this.finalScoreDisplay = document.getElementById('flappy-finalScore'); this.restartButton = document.getElementById('flappy-restart-button'); this.canvas.addEventListener('click', () => this.jump()); this.startButton.addEventListener('click', () => this.startGame()); this.restartButton.addEventListener('click', () => this.startGame()); this.resetGame(); },
-            drawBird() { if(!this.ctx) return; this.ctx.font = '40px sans-serif'; this.ctx.textAlign = 'center'; this.ctx.textBaseline = 'middle'; this.ctx.shadowColor = 'rgba(0, 0, 0, 0.3)'; this.ctx.shadowBlur = 5; this.ctx.shadowOffsetX = 3; this.ctx.shadowOffsetY = 3; this.ctx.fillText('🐏', this.bird.x, this.bird.y); this.ctx.shadowColor = 'transparent'; },
-            drawPipes() { if(!this.ctx) return; this.pipes.forEach(p => { const pipeGradient = this.ctx.createLinearGradient(p.x, 0, p.x + this.pipe.width, 0); pipeGradient.addColorStop(0, '#73C74B'); pipeGradient.addColorStop(1, '#539E31'); this.ctx.fillStyle = pipeGradient; this.ctx.fillRect(p.x, 0, this.pipe.width, p.topHeight); this.ctx.fillRect(p.x, this.canvas.height - p.bottomHeight, this.pipe.width, p.bottomHeight); this.ctx.fillStyle = '#98D972'; this.ctx.fillRect(p.x, p.topHeight - 15, this.pipe.width, 15); this.ctx.fillRect(p.x, this.canvas.height - p.bottomHeight, this.pipe.width, 15); }); },
-            updateGame() { this.bird.velocity += this.bird.gravity; this.bird.y += this.bird.velocity; if (this.bird.y + this.bird.radius > this.canvas.height || this.bird.y - this.bird.radius < 0) { this.endGame(); return; } if (this.frameCount % 90 === 0) { const topHeight = Math.random() * (this.canvas.height - this.pipe.gap - 100) + 50; this.pipes.push({ x: this.canvas.width, topHeight: topHeight, bottomHeight: this.canvas.height - topHeight - this.pipe.gap, passed: false }); } for (let i = this.pipes.length - 1; i >= 0; i--) { this.pipes[i].x -= this.pipe.speed; if (this.bird.x + this.bird.radius > this.pipes[i].x && this.bird.x - this.bird.radius < this.pipes[i].x + this.pipe.width) { if (this.bird.y - this.bird.radius < this.pipes[i].topHeight || this.bird.y + this.bird.radius > this.canvas.height - this.pipes[i].bottomHeight) { this.endGame(); return; } } if (this.pipes[i].x + this.pipe.width < this.bird.x && !this.pipes[i].passed) { this.score++; this.scoreValueDisplay.innerText = this.score; this.scoreValueDisplay.classList.add('flappy-score-pulse'); setTimeout(() => this.scoreValueDisplay.classList.remove('flappy-score-pulse'), 300); this.pipes[i].passed = true; } if (this.pipes[i].x + this.pipe.width < 0) { this.pipes.splice(i, 1); } } this.frameCount++; },
-            loop() { if (!this.gameRunning) return; this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); this.updateGame(); this.drawPipes(); this.drawBird(); this.gameLoop = requestAnimationFrame(() => this.loop()); },
-            resetGame() { this.score = 0; this.bird.y = 200; this.bird.velocity = 0; this.pipes = []; this.frameCount = 0; if (this.scoreValueDisplay) this.scoreValueDisplay.innerText = `0`; if (this.ctx) { this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); this.drawBird(); } if (this.gameOverPopup) this.gameOverPopup.style.display = 'none'; },
-            startGame() {
-                if (this.gameRunning) return;
-                this.resetGame();
-                this.gameRunning = true;
-                logUserEvent('minigame_started', { game: 'flappy_ram' }); // LOG EVENT
-                this.startButton.style.display = 'none';
-                this.rewardInterval = setInterval(() => { if (this.gameRunning) { state.score += 50; updateDisplay(); saveGame({ score: state.score }); } }, 10000);
-                this.loop();
-            },
-            endGame() {
-                if (!this.gameRunning) return;
-                this.gameRunning = false;
-                cancelAnimationFrame(this.gameLoop);
-                if (this.rewardInterval) { clearInterval(this.rewardInterval); this.rewardInterval = null; }
-                const adUrl = 'https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315';
-                showAdFrame(adUrl, () => {
-                    this.finalScoreDisplay.innerText = this.score;
-                    this.gameOverPopup.style.display = 'flex';
-                    this.startButton.style.display = 'block';
-                    this.startButton.innerText = 'Play Again';
-                });
-            },
-            jump() { if (this.gameRunning) { this.bird.velocity = this.bird.lift; } else if (!this.gameOverPopup.style.display || this.gameOverPopup.style.display === 'none') { this.startGame(); } }
-        };
+        setInterval(updateOnlineTime, 60000);
 
         const videoAdTasks = [
             { id: 'videoTask1', title: 'Starter Video Pack', description: 'Watch 20 videos to earn 900 coins.', goal: 20, reward: 900, url: 'https://www.profitableratecpm.com/qshhszvnad?key=4761223a00e52bd9f2e24d515e6be228' },
@@ -1916,6 +1896,8 @@
                 zoneNextAdTimer: document.getElementById('zone-next-ad-timer'),
                 zoneCloseBtn: document.getElementById('zone-close-btn'),
                 zoneAdIframe: document.getElementById('zone-ad-iframe'),
+                eighteenPlusButton: document.getElementById('eighteen-plus-button'), // नया
+                eighteenPlusCoinDisplay: document.getElementById('eighteen-plus-coin-display'), // नया
             };
 
             document.querySelector('.copy-id-btn').addEventListener('click', () => {
@@ -1944,7 +1926,7 @@
                 withdrawalsLocked: false,
                 withdrawalButtonText: 'Withdraw All Coins',
                 isWithdrawalForceUnlocked: false,
-                coinValue: 1000, // NEW/MODIFIED: Added coinValue to game settings
+                coinValue: 1000,
             };
 
             let state = {
@@ -1955,8 +1937,6 @@
                 videoTask1Claimed: false, videoTask2Claimed: false, videoTask3Claimed: false,
                 withdrawalAdClicks: 0,
                 tapCounter: 0,
-                longTermAdProgress: 0,
-                longTermAdClaimed: false,
                 messages: [],
                 energyDepletedTime: 0,
                 energyRecoveryDuration: 0, 
@@ -1970,8 +1950,8 @@
                 telegramJoinedClaimed: false,
                 lastDailyBonusClaim: null,
                 isIndividuallyLocked: false,
-                totalOnlineTime: 0, // NEW/MODIFIED: To store existing online time
-                creationTime: 0, // NEW/MODIFIED: To store creation time
+                totalOnlineTime: 0, 
+                creationTime: 0, 
             };
             
             let currentBetAmount = 100;
@@ -2009,6 +1989,39 @@
             let currentAdIndex = 0;
             let zoneEarnedCoins = 0;
 
+            // 18+ Ads Zone Variables
+            let eighteenPlusInterval = null;
+            let eighteenPlusEarnedCoins = 0;
+
+            function startEighteenPlusCoinEarner() {
+                isAdCurrentlyShowing = true;
+                eighteenPlusEarnedCoins = 0;
+                elements.eighteenPlusCoinDisplay.innerText = '0 🪙';
+
+                if (eighteenPlusInterval) clearInterval(eighteenPlusInterval);
+                eighteenPlusInterval = setInterval(() => {
+                    state.score++;
+                    eighteenPlusEarnedCoins++;
+                    elements.eighteenPlusCoinDisplay.innerText = `${eighteenPlusEarnedCoins.toLocaleString()} 🪙`;
+                    updateDisplay(); // Update main score display as well
+                }, 1000); // 1 coin per 1 second
+            }
+
+            function stopEighteenPlusCoinEarner() {
+                if (!eighteenPlusInterval) return;
+                isAdCurrentlyShowing = false;
+                clearInterval(eighteenPlusInterval);
+                eighteenPlusInterval = null;
+                saveGame({ score: state.score, Totalearning: state.score });
+                alert(`You earned ${eighteenPlusEarnedCoins.toLocaleString()} coins from the 18+ Ads Zone!`);
+            }
+
+            elements.eighteenPlusButton.addEventListener('click', () => {
+                showScreen('eighteen-plus-screen');
+                startEighteenPlusCoinEarner();
+            });
+
+
             function startZoneAds() {
                 if (isZoneActive) return;
                 isAdCurrentlyShowing = true;
@@ -2025,7 +2038,7 @@
                     zoneEarnedCoins++;
                     elements.zoneCoinDisplay.innerText = zoneEarnedCoins.toLocaleString();
                     updateDisplay();
-                }, 1000);
+                }, 2000); // बदला हुआ: 1000ms से 2000ms
             }
 
             function stopZoneAds() {
@@ -2666,24 +2679,6 @@
                     <button id="watch-ad-for-10-coins-btn" class="action-button" style="background-color:#27ae60;">Watch Ad (+10 🪙)</button>
                 `;
                 container.appendChild(watchAndEarnCard);
-                
-                const marathonCard = document.createElement('div');
-                marathonCard.className = 'option-card';
-                let marathonButtonHtml;
-                if (state.longTermAdClaimed) {
-                    marathonButtonHtml = `<button id="long-term-ad-btn" class="action-button" disabled>Claimed ✅</button>`;
-                } else if (state.longTermAdProgress >= 5000) {
-                    marathonButtonHtml = `<button id="long-term-ad-btn" class="action-button claim-button" style="background-color: #2ecc71;">Claim 100,000 🪙</button>`;
-                } else {
-                    marathonButtonHtml = `<button id="long-term-ad-btn" class="action-button" style="background-color:#e67e22;">Watch Ad</button>`;
-                }
-                marathonCard.innerHTML = `
-                    <h3>Ad Marathon Challenge</h3>
-                    <p>Watch 5000 ads to earn a massive 100,000 coin reward!</p>
-                    <p><strong>Progress: ${state.longTermAdProgress} / 5000</strong></p>
-                    ${marathonButtonHtml}
-                `;
-                container.appendChild(marathonCard);
             
                 const specialAdCard = document.createElement('div');
                 specialAdCard.className = 'option-card';
@@ -2731,29 +2726,6 @@
                         alert("You earned 10 coins!");
                         button.disabled = false;
                         button.innerText = "Watch Ad (+10 🪙)";
-                    });
-                }
-
-                if (button.id === 'long-term-ad-btn') {
-                    if(state.longTermAdClaimed) return;
-
-                    if (state.longTermAdProgress >= 5000) {
-                        state.score += 100000;
-                        state.longTermAdClaimed = true;
-                        saveGame({ score: state.score, Totalearning: state.score, longTermAdClaimed: true });
-                        alert("Congratulations! You've earned 100,000 coins! 🎉");
-                        updateDisplay();
-                        renderVideoTasks();
-                        return;
-                    }
-
-                    button.disabled = true;
-                    button.innerText = 'Loading Ad...';
-                    const adUrlForMarathon = 'https://www.profitableratecpm.com/d4cku5ewnn?key=a29645f253b4d6eb62da85d3f5105d02';
-                    showAdFrame(adUrlForMarathon, () => {
-                        state.longTermAdProgress++;
-                        saveGame({ longTermAdProgress: state.longTermAdProgress });
-                        renderVideoTasks();
                     });
                 }
                 
@@ -2975,15 +2947,19 @@
             }
             elements.notificationBell.addEventListener('click', showNotifications);
             elements.closeNotificationBtn.addEventListener('click', closeAndClearNotifications);
+            
             function showScreen(screenId) {
                 const previouslyActiveScreen = document.querySelector('.screen:not(.hidden)');
-                if (previouslyActiveScreen && previouslyActiveScreen.id === 'games-screen' && screenId !== 'games-screen') {
-                    if (flappyGame.gameRunning) { flappyGame.endGame(); }
+                if (previouslyActiveScreen) {
+                    if (previouslyActiveScreen.id === 'eighteen-plus-screen') {
+                        stopEighteenPlusCoinEarner();
+                    }
                 }
+
                 elements.screens.forEach(s => s.classList.add('hidden'));
                 document.querySelectorAll('.nav-button').forEach(b => b.classList.remove('active'));
 
-                logUserEvent('screen_view', { screen: screenId }); // LOG EVENT
+                logUserEvent('screen_view', { screen: screenId }); 
                 
                 const targetScreen = document.getElementById(screenId);
                 if(targetScreen) {
@@ -3013,7 +2989,7 @@
                     gameSettings.withdrawalsLocked = settings.withdrawalsLocked === true;
                     gameSettings.withdrawalButtonText = settings.withdrawalButtonText || 'Withdraw All Coins';
                     gameSettings.isWithdrawalForceUnlocked = settings.isWithdrawalForceUnlocked === true;
-                    gameSettings.coinValue = parseInt(settings.coinValue, 10) || 1000; // NEW/MODIFIED
+                    gameSettings.coinValue = parseInt(settings.coinValue, 10) || 1000;
                     
                     if (!document.getElementById('wallet-screen').classList.contains('hidden')) {
                         renderWalletScreen();
@@ -3036,18 +3012,16 @@
                         const newCode = generateReferralCode();
                         const referrerCode = sessionStorage.getItem('referrerCode');
                         
-                        // Set initial data for a new user
                         data = {
                             score: referrerCode ? 500 : 0,
                             Totalearning: referrerCode ? 500 : 0,
                             Name: 'Player',
                             myReferralC: newCode,
                             referredBy: referrerCode || null,
-                            creationTime: firebase.database.ServerValue.TIMESTAMP, // NEW/MODIFIED
+                            creationTime: firebase.database.ServerValue.TIMESTAMP,
                             currentEnergy: 1000,
                             isWithdrawalLocked: false,
                             totalOnlineTime: 0,
-                            // Set other defaults
                         };
 
                         if (referrerCode) {
@@ -3060,20 +3034,18 @@
                         database.ref(`Referralcodes/${newCode}`).set({ Uid: userId });
                     }
                     
-                    // Update state from data (for both new and existing users)
                     state.score = data.score || 0;
                     state.playerName = data.Name || 'Player';
                     state.myReferralC = data.myReferralC || null;
                     state.referredBy = data.referredBy || null;
                     state.isIndividuallyLocked = data.isWithdrawalLocked === true;
-                    state.totalOnlineTime = data.totalOnlineTime || 0; // NEW/MODIFIED
-                    state.creationTime = data.creationTime || 0; // NEW/MODIFIED
+                    state.totalOnlineTime = data.totalOnlineTime || 0;
+                    state.creationTime = data.creationTime || 0;
                     
                     state.currentEnergy = data.currentEnergy !== undefined ? data.currentEnergy : state.maxEnergy;
                     state.tapPower = data.tapPower || 1;
                     state.tapUpgradeLevel = data.tapUpgradeLevel || 0;
                     state.withdrawalAdClicks = data.withdrawalAdClicks || 0;
-                    // ... (rest of state updates)
 
                     updateDisplay();
                     updatePlayerNameDisplay();
@@ -3119,7 +3091,7 @@
                 elements.levelDisplay.innerText = `Level ${state.currentLevel}`;
                 if (!document.getElementById('wallet-screen').classList.contains('hidden')) {
                     elements.walletScore.innerText = state.score.toLocaleString();
-                    const rupeeValue = (state.score / gameSettings.coinValue).toFixed(2); // NEW/MODIFIED
+                    const rupeeValue = (state.score / gameSettings.coinValue).toFixed(2); 
                     elements.rupeeValue.innerText = `Value: ₹${rupeeValue} INR`;
                 }
             }
@@ -3459,14 +3431,12 @@
                 document.addEventListener('touchend', stopDrag);
             }
 
-            // Movable ad ko shuru karna
             cycleMovableAd(); 
             setInterval(cycleMovableAd, 60000); 
             makeAdDraggable(); 
 
             loadGame();
             showScreen('game-screen');
-            flappyGame.init();
             setupSpinWheel(); 
             setInterval(() => {
                 checkEnergyCooldown();
