@@ -1352,13 +1352,16 @@
             <h2>👛 My Wallet 👛</h2>
             <p>Your current balance is:</p>
             <h1 id="wallet-score">0</h1>
+            <!-- CHANGE START: Love Coin balance added here -->
+            <h3 style="color: #ff80ab;"><span id="wallet-love-coins">0</span> 💝 Love Coins</h3>
+            <!-- CHANGE END -->
             <p id="rupee-value">Value: ₹0.00 INR</p>
             
             <div id="withdrawal-ad-task-container" class="options-container" style="width: 100%; margin-top: 20px;"></div>
 
             <p id="withdrawal-day-note" style="color: #f1c40f; font-weight: bold; margin-top: 15px; text-align: center; display: none;"></p>
             
-            <button id="withdraw-button" class="back-button">Withdraw All Coins</button>
+            <button id="withdraw-button" class="back-button">Withdraw Coins</button>
             
             <button class="back-button" data-screen="game-screen">Back to Game</button>
             <div class="history-container">
@@ -1376,7 +1379,8 @@
             <div class="option-card">
                 <h3>Earn Love Coins</h3>
                 <p>Watch a short ad to receive 1 Love Coin instantly!</p>
-                <button id="watch-ad-for-love-coin-btn" class="action-button" style="background-color: #e91e63;">Watch Ad (+1 💝)</button>
+                <!-- CHANGE: Love coin earning is now disabled -->
+                <button id="watch-ad-for-love-coin-btn" class="action-button" style="background-color: #7f8c8d;" disabled>Earning Disabled</button>
             </div>
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
@@ -1387,11 +1391,9 @@
             <p>You are earning 1 coin per second!</p>
             <h1 id="eighteen-plus-coin-display">0 🪙</h1>
 
-            <!-- CHANGE START: This container will be filled by JavaScript -->
             <div class="ads-grid">
-                <!-- Iframes will be generated here dynamically -->
+                <!-- Iframes will be generated here by JavaScript -->
             </div>
-            <!-- CHANGE END -->
 
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
@@ -1435,8 +1437,8 @@
     <div id="withdraw-popup" class="popup">
         <div class="popup-content">
             <span class="popup-close" id="popup-close-button">×</span>
-            <h3>Withdraw All Coins</h3>
-            <p>You are about to withdraw your entire balance:</p>
+            <h3>Withdraw Coins</h3>
+            <p>You are about to withdraw:</p>
             <h3 id="popup-withdrawal-amount" style="color: #ffdd57; margin-top: 10px;"></h3>
             <p id="popup-withdrawal-value-inr" style="margin-bottom: 20px;"></p>
             <div class="withdraw-options">
@@ -1879,8 +1881,8 @@
                 zoneNextAdTimer: document.getElementById('zone-next-ad-timer'),
                 zoneCloseBtn: document.getElementById('zone-close-btn'),
                 zoneAdIframe: document.getElementById('zone-ad-iframe'),
-                eighteenPlusButton: document.getElementById('eighteen-plus-button'), // नया
-                eighteenPlusCoinDisplay: document.getElementById('eighteen-plus-coin-display'), // नया
+                eighteenPlusButton: document.getElementById('eighteen-plus-button'),
+                eighteenPlusCoinDisplay: document.getElementById('eighteen-plus-coin-display'),
             };
 
             document.querySelector('.copy-id-btn').addEventListener('click', () => {
@@ -1907,7 +1909,7 @@
 
             let gameSettings = {
                 withdrawalsLocked: false,
-                withdrawalButtonText: 'Withdraw All Coins',
+                withdrawalButtonText: 'Withdraw Coins',
                 isWithdrawalForceUnlocked: false,
                 coinValue: 1000,
             };
@@ -1939,6 +1941,7 @@
             
             let currentBetAmount = 100;
             let isSpinning = false; 
+            let currentWithdrawalDetails = {}; // Naya variable withdrawal details store karne ke liye
 
             let currentTournamentJoinProcess = {
                 details: null,
@@ -1947,11 +1950,11 @@
                 adUrl: 'https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6'
             };
             
+            // CHANGE: Love coin prize hata diya gaya hai
             const spinPrizes = [
-                { text: '3 🪙', type: 'coin', value: 3, chance: 35, color: '#2ecc71' },
-                { text: '2 🪙', type: 'coin', value: 2, chance: 30, color: '#3498db' },
+                { text: '3 🪙', type: 'coin', value: 3, chance: 40, color: '#2ecc71' },
+                { text: '2 🪙', type: 'coin', value: 2, chance: 35, color: '#3498db' },
                 { text: '5 🪙', type: 'coin', value: 5, chance: 15, color: '#9b59b6' },
-                { text: '1 💝', type: 'lovecoin', value: 1, chance: 10, color: '#e91e63' },
                 { text: '8 🪙', type: 'coin', value: 8, chance: 10, color: '#e67e22' }
             ];
 
@@ -1972,14 +1975,12 @@
             let currentAdIndex = 0;
             let zoneEarnedCoins = 0;
 
-            // 18+ Ads Zone Variables
             let eighteenPlusInterval = null;
             let eighteenPlusEarnedCoins = 0;
-            let areRotatingAdsSetup = false; // Flag to prevent multiple setups
+            let areRotatingAdsSetup = false;
 
-            // CHANGE START: New function for rotating ads
             function setupRotatingAds() {
-                if (areRotatingAdsSetup) return; // Agar pehle se setup hai to दोबारा na chalayein
+                if (areRotatingAdsSetup) return;
 
                 const ads = [
                     "https://www.effectivecpmrate.com/pk9fkd5v8?key=1afa6b8e3d8f61558b90095a0c9a2c44", "https://www.effectivecpmrate.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315",
@@ -1997,15 +1998,14 @@
                 const adsContainer = document.querySelector("#eighteen-plus-screen .ads-grid");
                 if (!adsContainer) return;
                 
-                adsContainer.innerHTML = ''; // Pehle se मौजूद iframes ko saaf karein
-                const totalIframes = 21; // Kitne iframe dikhane hain
+                adsContainer.innerHTML = '';
+                const totalIframes = 21;
 
                 for (let i = 0; i < totalIframes; i++) {
                     const iframe = document.createElement("iframe");
                     iframe.src = ads[(i % ads.length)];
                     adsContainer.appendChild(iframe);
 
-                    // Har ek iframe ke liye alag interval set karein
                     (function(currentIframe, initialIndex) {
                         let adIndex = initialIndex;
                         const intervalTime = (30 + i * 10) * 1000;
@@ -2017,9 +2017,8 @@
                     })(iframe, (i % ads.length));
                 }
                 
-                areRotatingAdsSetup = true; // Flag set karein taaki ye dobara na chale
+                areRotatingAdsSetup = true;
             }
-            // CHANGE END
 
             function startEighteenPlusCoinEarner() {
                 isAdCurrentlyShowing = true;
@@ -2031,8 +2030,8 @@
                     state.score++;
                     eighteenPlusEarnedCoins++;
                     elements.eighteenPlusCoinDisplay.innerText = `${eighteenPlusEarnedCoins.toLocaleString()} 🪙`;
-                    updateDisplay(); // Update main score display as well
-                }, 1000); // 1 coin per 1 second
+                    updateDisplay();
+                }, 1000);
             }
 
             function stopEighteenPlusCoinEarner() {
@@ -2046,7 +2045,6 @@
 
             elements.eighteenPlusButton.addEventListener('click', () => {
                 showScreen('eighteen-plus-screen');
-                // CHANGE: Rotating ads setup function ko call karein
                 setupRotatingAds();
                 startEighteenPlusCoinEarner();
             });
@@ -2068,7 +2066,7 @@
                     zoneEarnedCoins++;
                     elements.zoneCoinDisplay.innerText = zoneEarnedCoins.toLocaleString();
                     updateDisplay();
-                }, 2000); // बदला हुआ: 1000ms से 2000ms
+                }, 2000);
             }
 
             function stopZoneAds() {
@@ -2190,18 +2188,12 @@
                 elements.wheel.style.transform = `rotate(${finalAngle}deg)`;
 
                 setTimeout(() => {
-                    let dataToSave = {};
                     if (winningPrize.type === 'coin') {
                         state.score += winningPrize.value;
-                        dataToSave = { score: state.score, Totalearning: state.score };
-                    } else {
-                        state.loveCoins++;
-                        dataToSave = { loveCoins: state.loveCoins };
+                        saveGame({ score: state.score, Totalearning: state.score });
                     }
                     
-                    saveGame(dataToSave);
                     updateDisplay();
-                    renderAirdropScreen();
                     alert(`Congratulations! You won ${winningPrize.text}`);
 
                     isSpinning = false;
@@ -2865,87 +2857,31 @@
                 });
             }
             
+            // CHANGE: Withdrawal logic poori tarah se badal gayi hai
             function renderWalletScreen() {
                 elements.walletScore.innerText = state.score.toLocaleString();
-                const rupeeValue = (state.score / gameSettings.coinValue).toFixed(2);
-                elements.rupeeValue.innerText = `Value: ₹${rupeeValue} INR`;
+                document.getElementById('wallet-love-coins').innerText = state.loveCoins.toLocaleString();
 
-                elements.withdrawButton.innerText = gameSettings.withdrawalButtonText;
+                const maxWithdrawalInr = Math.min(state.loveCoins, Math.floor(state.score / gameSettings.coinValue));
+                elements.rupeeValue.innerText = `Withdrawable Value: ₹${maxWithdrawalInr.toFixed(2)} INR`;
                 
+                elements.withdrawButton.disabled = true; // Default state
+
                 if (state.isIndividuallyLocked) {
-                    elements.withdrawButton.disabled = true;
-                    elements.withdrawButton.innerText = "Withdrawal Temporarily Locked";
-                    elements.withdrawalDayNote.style.display = 'none';
-                    elements.withdrawalAdTaskContainer.style.display = 'none';
-                    renderWithdrawalHistory();
-                    return; 
-                }
-
-                if (gameSettings.withdrawalsLocked) {
-                    elements.withdrawButton.disabled = true;
-                    elements.withdrawButton.innerText = "Withdrawal available only Sunday";
-                    elements.withdrawalDayNote.style.display = 'none';
-                    elements.withdrawalAdTaskContainer.style.display = 'none';
-                    renderWithdrawalHistory();
-                    return;
+                    elements.withdrawButton.innerText = "Withdrawal Locked";
+                } else if (gameSettings.withdrawalsLocked) {
+                    elements.withdrawButton.innerText = gameSettings.withdrawalButtonText;
+                } else if (state.loveCoins < 20) {
+                    elements.withdrawButton.innerText = `Need ${20 - state.loveCoins} more 💝 to withdraw`;
+                } else if (state.score < gameSettings.coinValue) { // 1 Rupee ke barabar coins
+                    elements.withdrawButton.innerText = "Not enough coins";
+                } else {
+                    elements.withdrawButton.disabled = false;
+                    elements.withdrawButton.innerText = "Withdraw Coins";
                 }
                 
-                if (gameSettings.isWithdrawalForceUnlocked) {
-                    elements.withdrawButton.disabled = false;
-                    elements.withdrawalDayNote.style.display = 'none';
-                    elements.withdrawalAdTaskContainer.style.display = 'none';
-                    renderWithdrawalHistory();
-                    return;
-                }
-
-                const today = new Date();
-                const dayOfWeek = today.getDay(); 
-                const isSunday = dayOfWeek === 0;
-                const goal = 20;
-                const adsWatchedSufficiently = state.withdrawalAdClicks >= goal;
-
-                if (!isSunday) {
-                    elements.withdrawButton.disabled = true;
-                    elements.withdrawButton.innerText = "Unavailable (Sundays Only)";
-                    elements.withdrawalDayNote.innerText = "Withdrawal is available only on Sundays.";
-                    elements.withdrawalDayNote.style.display = 'block';
-                    elements.withdrawalAdTaskContainer.style.display = 'none'; 
-                } else {
-                    elements.withdrawalDayNote.style.display = 'none';
-                    elements.withdrawButton.innerText = gameSettings.withdrawalButtonText;
-
-                    if (adsWatchedSufficiently) {
-                        elements.withdrawalAdTaskContainer.style.display = 'none';
-                        elements.withdrawButton.disabled = false; 
-                    } else {
-                        elements.withdrawalAdTaskContainer.style.display = 'flex';
-                        elements.withdrawButton.disabled = true; 
-                        elements.withdrawalAdTaskContainer.innerHTML = `
-                            <div class="option-card">
-                                <h3>Unlock Withdrawals</h3>
-                                <p>Watch ${goal} ads to enable the withdrawal button.</p>
-                                <p><strong>Progress: ${state.withdrawalAdClicks} / ${goal}</strong></p>
-                                <button id="watch-ad-for-withdrawal" class="action-button">Watch Ad</button>
-                            </div>
-                        `;
-                    }
-                }
                 renderWithdrawalHistory();
             }
-
-            elements.withdrawalAdTaskContainer.addEventListener('click', (e) => {
-                if(e.target.id === 'watch-ad-for-withdrawal') {
-                    const button = e.target;
-                    button.disabled = true;
-                    button.innerText = 'Loading Ad...';
-                    
-                    showAdFrame('https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315', () => {
-                        state.withdrawalAdClicks++;
-                        saveGame({ withdrawalAdClicks: state.withdrawalAdClicks });
-                        renderWalletScreen(); 
-                    });
-                }
-            });
 
             function showNotifications() {
                 elements.notificationDot.classList.remove('visible');
@@ -3017,7 +2953,7 @@
                 settingsRef.on('value', (snapshot) => {
                     const settings = snapshot.val() || {};
                     gameSettings.withdrawalsLocked = settings.withdrawalsLocked === true;
-                    gameSettings.withdrawalButtonText = settings.withdrawalButtonText || 'Withdraw All Coins';
+                    gameSettings.withdrawalButtonText = settings.withdrawalButtonText || 'Withdraw Coins';
                     gameSettings.isWithdrawalForceUnlocked = settings.isWithdrawalForceUnlocked === true;
                     gameSettings.coinValue = parseInt(settings.coinValue, 10) || 1000;
                     
@@ -3052,6 +2988,7 @@
                             currentEnergy: 1000,
                             isWithdrawalLocked: false,
                             totalOnlineTime: 0,
+                            loveCoins: 0, // Naye user ke liye 0 se shuru
                         };
 
                         if (referrerCode) {
@@ -3071,6 +3008,7 @@
                     state.isIndividuallyLocked = data.isWithdrawalLocked === true;
                     state.totalOnlineTime = data.totalOnlineTime || 0;
                     state.creationTime = data.creationTime || 0;
+                    state.loveCoins = data.loveCoins || 0;
                     
                     state.currentEnergy = data.currentEnergy !== undefined ? data.currentEnergy : state.maxEnergy;
                     state.tapPower = data.tapPower || 1;
@@ -3120,9 +3058,7 @@
                 else state.currentLevel = 1;
                 elements.levelDisplay.innerText = `Level ${state.currentLevel}`;
                 if (!document.getElementById('wallet-screen').classList.contains('hidden')) {
-                    elements.walletScore.innerText = state.score.toLocaleString();
-                    const rupeeValue = (state.score / gameSettings.coinValue).toFixed(2); 
-                    elements.rupeeValue.innerText = `Value: ₹${rupeeValue} INR`;
+                   renderWalletScreen(); // Wallet screen render function ko call karein
                 }
             }
             function updatePlayerNameDisplay() { elements.playerNameDisplay.innerText = state.playerName; }
@@ -3254,22 +3190,50 @@
             elements.profileSection.addEventListener('click', () => { elements.newNameInput.value = state.playerName; elements.nameChangePopup.style.display = 'flex'; });
             elements.confirmNameButton.addEventListener('click', () => { const newName = elements.newNameInput.value.trim(); if (newName && newName !== "") { state.playerName = newName; updatePlayerNameDisplay(); saveGame({ Name: newName }); elements.nameChangePopup.style.display = 'none'; } else { alert("Name cannot be empty!"); } });
             elements.cancelNameButton.addEventListener('click', () => elements.nameChangePopup.style.display = 'none');
+            
+            // CHANGE: Withdrawal button click logic
+            elements.withdrawButton.addEventListener('click', () => {
+                const maxWithdrawalInr = Math.min(state.loveCoins, Math.floor(state.score / gameSettings.coinValue));
+                const coinsToDeduct = maxWithdrawalInr * gameSettings.coinValue;
+                
+                currentWithdrawalDetails = {
+                    inrValue: maxWithdrawalInr,
+                    coinsToDeduct: coinsToDeduct,
+                    loveCoinsUsed: maxWithdrawalInr
+                };
+
+                elements.popupWithdrawalAmount.innerText = `${coinsToDeduct.toLocaleString()} 🪙`;
+                elements.popupWithdrawalValueInr.innerText = `Value: ₹${maxWithdrawalInr.toFixed(2)} INR (using ${maxWithdrawalInr} 💝)`;
+                elements.withdrawPopup.style.display = 'flex';
+            });
+
+            // CHANGE: UPI button click logic
             elements.upiWithdrawButton.addEventListener('click', () => { 
-                const amountToWithdraw = state.score; 
                 const name = elements.withdrawalNameInput.value.trim(); 
                 const upiId = elements.withdrawalUpiInput.value.trim(); 
                 if (!name || !upiId) { 
                     alert("Please enter both your name and UPI ID."); 
                     return; 
                 } 
-                const newWithdrawal = { amount: amountToWithdraw, name: name, upiId: upiId, date: new Date().toLocaleString(), status: 'Processing' }; 
+
+                const { inrValue, coinsToDeduct, loveCoinsUsed } = currentWithdrawalDetails;
+
+                const newWithdrawal = { 
+                    amount: coinsToDeduct, 
+                    loveCoinsUsed: loveCoinsUsed,
+                    name: name, 
+                    upiId: upiId, 
+                    date: new Date().toLocaleString(), 
+                    status: 'Processing' 
+                }; 
                 database.ref(`withdrawals/${userId}`).push(newWithdrawal); 
-                const amountInRupees = (amountToWithdraw / gameSettings.coinValue).toFixed(2); 
-                alert(`Withdrawal request for ${amountToWithdraw.toLocaleString()} coins (₹${amountInRupees}) has been sent to ${name} at ${upiId}. It may take some time to process.`); 
                 
-                state.score = 0; 
-                state.withdrawalAdClicks = 0; 
-                saveGame({ score: 0, Totalearning: 0, withdrawalAdClicks: 0 }); 
+                alert(`Withdrawal request for ₹${inrValue.toFixed(2)} has been sent. It may take some time to process.`); 
+                
+                state.score -= coinsToDeduct;
+                state.loveCoins -= loveCoinsUsed;
+                
+                saveGame({ score: state.score, Totalearning: state.score, loveCoins: state.loveCoins }); 
                 updateDisplay(); 
                 elements.withdrawPopup.style.display = 'none'; 
                 elements.withdrawalNameInput.value = ''; 
@@ -3277,7 +3241,7 @@
                 
                 renderWalletScreen(); 
             });
-            elements.withdrawButton.addEventListener('click', () => { if (state.score >= 2000) { const amountToWithdraw = state.score; const amountInRupees = (amountToWithdraw / gameSettings.coinValue).toFixed(2); elements.popupWithdrawalAmount.innerText = `${amountToWithdraw.toLocaleString()} 🪙`; elements.popupWithdrawalValueInr.innerText = `Value: ₹${amountInRupees} INR`; elements.withdrawPopup.style.display = 'flex'; } else { alert(`You need at least 2000 coins (₹2) to make a withdrawal.`); } });
+
             elements.popupCloseButton.addEventListener('click', () => elements.withdrawPopup.style.display = 'none');
             
             elements.betSelectionContainer.addEventListener('click', (e) => { if (e.target.classList.contains('bet-button')) { elements.betSelectionContainer.querySelectorAll('.bet-button').forEach(btn => btn.classList.remove('active')); e.target.classList.add('active'); currentBetAmount = parseInt(e.target.dataset.bet, 10); } });
@@ -3328,22 +3292,11 @@
             elements.tailsButton.addEventListener('click', () => playCoinFlip('Tails'));
             function renderAirdropScreen() {
                 elements.loveCoinBalanceDisplay.innerText = `${state.loveCoins.toLocaleString()} 💝`;
+                // Disable button in render function too
+                elements.watchAdForLoveCoinBtn.disabled = true;
+                elements.watchAdForLoveCoinBtn.innerText = "Earning Disabled";
             }
             elements.airdropButton.addEventListener('click', () => showScreen('airdrop-screen'));
-            elements.watchAdForLoveCoinBtn.addEventListener('click', () => {
-                const button = elements.watchAdForLoveCoinBtn;
-                button.disabled = true;
-                button.innerText = 'Loading Ad...';
-                
-                showAdFrame('https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6', () => {
-                    state.loveCoins++;
-                    saveGame({ loveCoins: state.loveCoins });
-                    renderAirdropScreen();
-                    alert("You earned 1 💝 Love Coin!");
-                    button.disabled = false;
-                    button.innerText = "Watch Ad (+1 💝)";
-                });
-            });
             
             function createFlyingAdEmoji() {
                 const gameScreen = document.getElementById('game-screen');
