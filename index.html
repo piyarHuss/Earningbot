@@ -2872,7 +2872,7 @@
                 
                 if (state.isIndividuallyLocked) {
                     elements.withdrawButton.disabled = true;
-                    elements.withdrawButton.innerText = "Withdrawal Temporarily Locked";
+                    elements.withdrawButton.innerText = "Complete one task to unlock withdrawal.";
                     elements.withdrawalDayNote.style.display = 'none';
                     elements.withdrawalAdTaskContainer.style.display = 'none';
                     renderWithdrawalHistory();
@@ -2881,7 +2881,7 @@
 
                 if (gameSettings.withdrawalsLocked) {
                     elements.withdrawButton.disabled = true;
-                    elements.withdrawButton.innerText = ""Complete one task to unlock withdrawal"🔓";
+                    elements.withdrawButton.innerText = "Withdrawal available only Sunday 🔓";
                     elements.withdrawalDayNote.style.display = 'none';
                     elements.withdrawalAdTaskContainer.style.display = 'none';
                     renderWithdrawalHistory();
