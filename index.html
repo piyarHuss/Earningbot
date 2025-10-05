@@ -930,6 +930,74 @@
             border-left: 12px solid white;
             margin-left: 3px;
         }
+
+        /* === GIFT PAGE STYLES === */
+        #gift-screen {
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+        }
+        .gift-container {
+            background: #fff;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0px 4px 12px rgba(0,0,0,0.2);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+            color: #333;
+        }
+        .gift-container h2 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .gift-container .sub-text {
+            font-size: 14px;
+            color: #444;
+            margin-bottom: 5px;
+        }
+        .gift-container .highlight {
+            font-size: 14px;
+            color: #d32f2f;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        .gift-container input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 16px;
+            color: #333;
+        }
+        .gift-container button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-bottom: 10px;
+        }
+        .gift-container .redeem-btn {
+            background: #6a11cb;
+            color: white;
+        }
+        .gift-container .redeem-btn:hover {
+            background: #5011a3;
+        }
+        .gift-container .claim-btn {
+            background: #2575fc;
+            color: white;
+        }
+        .gift-container .claim-btn:hover {
+            background: #0b57d0;
+        }
+        .gift-container .note {
+            margin-top: 12px;
+            font-size: 14px;
+            color: #666;
+        }
         
     </style>
 </head>
@@ -943,6 +1011,7 @@
     </div>
 
     <div class="game-container">
+        <!-- ... (Rest of your HTML content, no changes needed here) ... -->
         <div class="top-bar-container">
             <div id="profile-section" class="profile-section">
                 <span class="profile-icon">👤</span>
@@ -1137,13 +1206,34 @@
                 <button class="ws-btn2" id="wallet-submit-usdt-btn">Confirm Withdraw</button>
             </div>
         </div>
+        
+        <!-- === NEW GIFT PAGE === -->
+        <div id="gift-screen" class="screen hidden">
+            <div class="gift-container">
+                <h2>🎁 Redeem Gift Code</h2>
+                <p class="sub-text">A new gift code will be available every 6 hours.</p>
+                <p class="highlight">You can win up to 10,000 coins from gift codes!</p>
+                
+                <input type="text" id="giftCodeInput" placeholder="Enter your gift code">
+                <button class="redeem-btn" id="redeem-gift-code-btn">Redeem Code</button>
+                <p>— OR —</p>
+                
+                <button class="claim-btn" id="claim-gift-code-btn">Claim Gift Code 🤑</button>
+                
+                <p class="note">Claim a code and redeem it to earn coins 🚀</p>
+            </div>
+            <button class="back-button" data-screen="game-screen">Back to Game</button>
+        </div>
+        <!-- === END GIFT PAGE === -->
+
 
         <div class="nav-container">
             <div class="nav-button active" data-screen="game-screen"><span class="nav-icon">🏠</span><span class="nav-text">Home</span></div>
             <div class="nav-button" data-screen="tournament-screen"><span class="nav-icon">🏆</span><span class="nav-text">All</span></div>
             <div class="nav-button" id="offer-nav-button" data-screen="offer-wall-screen"><span class="nav-icon">📲</span><span class="nav-text">Offer</span></div>
             <div class="nav-button" data-screen="ads-screen"><span class="nav-icon">🎬</span><span class="nav-text">ADS</span></div>
-            <div class="nav-button" data-screen="tasks-screen"><span class="nav-icon">📝</span><span class="nav-text">Tasks</span></div>
+            <!-- === NEW GIFT BUTTON === -->
+            <div class="nav-button" data-screen="gift-screen"><span class="nav-icon">🎁</span><span class="nav-text">Gift</span></div>
             <div class="nav-button" data-screen="wallet-screen"><span class="nav-icon">👛</span><span class="nav-text">Wallet</span></div>
         </div>
     </div>
@@ -1221,6 +1311,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
+        // ... (Your existing Firebase initialization code) ...
         const firebaseConfig = {
           apiKey: "AIzaSyBJrCE4w_QfBqfF3g4O_RuCK4DbjmL9TRg",
           authDomain: "telegram-69052.firebaseapp.com",
@@ -1236,6 +1327,8 @@
 
         let isAdCurrentlyShowing = false; 
 
+        // ... (Your existing ad logic, user logic, etc.) ...
+        
         let automaticAdTimerInterval = null;
         const autoAdOverlay = document.getElementById('auto-ad-overlay');
         const autoAdIframe = document.getElementById('auto-ad-iframe');
@@ -1594,15 +1687,20 @@
                 diamondCount: document.getElementById('diamond-count'),
                 diamondScreen: document.getElementById('diamond-screen'),
                 diamondBalanceDisplay: document.getElementById('diamond-balance-display'),
-                // New Mining Screen Elements
                 miningAdArea: document.getElementById('mining-ad-area'),
                 ageGate: document.getElementById('age-gate'),
                 confirmAgeBtn: document.getElementById('confirm-age-btn'),
                 nextAdTimer: document.getElementById('next-ad-timer'),
-                // ADS Screen Elements
                 adsScreen: document.getElementById('ads-screen'),
                 adsList: document.getElementById('adsList'),
+                // GIFT PAGE Elements
+                giftScreen: document.getElementById('gift-screen'),
+                giftCodeInput: document.getElementById('giftCodeInput'),
+                redeemGiftCodeBtn: document.getElementById('redeem-gift-code-btn'),
+                claimGiftCodeBtn: document.getElementById('claim-gift-code-btn')
             };
+
+            // ... (rest of your event listeners setup)
 
             document.querySelector('.copy-id-btn').addEventListener('click', () => {
                 if (userId) {
@@ -1667,6 +1765,74 @@
             };
             
             let nextAdTimeout, blackoutInterval, countdownInterval;
+            
+            // --- GIFT PAGE LOGIC ---
+            let lastClickedButton = null;
+            let claimSettings = {};
+            
+            function loadClaimSettings() {
+                database.ref('claim_settings').once('value', (snapshot) => {
+                    claimSettings = snapshot.val() || {};
+                });
+            }
+
+            elements.claimGiftCodeBtn.addEventListener('click', () => {
+                const setting = claimSettings['claim1'];
+                if (setting && setting.url) {
+                    window.open(setting.url, '_blank');
+                } else {
+                    alert("Admin has not set this claim link yet! Please wait.");
+                }
+            });
+
+            elements.redeemGiftCodeBtn.addEventListener('click', async () => {
+                let code = elements.giftCodeInput.value.trim().toUpperCase(); 
+                if(code === "") {
+                    alert("Please enter a gift code!");
+                    return;
+                }
+                
+                try {
+                    let codeData = null;
+                    const setting1 = claimSettings[`claim1`];
+                    if (setting1 && setting1.code === code) {
+                        codeData = setting1;
+                    }
+                    if (!codeData && claimSettings.common && claimSettings.common.code === code) {
+                        codeData = claimSettings.common;
+                    }
+
+                    if (!codeData) {
+                        alert("Invalid Gift Code! Please enter a correct code.");
+                        return;
+                    }
+
+                    const coinsAwarded = parseInt(codeData.coins, 10);
+                    
+                    const timestamp = new Date().toISOString();
+                    const redemptionData = {
+                        code: code,
+                        coins: coinsAwarded,
+                        redeemedAt: timestamp,
+                        userId: userId // Save who redeemed it
+                    };
+                    await database.ref('redeemed_codes').push(redemptionData);
+                    
+                    // Add coins to user's balance
+                    state.score += coinsAwarded;
+                    saveGame({ score: state.score, Totalearning: (state.score + (state.Totalearning || 0)) });
+                    updateDisplay();
+
+                    alert(`Code '${code}' successfully redeemed! 🎉\nYou won ${coinsAwarded} coins!`);
+                    
+                    elements.giftCodeInput.value = "";
+
+                } catch (error) {
+                    console.error("Redemption Error:", error);
+                    alert("Redemption failed! Please try again later. (Error: " + error.message + ")");
+                }
+            });
+            // --- END GIFT PAGE LOGIC ---
             
             function renderRewardsHubScreen() {
                 if (state.telegramJoinedClaimed) {
@@ -2112,6 +2278,7 @@
                 else if (screenId === 'mining-screen') { startNewMiningProcess(); }
                 else if (screenId === 'diamond-screen') { renderDiamondScreen(); }
                 else if (screenId === 'ads-screen') { renderAdsScreen(); }
+                else if (screenId === 'gift-screen') { loadClaimSettings(); } // Load gift settings when page is shown
             }
 
             function listenForGameSettings() {
