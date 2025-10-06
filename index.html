@@ -928,7 +928,7 @@
             margin-left: 3px;
         }
 
-        /* === GIFT PAGE STYLES === */
+        /* === NEW GIFT PAGE STYLES === */
         #gift-screen {
             background: linear-gradient(135deg, #6a11cb, #2575fc);
         }
@@ -994,6 +994,19 @@
             margin-top: 12px;
             font-size: 14px;
             color: #666;
+        }
+        #claimButtonContainer {
+            display: block;
+        }
+        .redeemed-message {
+            display: none;
+            padding: 12px;
+            border-radius: 8px;
+            background: #4CAF50;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 10px;
         }
         
     </style>
@@ -1215,7 +1228,13 @@
                 <button class="redeem-btn" id="redeem-gift-code-btn">Redeem Code</button>
                 <p>— OR —</p>
                 
-                <button class="claim-btn" id="claim-gift-code-btn">Claim Gift Code 🤑</button>
+                <div id="claimButtonContainer">
+                    <button class="claim-btn" id="claimBtn1">Claim Gift Code 🤑</button>
+                </div>
+                
+                <div id="redeemedMessage" class="redeemed-message">
+                    Code successfully redeemed! 🥳
+                </div>
                 
                 <p class="note">Claim a code and redeem it to earn coins 🚀</p>
             </div>
@@ -1694,7 +1713,9 @@
                 giftScreen: document.getElementById('gift-screen'),
                 giftCodeInput: document.getElementById('giftCodeInput'),
                 redeemGiftCodeBtn: document.getElementById('redeem-gift-code-btn'),
-                claimGiftCodeBtn: document.getElementById('claim-gift-code-btn')
+                claimButtonContainer: document.getElementById('claimButtonContainer'),
+                claimBtn1: document.getElementById('claimBtn1'),
+                redeemedMessage: document.getElementById('redeemedMessage')
             };
 
             // ... (rest of your event listeners setup)
@@ -1762,29 +1783,50 @@
             };
             
             let nextAdTimeout, blackoutInterval, countdownInterval;
-            
-            // --- GIFT PAGE LOGIC ---
+
+            // --- NEW GIFT PAGE LOGIC (INTEGRATED) ---
             let lastClickedButton = null;
             let claimSettings = {};
-            
+
+            async function checkClaimStatus() {
+                const claimContainer = elements.claimButtonContainer;
+                const redeemedMsg = elements.redeemedMessage;
+
+                const claimCode = claimSettings.claim1 ? claimSettings.claim1.code : null;
+                if (!claimCode) return;
+
+                const snapshot = await database.ref('redemptions_by_user/' + userId).once('value');
+                const userRedemptions = snapshot.val();
+                
+                let claimRedeemed = false;
+                if (userRedemptions) {
+                    for (const key in userRedemptions) {
+                        if (userRedemptions[key].code === claimCode) {
+                            claimRedeemed = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (claimRedeemed) {
+                    claimContainer.style.display = 'none';
+                    redeemedMsg.style.display = 'block';
+                } else {
+                    claimContainer.style.display = 'block';
+                    redeemedMsg.style.display = 'none';
+                }
+            }
+
             function loadClaimSettings() {
                 database.ref('claim_settings').once('value', (snapshot) => {
                     claimSettings = snapshot.val() || {};
+                    checkClaimStatus();
                 });
             }
 
-            elements.claimGiftCodeBtn.addEventListener('click', () => {
-                const setting = claimSettings['claim1'];
-                if (setting && setting.url) {
-                    window.open(setting.url, '_blank');
-                } else {
-                    alert("Admin has not set this claim link yet! Please wait.");
-                }
-            });
-
-            elements.redeemGiftCodeBtn.addEventListener('click', async () => {
-                let code = elements.giftCodeInput.value.trim().toUpperCase(); 
-                if(code === "") {
+            async function redeemCode() {
+                let code = elements.giftCodeInput.value.trim().toUpperCase();
+                if (code === "") {
                     alert("Please enter a gift code!");
                     return;
                 }
@@ -1798,38 +1840,69 @@
                     if (!codeData && claimSettings.common && claimSettings.common.code === code) {
                         codeData = claimSettings.common;
                     }
-
                     if (!codeData) {
                         alert("Invalid Gift Code! Please enter a correct code.");
                         return;
                     }
+                    
+                    const redemptionSnapshot = await database.ref('redemptions_by_user/' + userId).once('value');
+                    const userRedemptions = redemptionSnapshot.val();
+                    let alreadyRedeemed = false;
+                    if (userRedemptions) {
+                        for (const key in userRedemptions) {
+                            if (userRedemptions[key].code === code) {
+                                alreadyRedeemed = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (alreadyRedeemed) {
+                        alert("You have already redeemed the code '" + code + "'. Each code can be redeemed only once.");
+                        return;
+                    }
 
                     const coinsAwarded = parseInt(codeData.coins, 10);
-                    
                     const timestamp = new Date().toISOString();
-                    const redemptionData = {
-                        code: code,
-                        coins: coinsAwarded,
-                        redeemedAt: timestamp,
-                        userId: userId // Save who redeemed it
-                    };
-                    await database.ref('redeemed_codes').push(redemptionData);
-                    
-                    // Add coins to user's balance
-                    state.score += coinsAwarded;
-                    saveGame({ score: state.score, Totalearning: (state.score + (state.Totalearning || 0)) });
-                    updateDisplay();
+                    const redemptionData = { code, coins: coinsAwarded, redeemedAt: timestamp, userId: userId };
 
-                    alert(`Code '${code}' successfully redeemed! 🎉\nYou won ${coinsAwarded} coins!`);
+                    await database.ref('redeemed_codes').push(redemptionData);
+                    await database.ref('redemptions_by_user/' + userId).push({ code, coins: coinsAwarded });
+                    
+                    state.score += coinsAwarded;
+                    saveGame({ score: state.score });
+                    updateDisplay();
+                    
+                    alert("Code '" + code + "' successfully redeemed! 🎉\nYou won " + coinsAwarded + " coins!");
                     
                     elements.giftCodeInput.value = "";
-
+                    if (code === setting1?.code) {
+                        checkClaimStatus();
+                    }
                 } catch (error) {
                     console.error("Redemption Error:", error);
                     alert("Redemption failed! Please try again later. (Error: " + error.message + ")");
                 }
+            }
+            
+            function claimCode(button, url) {
+                if (!url || url === 'placeholder') {
+                    alert("Admin has not set this claim link yet! Please wait.");
+                    return;
+                }
+                lastClickedButton = button;
+                window.open(url, '_blank');
+            }
+
+            elements.redeemGiftCodeBtn.addEventListener('click', redeemCode);
+            elements.claimBtn1.addEventListener('click', () => {
+                const setting = claimSettings['claim1'];
+                if (setting && setting.url) {
+                    claimCode(elements.claimBtn1, setting.url);
+                } else {
+                    claimCode(elements.claimBtn1, 'placeholder');
+                }
             });
-            // --- END GIFT PAGE LOGIC ---
+            // --- END NEW GIFT PAGE LOGIC ---
             
             function renderRewardsHubScreen() {
                 if (state.telegramJoinedClaimed) {
