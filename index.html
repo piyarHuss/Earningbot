@@ -168,7 +168,7 @@
             100% { transform: scale(1); box-shadow: 0 0 5px rgba(243, 156, 18, 0.3); }
         }
 
-        #rewards-hub-button, #mining-button {
+        #rewards-hub-button, #mining-button, #daily-tasks-side-button {
             position: absolute;
             left: 20px;
             width: 40px; 
@@ -194,8 +194,13 @@
             background: linear-gradient(45deg, #f39c12, #e67e22);
             box-shadow: 0 5px 15px rgba(243, 156, 18, 0.5);
         }
+        #daily-tasks-side-button {
+            top: 230px;
+            background: linear-gradient(45deg, #ff416c, #ff4b2b);
+            box-shadow: 0 5px 15px rgba(255, 65, 108, 0.5);
+        }
 
-        #rewards-hub-button:hover, #mining-button:hover {
+        #rewards-hub-button:hover, #mining-button:hover, #daily-tasks-side-button:hover {
             transform: scale(1.1);
         }
          #rewards-hub-button:hover {
@@ -203,6 +208,9 @@
         }
          #mining-button:hover {
             box-shadow: 0 8px 25px rgba(230, 126, 34, 0.7);
+        }
+        #daily-tasks-side-button:hover {
+            box-shadow: 0 8px 25px rgba(255, 75, 43, 0.7);
         }
 
         @keyframes pulse-boost {
@@ -928,7 +936,6 @@
             margin-left: 3px;
         }
 
-        /* === NEW GIFT PAGE STYLES === */
         #gift-screen {
             background: linear-gradient(135deg, #6a11cb, #2575fc);
         }
@@ -1009,6 +1016,26 @@
             margin-bottom: 10px;
         }
         
+        /* === NEW DAILY TASK STYLES === */
+        #daily-tasks-screen {
+            background: #0f0f10;
+        }
+        #daily-tasks-screen .dt-wrap { max-width: 420px; margin: 0 auto; width: 100%; }
+        #daily-tasks-screen .dt-header { margin-bottom: 16px; }  
+        #daily-tasks-screen .dt-title { font-size: 20px; font-weight: 700; color: #fff; text-align: center; }  
+        #daily-tasks-screen .dt-wallet { display: flex; justify-content: space-between; background: #191919; padding: 12px; border-radius: 14px; margin-bottom: 16px; }  
+        #daily-tasks-screen .dt-wallet div { font-size: 15px; font-weight: 600; color: #fff; }  
+        #daily-tasks-screen .dt-list { display: flex; flex-direction: column; gap: 12px; }  
+        #daily-tasks-screen .dt-card { display: flex; align-items: center; justify-content: space-between; background: #191919; border-radius: 14px; padding: 10px 14px; min-height: 60px; }  
+        #daily-tasks-screen .dt-left { display: flex; align-items: center; gap: 10px; }  
+        #daily-tasks-screen .dt-avatar { width: 42px; height: 42px; border-radius: 10px; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; font-size: 22px; }  
+        #daily-tasks-screen .dt-meta { display: flex; flex-direction: column; }  
+        #daily-tasks-screen .dt-name { font-size: 15px; font-weight: 600; color: #fff; }  
+        #daily-tasks-screen .dt-desc { font-size: 12px; color: #aaa; }  
+        #daily-tasks-screen .dt-task-right { display: flex; align-items: center; gap: 8px; }  
+        #daily-tasks-screen .dt-counter { font-size: 14px; font-weight: 600; color: #fff; }  
+        #daily-tasks-screen .dt-claim { background: #fff; color: #000; font-weight: 600; border: none; border-radius: 10px; padding: 6px 14px; cursor: pointer; font-size: 14px; }
+        #daily-tasks-screen .dt-claim:disabled { background: #555; color: #999; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -1021,7 +1048,6 @@
     </div>
 
     <div class="game-container">
-        <!-- ... (Rest of your HTML content, no changes needed here) ... -->
         <div class="top-bar-container">
             <div id="profile-section" class="profile-section">
                 <span class="profile-icon">👤</span>
@@ -1040,6 +1066,7 @@
         <div id="game-screen" class="screen">
             <div id="mining-button">⛏️</div>
             <div id="rewards-hub-button">🎁</div>
+            <div id="daily-tasks-side-button">🔥</div>
             
             <div class="stats-container" style="margin-top: 60px;">
                 <h1 id="score-display">0</h1>
@@ -1217,7 +1244,6 @@
             </div>
         </div>
         
-        <!-- === NEW GIFT PAGE === -->
         <div id="gift-screen" class="screen hidden">
             <div class="gift-container">
                 <h2>🎁 Redeem Gift Code</h2>
@@ -1240,15 +1266,26 @@
             </div>
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
-        <!-- === END GIFT PAGE === -->
 
+        <div id="daily-tasks-screen" class="screen scrollable-screen hidden">
+            <div class="dt-wrap">
+                <div class="dt-header">  
+                    <div class="dt-title">Daily Tasks</div>  
+                </div>    
+                <div class="dt-wallet">  
+                    <div>🪙 Coins: <span id="dt-coin-balance">0</span></div>  
+                    <div>💎 Diamonds: <span id="dt-diamond-balance">0</span></div>  
+                </div>    
+                <div class="dt-list" id="daily-task-list-container"></div>  
+            </div>
+            <button class="back-button" data-screen="game-screen">Back to Game</button>
+        </div>
 
         <div class="nav-container">
             <div class="nav-button active" data-screen="game-screen"><span class="nav-icon">🏠</span><span class="nav-text">Home</span></div>
             <div class="nav-button" data-screen="tournament-screen"><span class="nav-icon">🏆</span><span class="nav-text">All</span></div>
             <div class="nav-button" id="offer-nav-button" data-screen="offer-wall-screen"><span class="nav-icon">📲</span><span class="nav-text">Offer</span></div>
             <div class="nav-button" data-screen="ads-screen"><span class="nav-icon">🎬</span><span class="nav-text">ADS</span></div>
-            <!-- === NEW GIFT BUTTON === -->
             <div class="nav-button" data-screen="gift-screen"><span class="nav-icon">🎁</span><span class="nav-text">Gift</span></div>
             <div class="nav-button" data-screen="wallet-screen"><span class="nav-icon">👛</span><span class="nav-text">Wallet</span></div>
         </div>
@@ -1327,7 +1364,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // ... (Your existing Firebase initialization code) ...
         const firebaseConfig = {
           apiKey: "AIzaSyBJrCE4w_QfBqfF3g4O_RuCK4DbjmL9TRg",
           authDomain: "telegram-69052.firebaseapp.com",
@@ -1343,8 +1379,6 @@
 
         let isAdCurrentlyShowing = false; 
 
-        // ... (Your existing ad logic, user logic, etc.) ...
-        
         let automaticAdTimerInterval = null;
         const autoAdOverlay = document.getElementById('auto-ad-overlay');
         const autoAdIframe = document.getElementById('auto-ad-iframe');
@@ -1675,7 +1709,6 @@
                 claimTelegramRewardBtn: document.getElementById('claim-telegram-reward-btn'),
                 claimDailyBonusBtn: document.getElementById('claim-daily-bonus-btn'),
                 userIdDisplayOffer: document.getElementById('user-id-display-offer'),
-                // Wallet Elements
                 walletPlayerName: document.getElementById('wallet-player-name'),
                 walletBalance: document.getElementById('wallet-balance'),
                 walletUsdValue: document.getElementById('wallet-usd-value'),
@@ -1697,7 +1730,6 @@
                 walletUsdtAddress: document.getElementById('wallet-usdt-address'),
                 walletUsdtCoins: document.getElementById('wallet-usdt-coins'),
                 walletUsdtReceive: document.getElementById('wallet-usdt-receive'),
-                // Mining & Diamond Elements
                 miningButton: document.getElementById('mining-button'),
                 diamondDisplay: document.getElementById('diamond-display'),
                 diamondCount: document.getElementById('diamond-count'),
@@ -1709,16 +1741,20 @@
                 nextAdTimer: document.getElementById('next-ad-timer'),
                 adsScreen: document.getElementById('ads-screen'),
                 adsList: document.getElementById('adsList'),
-                // GIFT PAGE Elements
                 giftScreen: document.getElementById('gift-screen'),
                 giftCodeInput: document.getElementById('giftCodeInput'),
                 redeemGiftCodeBtn: document.getElementById('redeem-gift-code-btn'),
                 claimButtonContainer: document.getElementById('claimButtonContainer'),
                 claimBtn1: document.getElementById('claimBtn1'),
-                redeemedMessage: document.getElementById('redeemedMessage')
+                redeemedMessage: document.getElementById('redeemedMessage'),
+                dailyTasksSideButton: document.getElementById('daily-tasks-side-button'), // New side button
+                dailyTasksScreen: document.getElementById('daily-tasks-screen'),
+                dtCoinBalance: document.getElementById('dt-coin-balance'),
+                dtDiamondBalance: document.getElementById('dt-diamond-balance'),
+                dailyTaskListContainer: document.getElementById('daily-task-list-container'),
             };
 
-            // ... (rest of your event listeners setup)
+            elements.dailyTasksSideButton.addEventListener('click', () => showScreen('daily-tasks-screen'));
 
             document.querySelector('.copy-id-btn').addEventListener('click', () => {
                 if (userId) {
@@ -1773,6 +1809,7 @@
                 creationTime: 0,
                 diamonds: 0,
                 adsProgress: {},
+                dailyTaskProgress: {},
             };
             
             let currentTournamentJoinProcess = {
@@ -1783,8 +1820,26 @@
             };
             
             let nextAdTimeout, blackoutInterval, countdownInterval;
-
-            // --- NEW GIFT PAGE LOGIC (INTEGRATED) ---
+            
+            // --- DAILY TASKS & GIFT PAGE LOGIC (INTEGRATED) ---
+            let dailyTaskSettings = { coinsPerTask: 30, tapLimit: 10, delaySeconds: 6 };
+            let dailyTaskLinks = {};
+            const dailyTasksList = [  
+              {id:1, icon:"😍", name:"Watch Short Ad", desc:"Rewarded Interstitial"}, {id:2, icon:"😎", name:"Click for Reward", desc:"Rewarded Popup"},  
+              {id:3, icon:"🤑", name:"Big Cash Bonus", desc:"Earn instantly"}, {id:4, icon:"💰", name:"Treasure Reward", desc:"Open & win coins"},  
+              {id:5, icon:"🌼", name:"Lucky Flower", desc:"Daily surprise"}, {id:6, icon:"😙", name:"Fun Task", desc:"Simple action"},  
+              {id:7, icon:"🎮", name:"Play & Earn", desc:"Mini game reward"}, {id:8, icon:"🥳", name:"Celebration Bonus", desc:"Special prize"},  
+              {id:9, icon:"🔥", name:"Hot Offer", desc:"Limited time"}, {id:10, icon:"👀", name:"Watch & Win", desc:"Extra reward"},  
+              {id:11, icon:"💎", name:"Diamond Gift", desc:"Premium bonus", diamond:true}, {id:12, icon:"🪙", name:"Golden Coin", desc:"Collect coins"},  
+              {id:13, icon:"👁️", name:"Secret View", desc:"Hidden reward"}, {id:14, icon:"📺", name:"Double Watch", desc:"Extra bonus"},  
+              {id:15, icon:"🎁", name:"Triple Watch", desc:"Special gift"}, {id:16, icon:"🥵", name:"Hot Challenge", desc:"Complete now"},  
+              {id:17, icon:"💸", name:"Cash Drop", desc:"Win instantly"}, {id:18, icon:"🎉", name:"Party Reward", desc:"Enjoy & earn"},  
+              {id:19, icon:"❤️‍🔥", name:"Love Fire", desc:"Special surprise"}, {id:20, icon:"👁️", name:"Eye Reward", desc:"Secret bonus"},  
+              {id:21, icon:"🌡️", name:"Heat Bonus", desc:"Hot prize"}, {id:22, icon:"🐳", name:"Whale Gift", desc:"Big reward"},  
+              {id:23, icon:"⏰", name:"Time Bonus", desc:"Claim fast"}, {id:24, icon:"🔓", name:"Unlock Reward", desc:"Hidden treasure"},  
+              {id:25, icon:"🇮🇳", name:"India Bonus", desc:"Special gift"}  
+            ];
+            
             let lastClickedButton = null;
             let claimSettings = {};
 
@@ -1902,7 +1957,105 @@
                     claimCode(elements.claimBtn1, 'placeholder');
                 }
             });
-            // --- END NEW GIFT PAGE LOGIC ---
+
+            async function loadDailyTaskSettingsAndRender() {
+                try {
+                    const settingsSnapshot = await database.ref('dailyTaskSettings').once('value');
+                    if (settingsSnapshot.exists()) dailyTaskSettings = settingsSnapshot.val();
+                    
+                    const linksSnapshot = await database.ref('dailyTaskLinks').once('value');
+                    if (linksSnapshot.exists()) dailyTaskLinks = linksSnapshot.val();
+
+                    renderDailyTasksScreen();
+                } catch (error) {
+                    console.error("Failed to load daily task settings:", error);
+                    elements.dailyTaskListContainer.innerHTML = "<p style='color:red; text-align:center;'>Could not load tasks. Please try again.</p>";
+                }
+            }
+            
+            function renderDailyTasksScreen() {
+                elements.dtCoinBalance.textContent = state.score.toLocaleString();
+                elements.dtDiamondBalance.textContent = state.diamonds.toLocaleString();
+                elements.dailyTaskListContainer.innerHTML = '';
+
+                dailyTasksList.forEach(task => {
+                    const taskProgress = state.dailyTaskProgress[`task${task.id}`] || { count: 0 };
+                    const remaining = dailyTaskSettings.tapLimit - taskProgress.count;
+                    
+                    const card = document.createElement("div");
+                    card.className="dt-card";
+                    card.innerHTML = `  
+                        <div class="dt-left">  
+                            <div class="dt-avatar">${task.icon}</div>  
+                            <div class="dt-meta"><div class="dt-name">${task.name}</div><div class="dt-desc">${task.desc}</div></div>  
+                        </div>  
+                        <div class="dt-task-right">  
+                            <span class="dt-counter">${remaining < 0 ? 0 : remaining}</span>  
+                            <button class="dt-claim" ${remaining <= 0 ? 'disabled' : ''}>Claim</button>  
+                        </div>  
+                    `;
+                    
+                    const claimButton = card.querySelector('.dt-claim');
+                    claimButton.addEventListener('click', () => handleDailyTaskClick(task, claimButton));
+
+                    elements.dailyTaskListContainer.appendChild(card);
+                });
+            }
+
+            function handleDailyTaskClick(task, button) {
+                const taskId = task.id;
+                const isDiamond = task.diamond || false;
+
+                const taskProgress = state.dailyTaskProgress[`task${taskId}`] || { count: 0 };
+                if (taskProgress.count >= dailyTaskSettings.tapLimit) {
+                    alert("❌ Limit reached for this task!");
+                    return;
+                }
+
+                const link = dailyTaskLinks["taskLink" + taskId];
+                if (!link) {
+                    alert("⚠️ Admin has not set a link for this task yet!");
+                    return;
+                }
+                
+                window.open(link, "_blank");
+                
+                button.disabled = true;
+                let countdown = dailyTaskSettings.delaySeconds;
+                button.textContent = `Wait ${countdown}s`;
+                
+                const interval = setInterval(() => {
+                    countdown--;
+                    button.textContent = `Wait ${countdown}s`;
+                    if (countdown <= 0) {
+                        clearInterval(interval);
+                    }
+                }, 1000);
+
+                setTimeout(() => {
+                    taskProgress.count++;
+                    state.dailyTaskProgress[`task${taskId}`] = taskProgress;
+
+                    const reward = dailyTaskSettings.coinsPerTask;
+                    if (isDiamond) {
+                        state.diamonds += reward;
+                        alert(`💎 +${reward} Diamonds मिले!`);
+                    } else {
+                        state.score += reward;
+                        alert(`🪙 +${reward} Coins मिले!`);
+                    }
+
+                    saveGame({ 
+                        score: state.score, 
+                        diamonds: state.diamonds,
+                        dailyTaskProgress: state.dailyTaskProgress 
+                    });
+
+                    updateDisplay();
+                    renderDailyTasksScreen();
+
+                }, dailyTaskSettings.delaySeconds * 1000);
+            }
             
             function renderRewardsHubScreen() {
                 if (state.telegramJoinedClaimed) {
@@ -2348,7 +2501,8 @@
                 else if (screenId === 'mining-screen') { startNewMiningProcess(); }
                 else if (screenId === 'diamond-screen') { renderDiamondScreen(); }
                 else if (screenId === 'ads-screen') { renderAdsScreen(); }
-                else if (screenId === 'gift-screen') { loadClaimSettings(); } // Load gift settings when page is shown
+                else if (screenId === 'gift-screen') { loadClaimSettings(); }
+                else if (screenId === 'daily-tasks-screen') { loadDailyTaskSettingsAndRender(); }
             }
 
             function listenForGameSettings() {
@@ -2359,7 +2513,7 @@
                     gameSettings.withdrawalButtonText = settings.withdrawalButtonText || 'Withdraw All Coins';
                     gameSettings.isWithdrawalForceUnlocked = settings.isWithdrawalForceUnlocked === true;
                     gameSettings.coinValue = parseInt(settings.coinValue, 10) || 1000;
-                    gameSettings.logoUrls = settings.logoUrls || { upi: '', usdt: '' }; // NEW
+                    gameSettings.logoUrls = settings.logoUrls || { upi: '', usdt: '' };
                     
                     if (!document.getElementById('wallet-screen').classList.contains('hidden')) {
                         renderNewWalletScreen();
@@ -2398,6 +2552,7 @@
                             totalOnlineTime: 0,
                             diamonds: 0,
                             adsProgress: {},
+                            dailyTaskProgress: {},
                         };
 
                         if (referrerCode) {
@@ -2425,6 +2580,7 @@
                     
                     state.diamonds = data.diamonds || 0;
                     state.adsProgress = data.adsProgress || {};
+                    state.dailyTaskProgress = data.dailyTaskProgress || {};
 
                     updateDisplay();
                     updatePlayerNameDisplay();
