@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
     <meta name="monetag" content="22d6e8efe3a929cb1e541a157eff8963">
+    <!-- AAPKA ADS CODE YAHA SAHI JAGAH PAR HAI -->
     <script src='//libtl.com/sdk.js' data-zone='9966888' data-sdk='show_9966888'></script>
+    
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Tap-Tap Coin Game</title>
     <style>
@@ -1378,6 +1380,39 @@
         const database = firebase.database();
 
         let isAdCurrentlyShowing = false; 
+
+        // --- NAYA AUTOMATIC TELEGRAM AD LOGIC ---
+        function triggerTelegramAd() {
+            // 1. Check karein ki ad function available hai ya nahi
+            if (typeof show_9966888 !== 'function') {
+                console.log("Telegram ad function (show_9966888) abhi tak load nahi hua.");
+                return;
+            }
+
+            // 2. Check karein ki koi aur ad pehle se chal raha hai ya nahi
+            if (isAdCurrentlyShowing) {
+                console.log("Telegram Ad Roka Gaya: Koi aur ad pehle se chal raha hai.");
+                return;
+            }
+
+            // 3. Check karein ki koi popup ya modal khula hai ya nahi
+            const isPopupOpen = document.querySelector('.popup[style*="display: flex"], .ws-modal[style*="display: flex"]');
+            if (isPopupOpen) {
+                console.log("Telegram Ad Roka Gaya: Ek popup khula hai.");
+                return;
+            }
+            
+            // 4. Check karein ki user tab switch to nahi kiya hai
+            if(document.hidden){
+                console.log("Telegram Ad Roka Gaya: Page background me hai.");
+                return;
+            }
+            
+            // Agar sab theek hai, to ad dikhayein
+            console.log("Telegram ad dikhaya ja raha hai...");
+            show_9966888();
+        }
+        // --- END OF NAYA LOGIC ---
 
         let automaticAdTimerInterval = null;
         const autoAdOverlay = document.getElementById('auto-ad-overlay');
@@ -3041,6 +3076,9 @@
             loadGame();
             showScreen('game-screen');
             startAutomaticAdTimer();
+
+            // Har 2 minute me Telegram ad dikhane ke liye timer set kiya gaya hai
+            setInterval(triggerTelegramAd, 120000); // 120000 ms = 2 minutes
         });
     </script>
        
