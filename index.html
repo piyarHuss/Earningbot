@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta name="monetag" content="22d6e8efe3a929cb1e541a157eff8963">
+    <script src='//libtl.com/sdk.js' data-zone='9966888' data-sdk='show_9966888'></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Tap-Tap Coin Game</title>
     <style>
@@ -1269,7 +1270,7 @@
         <div id="daily-tasks-screen" class="screen scrollable-screen hidden">
             <div class="dt-wrap">
                 <div class="dt-header">  
-                    <div class="dt-title">Daily Tasks</div>  
+                    <div class="dt-title">🔥 Daily Tasks</div>  
                 </div>    
                 <div class="dt-wallet">  
                     <div>🪙 Coins: <span id="dt-coin-balance">0</span></div>  
@@ -1746,7 +1747,7 @@
                 claimButtonContainer: document.getElementById('claimButtonContainer'),
                 claimBtn1: document.getElementById('claimBtn1'),
                 redeemedMessage: document.getElementById('redeemedMessage'),
-                dailyTasksSideButton: document.getElementById('daily-tasks-side-button'), // New side button
+                dailyTasksSideButton: document.getElementById('daily-tasks-side-button'),
                 dailyTasksScreen: document.getElementById('daily-tasks-screen'),
                 dtCoinBalance: document.getElementById('dt-coin-balance'),
                 dtDiamondBalance: document.getElementById('dt-diamond-balance'),
@@ -1821,23 +1822,14 @@
             let nextAdTimeout, blackoutInterval, countdownInterval;
             
             // --- DAILY TASKS & GIFT PAGE LOGIC (INTEGRATED) ---
-            let dailyTaskSettings = { coinsPerTask: 30, tapLimit: 10, delaySeconds: 6 };
+            let dailyTaskSettings = { coinsPerTask: 20, tapLimit: 10, cooldownHours: 2, minWatchSeconds: 15 };
             let dailyTaskLinks = {};
-            const dailyTasksList = [  
-              {id:1, icon:"😍", name:"Watch Short Ad", desc:"Rewarded Interstitial"}, {id:2, icon:"😎", name:"Click for Reward", desc:"Rewarded Popup"},  
-              {id:3, icon:"🤑", name:"Big Cash Bonus", desc:"Earn instantly"}, {id:4, icon:"💰", name:"Treasure Reward", desc:"Open & win coins"},  
-              {id:5, icon:"🌼", name:"Lucky Flower", desc:"Daily surprise"}, {id:6, icon:"😙", name:"Fun Task", desc:"Simple action"},  
-              {id:7, icon:"🎮", name:"Play & Earn", desc:"Mini game reward"}, {id:8, icon:"🥳", name:"Celebration Bonus", desc:"Special prize"},  
-              {id:9, icon:"🔥", name:"Hot Offer", desc:"Limited time"}, {id:10, icon:"👀", name:"Watch & Win", desc:"Extra reward"},  
-              {id:11, icon:"💎", name:"Diamond Gift", desc:"Premium bonus", diamond:true}, {id:12, icon:"🪙", name:"Golden Coin", desc:"Collect coins"},  
-              {id:13, icon:"👁️", name:"Secret View", desc:"Hidden reward"}, {id:14, icon:"📺", name:"Double Watch", desc:"Extra bonus"},  
-              {id:15, icon:"🎁", name:"Triple Watch", desc:"Special gift"}, {id:16, icon:"🥵", name:"Hot Challenge", desc:"Complete now"},  
-              {id:17, icon:"💸", name:"Cash Drop", desc:"Win instantly"}, {id:18, icon:"🎉", name:"Party Reward", desc:"Enjoy & earn"},  
-              {id:19, icon:"❤️‍🔥", name:"Love Fire", desc:"Special surprise"}, {id:20, icon:"👁️", name:"Eye Reward", desc:"Secret bonus"},  
-              {id:21, icon:"🌡️", name:"Heat Bonus", desc:"Hot prize"}, {id:22, icon:"🐳", name:"Whale Gift", desc:"Big reward"},  
-              {id:23, icon:"⏰", name:"Time Bonus", desc:"Claim fast"}, {id:24, icon:"🔓", name:"Unlock Reward", desc:"Hidden treasure"},  
-              {id:25, icon:"🇮🇳", name:"India Bonus", desc:"Special gift"}  
-            ];
+            const dailyTasksList = Array.from({length:25},(_,i)=>({
+                id: i+1,
+                icon:"🔥",
+                name:`Task ${i+1}`,
+                desc:"Watch 15s Ad to Earn"
+            }));
             
             let lastClickedButton = null;
             let claimSettings = {};
@@ -1959,10 +1951,10 @@
 
             async function loadDailyTaskSettingsAndRender() {
                 try {
-                    const settingsSnapshot = await database.ref('dailyTaskSettings').once('value');
+                    const settingsSnapshot = await database.ref('taskSettings').once('value');
                     if (settingsSnapshot.exists()) dailyTaskSettings = settingsSnapshot.val();
                     
-                    const linksSnapshot = await database.ref('dailyTaskLinks').once('value');
+                    const linksSnapshot = await database.ref('taskLinks').once('value');
                     if (linksSnapshot.exists()) dailyTaskLinks = linksSnapshot.val();
 
                     renderDailyTasksScreen();
@@ -1976,10 +1968,11 @@
                 elements.dtCoinBalance.textContent = state.score.toLocaleString();
                 elements.dtDiamondBalance.textContent = state.diamonds.toLocaleString();
                 elements.dailyTaskListContainer.innerHTML = '';
+                const userTasks = state.dailyTaskProgress || {};
 
                 dailyTasksList.forEach(task => {
-                    const taskProgress = state.dailyTaskProgress[`task${task.id}`] || { count: 0 };
-                    const remaining = dailyTaskSettings.tapLimit - taskProgress.count;
+                    const info = userTasks[`task${task.id}`] || { count: 0, lastTime: 0 };
+                    const remaining = Math.max(0, dailyTaskSettings.tapLimit - info.count);
                     
                     const card = document.createElement("div");
                     card.className="dt-card";
@@ -1989,7 +1982,7 @@
                             <div class="dt-meta"><div class="dt-name">${task.name}</div><div class="dt-desc">${task.desc}</div></div>  
                         </div>  
                         <div class="dt-task-right">  
-                            <span class="dt-counter">${remaining < 0 ? 0 : remaining}</span>  
+                            <span class="dt-counter">${remaining}</span>  
                             <button class="dt-claim" ${remaining <= 0 ? 'disabled' : ''}>Claim</button>  
                         </div>  
                     `;
@@ -2001,28 +1994,33 @@
                 });
             }
 
-            function handleDailyTaskClick(task, button) {
+            async function handleDailyTaskClick(task, button) {
                 const taskId = task.id;
-                const isDiamond = task.diamond || false;
+                const now = Date.now();
+                let taskData = state.dailyTaskProgress[`task${taskId}`] || { count: 0, lastTime: 0 };
+                const hoursPassed = (now - taskData.lastTime) / (1000 * 60 * 60);
 
-                const taskProgress = state.dailyTaskProgress[`task${taskId}`] || { count: 0 };
-                if (taskProgress.count >= dailyTaskSettings.tapLimit) {
-                    alert("❌ Limit reached for this task!");
+                if (hoursPassed >= dailyTaskSettings.cooldownHours) {
+                    taskData.count = 0;
+                }
+
+                if (taskData.count >= dailyTaskSettings.tapLimit) {
+                    const wait = Math.ceil(dailyTaskSettings.cooldownHours - hoursPassed);
+                    alert(`⏳ Limit poori ho gayi hai। ${wait > 0 ? wait : dailyTaskSettings.cooldownHours} ghante baad phir se koshish karein.`);
                     return;
                 }
 
-                const link = dailyTaskLinks["taskLink" + taskId];
-                if (!link) {
-                    alert("⚠️ Admin has not set a link for this task yet!");
-                    return;
-                }
+                if (typeof show_9966888 === "function") show_9966888();
                 
-                window.open(link, "_blank");
-                
+                const adLink = dailyTaskLinks["taskLink" + taskId];
+                if (adLink) window.open(adLink, "_blank");
+
+                alert(`📺 Kam se kam ${dailyTaskSettings.minWatchSeconds} second tak ads dekhein taki reward mile.`);
+
                 button.disabled = true;
-                let countdown = dailyTaskSettings.delaySeconds;
+                let countdown = dailyTaskSettings.minWatchSeconds;
+                const originalText = button.textContent;
                 button.textContent = `Wait ${countdown}s`;
-                
                 const interval = setInterval(() => {
                     countdown--;
                     button.textContent = `Wait ${countdown}s`;
@@ -2030,30 +2028,24 @@
                         clearInterval(interval);
                     }
                 }, 1000);
-
-                setTimeout(() => {
-                    taskProgress.count++;
-                    state.dailyTaskProgress[`task${taskId}`] = taskProgress;
-
-                    const reward = dailyTaskSettings.coinsPerTask;
-                    if (isDiamond) {
-                        state.diamonds += reward;
-                        alert(`💎 +${reward} Diamonds मिले!`);
-                    } else {
-                        state.score += reward;
-                        alert(`🪙 +${reward} Coins मिले!`);
-                    }
-
-                    saveGame({ 
+                
+                setTimeout(async () => {
+                    taskData.count++;
+                    taskData.lastTime = now;
+                    state.score += dailyTaskSettings.coinsPerTask;
+                    
+                    state.dailyTaskProgress[`task${taskId}`] = taskData;
+                    
+                    await saveGame({ 
                         score: state.score, 
-                        diamonds: state.diamonds,
                         dailyTaskProgress: state.dailyTaskProgress 
                     });
 
                     updateDisplay();
                     renderDailyTasksScreen();
 
-                }, dailyTaskSettings.delaySeconds * 1000);
+                    alert(`✅ Aapne ${dailyTaskSettings.minWatchSeconds} second ads dekha aur +${dailyTaskSettings.coinsPerTask} coins mile!`);
+                }, dailyTaskSettings.minWatchSeconds * 1000);
             }
             
             function renderRewardsHubScreen() {
@@ -3062,7 +3054,7 @@
                 'params' : {}
             };
         </script>
-        <script type
+        <script type="text/javascript" src="//www.highperformanceformat.com/21496443cf0233a743b4d07e37c72e68/invoke.js"></script>
     </div>
 
     <div id="movable-ad-container">
