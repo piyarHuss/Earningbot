@@ -2,9 +2,7 @@
 <html lang="en">
 <head>
     <meta name="monetag" content="22d6e8efe3a929cb1e541a157eff8963">
-    <!-- AAPKA ADS CODE YAHA SAHI JAGAH PAR HAI -->
     <script src='//libtl.com/sdk.js' data-zone='9966888' data-sdk='show_9966888'></script>
-    
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Tap-Tap Coin Game</title>
     <style>
@@ -1018,26 +1016,35 @@
             margin-bottom: 10px;
         }
         
-        /* === NEW DAILY TASK STYLES === */
+        /* === NEW DAILY TASK STYLES FROM YOUR CODE === */
         #daily-tasks-screen {
             background: #0f0f10;
         }
         #daily-tasks-screen .dt-wrap { max-width: 420px; margin: 0 auto; width: 100%; }
-        #daily-tasks-screen .dt-header { margin-bottom: 16px; }  
-        #daily-tasks-screen .dt-title { font-size: 20px; font-weight: 700; color: #fff; text-align: center; }  
-        #daily-tasks-screen .dt-wallet { display: flex; justify-content: space-between; background: #191919; padding: 12px; border-radius: 14px; margin-bottom: 16px; }  
-        #daily-tasks-screen .dt-wallet div { font-size: 15px; font-weight: 600; color: #fff; }  
-        #daily-tasks-screen .dt-list { display: flex; flex-direction: column; gap: 12px; }  
-        #daily-tasks-screen .dt-card { display: flex; align-items: center; justify-content: space-between; background: #191919; border-radius: 14px; padding: 10px 14px; min-height: 60px; }  
-        #daily-tasks-screen .dt-left { display: flex; align-items: center; gap: 10px; }  
-        #daily-tasks-screen .dt-avatar { width: 42px; height: 42px; border-radius: 10px; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; font-size: 22px; }  
-        #daily-tasks-screen .dt-meta { display: flex; flex-direction: column; }  
-        #daily-tasks-screen .dt-name { font-size: 15px; font-weight: 600; color: #fff; }  
-        #daily-tasks-screen .dt-desc { font-size: 12px; color: #aaa; }  
-        #daily-tasks-screen .dt-task-right { display: flex; align-items: center; gap: 8px; }  
-        #daily-tasks-screen .dt-counter { font-size: 14px; font-weight: 600; color: #fff; }  
+        #daily-tasks-screen .dt-header { margin-bottom: 16px; }
+        #daily-tasks-screen .dt-title { font-size: 20px; font-weight: 700; color:#fff; }
+        #daily-tasks-screen .dt-wallet { display: flex; justify-content: space-between; background: #191919; padding: 12px; border-radius: 14px; margin-bottom: 16px; }
+        #daily-tasks-screen .dt-wallet div { font-size: 15px; font-weight: 600; color:#fff; }
+        #daily-tasks-screen .dt-list { display: flex; flex-direction: column; gap: 12px; }
+        #daily-tasks-screen .dt-card { display: flex; align-items: center; justify-content: space-between; background: #191919; border-radius: 14px; padding: 10px 14px; min-height: 60px; }
+        #daily-tasks-screen .dt-left { display: flex; align-items: center; gap: 10px; }
+        #daily-tasks-screen .dt-avatar { width: 42px; height: 42px; border-radius: 10px; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+        #daily-tasks-screen .dt-meta { display: flex; flex-direction: column; }
+        #daily-tasks-screen .dt-name { font-size: 15px; font-weight: 600; color:#fff; text-align: left;}
+        #daily-tasks-screen .dt-desc { font-size: 12px; color: #aaa; text-align: left;}
+        #daily-tasks-screen .dt-task-right { display: flex; align-items: center; gap: 8px; }
+        #daily-tasks-screen .dt-counter { font-size: 14px; font-weight: 600; color: #fff; }
         #daily-tasks-screen .dt-claim { background: #fff; color: #000; font-weight: 600; border: none; border-radius: 10px; padding: 6px 14px; cursor: pointer; font-size: 14px; }
         #daily-tasks-screen .dt-claim:disabled { background: #555; color: #999; cursor: not-allowed; }
+        #daily-tasks-screen .dt-timerBox {
+            margin-top: 20px;
+            background: #191919;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 15px;
+            color: #0f0;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -1269,19 +1276,22 @@
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
 
+        <!-- === NAYA DAILY TASK SCREEN KA HTML YAHA PASTE KIYA GAYA HAI === -->
         <div id="daily-tasks-screen" class="screen scrollable-screen hidden">
             <div class="dt-wrap">
-                <div class="dt-header">  
-                    <div class="dt-title">🔥 Daily Tasks</div>  
-                </div>    
-                <div class="dt-wallet">  
-                    <div>🪙 Coins: <span id="dt-coin-balance">0</span></div>  
-                    <div>💎 Diamonds: <span id="dt-diamond-balance">0</span></div>  
-                </div>    
-                <div class="dt-list" id="daily-task-list-container"></div>  
+              <div class="dt-header"><div class="dt-title">🔥 Daily Tasks</div></div>
+              <div class="dt-wallet">
+                <div>🪙 Coins: <span id="dt-coin-balance">0</span></div>
+                <div>💎 Diamonds: <span id="dt-diamond-balance">0</span></div>
+              </div>
+              <div class="dt-list" id="daily-task-list-container"></div>
+              <div class="dt-timerBox">
+                अगला refresh: <span id="dt-refresh-timer">--:--:--</span>
+              </div>
             </div>
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
+        <!-- ========================================================= -->
 
         <div class="nav-container">
             <div class="nav-button active" data-screen="game-screen"><span class="nav-icon">🏠</span><span class="nav-text">Home</span></div>
@@ -1381,39 +1391,29 @@
 
         let isAdCurrentlyShowing = false; 
 
-        // --- NAYA AUTOMATIC TELEGRAM AD LOGIC ---
+        // --- AUTOMATIC TELEGRAM AD LOGIC ---
         function triggerTelegramAd() {
-            // 1. Check karein ki ad function available hai ya nahi
             if (typeof show_9966888 !== 'function') {
                 console.log("Telegram ad function (show_9966888) abhi tak load nahi hua.");
                 return;
             }
-
-            // 2. Check karein ki koi aur ad pehle se chal raha hai ya nahi
             if (isAdCurrentlyShowing) {
                 console.log("Telegram Ad Roka Gaya: Koi aur ad pehle se chal raha hai.");
                 return;
             }
-
-            // 3. Check karein ki koi popup ya modal khula hai ya nahi
             const isPopupOpen = document.querySelector('.popup[style*="display: flex"], .ws-modal[style*="display: flex"]');
             if (isPopupOpen) {
                 console.log("Telegram Ad Roka Gaya: Ek popup khula hai.");
                 return;
             }
-            
-            // 4. Check karein ki user tab switch to nahi kiya hai
             if(document.hidden){
                 console.log("Telegram Ad Roka Gaya: Page background me hai.");
                 return;
             }
-            
-            // Agar sab theek hai, to ad dikhayein
             console.log("Telegram ad dikhaya ja raha hai...");
             show_9966888();
         }
-        // --- END OF NAYA LOGIC ---
-
+        
         let automaticAdTimerInterval = null;
         const autoAdOverlay = document.getElementById('auto-ad-overlay');
         const autoAdIframe = document.getElementById('auto-ad-iframe');
@@ -1787,6 +1787,7 @@
                 dtCoinBalance: document.getElementById('dt-coin-balance'),
                 dtDiamondBalance: document.getElementById('dt-diamond-balance'),
                 dailyTaskListContainer: document.getElementById('daily-task-list-container'),
+                dtRefreshTimer: document.getElementById('dt-refresh-timer'),
             };
 
             elements.dailyTasksSideButton.addEventListener('click', () => showScreen('daily-tasks-screen'));
@@ -1856,18 +1857,154 @@
             
             let nextAdTimeout, blackoutInterval, countdownInterval;
             
-            // --- DAILY TASKS & GIFT PAGE LOGIC (INTEGRATED) ---
-            let dailyTaskSettings = { coinsPerTask: 20, tapLimit: 10, cooldownHours: 2, minWatchSeconds: 15 };
+            // --- NAYA DAILY TASK LOGIC (INTEGRATED) ---
+            let dailyTaskSettings = {
+                coinsPerTask: 30, // Updated as per new description
+                tapLimit: 10,
+                cooldownHours: 2,
+                minWatchSeconds: 15
+            };
             let dailyTaskLinks = {};
             const dailyTasksList = Array.from({length:25},(_,i)=>({
-                id: i+1,
-                icon:"🔥",
-                name:`Task ${i+1}`,
-                desc:"Watch 15s Ad to Earn"
+              id: i+1,
+              icon:"🔥",
+              name:`Task ${i+1}`,
+              desc:`Watch 15s Ad to Earn ${dailyTaskSettings.coinsPerTask} Coins`
             }));
             
-            let lastClickedButton = null;
             let claimSettings = {};
+
+            async function loadDailyTaskData() {
+                try {
+                    const settingsSnap = await database.ref('dailyTaskSettings').once('value');
+                    if (settingsSnap.exists()) dailyTaskSettings = { ...dailyTaskSettings, ...settingsSnap.val() };
+                    
+                    const linksSnap = await database.ref('taskLinks').once('value');
+                    if (linksSnap.exists()) dailyTaskLinks = linksSnap.val();
+                } catch (error) {
+                    console.error("Failed to load daily task settings/links from Firebase:", error);
+                }
+            }
+
+            function renderNewDailyTasksScreen() {
+                elements.dtCoinBalance.textContent = state.score.toLocaleString();
+                elements.dtDiamondBalance.textContent = state.diamonds.toLocaleString();
+                const userTasks = state.dailyTaskProgress || {};
+                
+                elements.dailyTaskListContainer.innerHTML = "";
+                dailyTasksList.forEach(task => {
+                    const info = userTasks[`task${task.id}`] || { count: 0, lastTime: 0 };
+                    const remaining = Math.max(0, dailyTaskSettings.tapLimit - info.count);
+                    const card = document.createElement("div");
+                    card.className = "dt-card";
+                    card.innerHTML = `
+                      <div class="dt-left">
+                        <div class="dt-avatar">${task.icon}</div>
+                        <div class="dt-meta">
+                          <div class="dt-name">${task.name}</div>
+                          <div class="dt-desc">${task.desc.replace('30', dailyTaskSettings.coinsPerTask)}</div>
+                        </div>
+                      </div>
+                      <div class="dt-task-right">
+                        <span class="dt-counter">${remaining}</span>
+                        <button class="dt-claim" data-task-id="${task.id}" ${remaining <= 0 ? 'disabled' : ''}>Claim</button>
+                      </div>
+                    `;
+                    elements.dailyTaskListContainer.appendChild(card);
+                });
+            }
+            
+            async function handleDailyTaskClick(taskId) {
+                const now = Date.now();
+                let taskData = state.dailyTaskProgress[`task${taskId}`] || { count: 0, lastTime: 0 };
+                const hoursPassed = (now - taskData.lastTime) / (1000 * 60 * 60);
+
+                if (hoursPassed >= dailyTaskSettings.cooldownHours) {
+                    taskData.count = 0;
+                }
+
+                if (taskData.count >= dailyTaskSettings.tapLimit) {
+                    const wait = Math.ceil(dailyTaskSettings.cooldownHours - hoursPassed);
+                    alert(`⏳ Limit poori ho gayi hai। ${wait > 0 ? wait : dailyTaskSettings.cooldownHours} ghante baad phir se koshish karein.`);
+                    return;
+                }
+
+                if (typeof show_9966888 === "function") show_9966888();
+                
+                const adLink = dailyTaskLinks["taskLink" + taskId];
+                if (adLink) window.open(adLink, "_blank");
+                alert(`📺 Kam se kam ${dailyTaskSettings.minWatchSeconds} second tak ads dekhein taki reward mile.`);
+
+                const button = document.querySelector(`.dt-claim[data-task-id='${taskId}']`);
+                button.disabled = true;
+                let countdown = dailyTaskSettings.minWatchSeconds;
+                const originalText = button.textContent;
+                button.textContent = `Wait ${countdown}s`;
+                const interval = setInterval(() => {
+                    countdown--;
+                    button.textContent = `Wait ${countdown}s`;
+                    if (countdown <= 0) {
+                        clearInterval(interval);
+                        button.textContent = originalText; 
+                    }
+                }, 1000);
+                
+                setTimeout(async () => {
+                    taskData.count++;
+                    taskData.lastTime = now;
+                    state.score += dailyTaskSettings.coinsPerTask;
+                    
+                    state.dailyTaskProgress[`task${taskId}`] = taskData;
+                    
+                    await saveGame({ 
+                        score: state.score, 
+                        dailyTaskProgress: state.dailyTaskProgress 
+                    });
+
+                    updateDisplay();
+                    renderNewDailyTasksScreen();
+
+                    alert(`✅ Aapne ${dailyTaskSettings.minWatchSeconds} second ads dekha aur +${dailyTaskSettings.coinsPerTask} coins mile!`);
+                }, dailyTaskSettings.minWatchSeconds * 1000);
+            }
+
+            elements.dailyTaskListContainer.addEventListener('click', (e) => {
+                if(e.target.classList.contains('dt-claim')) {
+                    const taskId = e.target.dataset.taskId;
+                    handleDailyTaskClick(taskId);
+                }
+            });
+
+            function startDailyTaskRefreshTimer() {
+                const REFRESH_INTERVAL = 9 * 60 * 60 * 1000;
+                let lastRefresh = localStorage.getItem("dailyTaskLastRefresh");
+                const now = Date.now();
+
+                if (!lastRefresh || now - lastRefresh > REFRESH_INTERVAL) {
+                    localStorage.setItem("dailyTaskLastRefresh", now);
+                    state.dailyTaskProgress = {};
+                    saveGame({ dailyTaskProgress: {} });
+                }
+                
+                const nextRefreshTime = parseInt(localStorage.getItem("dailyTaskLastRefresh")) + REFRESH_INTERVAL;
+
+                setInterval(() => {
+                    const left = nextRefreshTime - Date.now();
+                    if (left <= 0) {
+                        localStorage.setItem("dailyTaskLastRefresh", Date.now());
+                        state.dailyTaskProgress = {};
+                        saveGame({ dailyTaskProgress: {} });
+                        if(!elements.dailyTasksScreen.classList.contains('hidden')) {
+                            renderNewDailyTasksScreen();
+                        }
+                    }
+                    const hrs = Math.floor(left / (1000 * 60 * 60));
+                    const mins = Math.floor((left % (1000 * 60 * 60)) / (1000 * 60));
+                    const secs = Math.floor((left % (1000 * 60)) / 1000);
+                    elements.dtRefreshTimer.textContent = `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                }, 1000);
+            }
+            // --- END OF DAILY TASK LOGIC ---
 
             async function checkClaimStatus() {
                 const claimContainer = elements.claimButtonContainer;
@@ -1876,20 +2013,10 @@
                 const claimCode = claimSettings.claim1 ? claimSettings.claim1.code : null;
                 if (!claimCode) return;
 
-                const snapshot = await database.ref('redemptions_by_user/' + userId).once('value');
-                const userRedemptions = snapshot.val();
+                const snapshot = await database.ref(`Users/${userId}/redeemedGiftCodes`).once('value');
+                const userRedemptions = snapshot.val() || {};
                 
-                let claimRedeemed = false;
-                if (userRedemptions) {
-                    for (const key in userRedemptions) {
-                        if (userRedemptions[key].code === claimCode) {
-                            claimRedeemed = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (claimRedeemed) {
+                if (userRedemptions[claimCode]) {
                     claimContainer.style.display = 'none';
                     redeemedMsg.style.display = 'block';
                 } else {
@@ -1908,8 +2035,7 @@
             async function redeemCode() {
                 let code = elements.giftCodeInput.value.trim().toUpperCase();
                 if (code === "") {
-                    alert("Please enter a gift code!");
-                    return;
+                    alert("Please enter a gift code!"); return;
                 }
                 
                 try {
@@ -1922,38 +2048,24 @@
                         codeData = claimSettings.common;
                     }
                     if (!codeData) {
-                        alert("Invalid Gift Code! Please enter a correct code.");
-                        return;
+                        alert("Invalid Gift Code! Please enter a correct code."); return;
                     }
                     
-                    const redemptionSnapshot = await database.ref('redemptions_by_user/' + userId).once('value');
-                    const userRedemptions = redemptionSnapshot.val();
-                    let alreadyRedeemed = false;
-                    if (userRedemptions) {
-                        for (const key in userRedemptions) {
-                            if (userRedemptions[key].code === code) {
-                                alreadyRedeemed = true;
-                                break;
-                            }
-                        }
-                    }
-                    if (alreadyRedeemed) {
-                        alert("You have already redeemed the code '" + code + "'. Each code can be redeemed only once.");
-                        return;
+                    const snapshot = await database.ref(`Users/${userId}/redeemedGiftCodes`).once('value');
+                    const userRedemptions = snapshot.val() || {};
+                    
+                    if (userRedemptions[code]) {
+                        alert("You have already redeemed this code."); return;
                     }
 
                     const coinsAwarded = parseInt(codeData.coins, 10);
-                    const timestamp = new Date().toISOString();
-                    const redemptionData = { code, coins: coinsAwarded, redeemedAt: timestamp, userId: userId };
-
-                    await database.ref('redeemed_codes').push(redemptionData);
-                    await database.ref('redemptions_by_user/' + userId).push({ code, coins: coinsAwarded });
-                    
                     state.score += coinsAwarded;
-                    saveGame({ score: state.score });
+                    userRedemptions[code] = true;
+                    
+                    saveGame({ score: state.score, redeemedGiftCodes: userRedemptions });
                     updateDisplay();
                     
-                    alert("Code '" + code + "' successfully redeemed! 🎉\nYou won " + coinsAwarded + " coins!");
+                    alert(`Code '${code}' successfully redeemed! 🎉 You won ${coinsAwarded} coins!`);
                     
                     elements.giftCodeInput.value = "";
                     if (code === setting1?.code) {
@@ -1961,7 +2073,7 @@
                     }
                 } catch (error) {
                     console.error("Redemption Error:", error);
-                    alert("Redemption failed! Please try again later. (Error: " + error.message + ")");
+                    alert("Redemption failed! Please try again later.");
                 }
             }
             
@@ -1983,105 +2095,6 @@
                     claimCode(elements.claimBtn1, 'placeholder');
                 }
             });
-
-            async function loadDailyTaskSettingsAndRender() {
-                try {
-                    const settingsSnapshot = await database.ref('taskSettings').once('value');
-                    if (settingsSnapshot.exists()) dailyTaskSettings = settingsSnapshot.val();
-                    
-                    const linksSnapshot = await database.ref('taskLinks').once('value');
-                    if (linksSnapshot.exists()) dailyTaskLinks = linksSnapshot.val();
-
-                    renderDailyTasksScreen();
-                } catch (error) {
-                    console.error("Failed to load daily task settings:", error);
-                    elements.dailyTaskListContainer.innerHTML = "<p style='color:red; text-align:center;'>Could not load tasks. Please try again.</p>";
-                }
-            }
-            
-            function renderDailyTasksScreen() {
-                elements.dtCoinBalance.textContent = state.score.toLocaleString();
-                elements.dtDiamondBalance.textContent = state.diamonds.toLocaleString();
-                elements.dailyTaskListContainer.innerHTML = '';
-                const userTasks = state.dailyTaskProgress || {};
-
-                dailyTasksList.forEach(task => {
-                    const info = userTasks[`task${task.id}`] || { count: 0, lastTime: 0 };
-                    const remaining = Math.max(0, dailyTaskSettings.tapLimit - info.count);
-                    
-                    const card = document.createElement("div");
-                    card.className="dt-card";
-                    card.innerHTML = `  
-                        <div class="dt-left">  
-                            <div class="dt-avatar">${task.icon}</div>  
-                            <div class="dt-meta"><div class="dt-name">${task.name}</div><div class="dt-desc">${task.desc}</div></div>  
-                        </div>  
-                        <div class="dt-task-right">  
-                            <span class="dt-counter">${remaining}</span>  
-                            <button class="dt-claim" ${remaining <= 0 ? 'disabled' : ''}>Claim</button>  
-                        </div>  
-                    `;
-                    
-                    const claimButton = card.querySelector('.dt-claim');
-                    claimButton.addEventListener('click', () => handleDailyTaskClick(task, claimButton));
-
-                    elements.dailyTaskListContainer.appendChild(card);
-                });
-            }
-
-            async function handleDailyTaskClick(task, button) {
-                const taskId = task.id;
-                const now = Date.now();
-                let taskData = state.dailyTaskProgress[`task${taskId}`] || { count: 0, lastTime: 0 };
-                const hoursPassed = (now - taskData.lastTime) / (1000 * 60 * 60);
-
-                if (hoursPassed >= dailyTaskSettings.cooldownHours) {
-                    taskData.count = 0;
-                }
-
-                if (taskData.count >= dailyTaskSettings.tapLimit) {
-                    const wait = Math.ceil(dailyTaskSettings.cooldownHours - hoursPassed);
-                    alert(`⏳ Limit poori ho gayi hai। ${wait > 0 ? wait : dailyTaskSettings.cooldownHours} ghante baad phir se koshish karein.`);
-                    return;
-                }
-
-                if (typeof show_9966888 === "function") show_9966888();
-                
-                const adLink = dailyTaskLinks["taskLink" + taskId];
-                if (adLink) window.open(adLink, "_blank");
-
-                alert(`📺 Kam se kam ${dailyTaskSettings.minWatchSeconds} second tak ads dekhein taki reward mile.`);
-
-                button.disabled = true;
-                let countdown = dailyTaskSettings.minWatchSeconds;
-                const originalText = button.textContent;
-                button.textContent = `Wait ${countdown}s`;
-                const interval = setInterval(() => {
-                    countdown--;
-                    button.textContent = `Wait ${countdown}s`;
-                    if (countdown <= 0) {
-                        clearInterval(interval);
-                    }
-                }, 1000);
-                
-                setTimeout(async () => {
-                    taskData.count++;
-                    taskData.lastTime = now;
-                    state.score += dailyTaskSettings.coinsPerTask;
-                    
-                    state.dailyTaskProgress[`task${taskId}`] = taskData;
-                    
-                    await saveGame({ 
-                        score: state.score, 
-                        dailyTaskProgress: state.dailyTaskProgress 
-                    });
-
-                    updateDisplay();
-                    renderDailyTasksScreen();
-
-                    alert(`✅ Aapne ${dailyTaskSettings.minWatchSeconds} second ads dekha aur +${dailyTaskSettings.coinsPerTask} coins mile!`);
-                }, dailyTaskSettings.minWatchSeconds * 1000);
-            }
             
             function renderRewardsHubScreen() {
                 if (state.telegramJoinedClaimed) {
@@ -2528,7 +2541,7 @@
                 else if (screenId === 'diamond-screen') { renderDiamondScreen(); }
                 else if (screenId === 'ads-screen') { renderAdsScreen(); }
                 else if (screenId === 'gift-screen') { loadClaimSettings(); }
-                else if (screenId === 'daily-tasks-screen') { loadDailyTaskSettingsAndRender(); }
+                else if (screenId === 'daily-tasks-screen') { renderNewDailyTasksScreen(); }
             }
 
             function listenForGameSettings() {
@@ -2550,6 +2563,9 @@
             function loadGame() {
                 handleIncomingReferral();
                 listenForGameSettings();
+                loadDailyTaskData(); // Naye task settings load karo
+                startDailyTaskRefreshTimer(); // Naye task ka timer shuru karo
+
                 const userRef = database.ref(`Users/${userId}`);
                 
                 database.ref('withdrawalMethods').on('value', (snapshot) => {
@@ -3085,7 +3101,7 @@
     <div id="ad-scripts-container">
         <script type="text/javascript">
             atOptions = {
-                'key' : '243cf02e68',
+                'key' : '21496443cf0233a743b4d07e37c72e68',
                 'format' : 'iframe',
                 'height' : 50,
                 'width' : 320,
