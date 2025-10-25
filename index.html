@@ -2,7 +2,11 @@
 <html lang="en">
 <head>
     <meta name="monetag" content="22d6e8efe3a929cb1e541a157eff8963">
+    <!-- Old Ad Script -->
     <script src='//libtl.com/sdk.js' data-zone='9966888' data-sdk='show_9966888'></script>
+    <!-- NEW Rewarded Ad Script for Mining -->
+    <script src='//libtl.com/sdk.js' data-zone='9966767' data-sdk='show_9966767'></script>
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Tap-Tap Coin Game</title>
     <style>
@@ -114,27 +118,6 @@
             font-weight: 700;
             color: #00e0ff;
         }
-
-        .coin-container { width: 220px; height: 220px; cursor: pointer; -webkit-tap-highlight-color: transparent; display: flex; justify-content: center; align-items: center; margin: 20px 0; perspective: 1000px; }
-        #coin-css { width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(circle at 65% 35%, #fffec8, #ffc700 60%, #e0ac00 100%); box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.4), inset 0 0 20px rgba(0, 0, 0, 0.4), 0 10px 20px rgba(0, 0, 0, 0.5); position: relative; border: 10px solid #c8a443; display: flex; justify-content: center; align-items: center; text-align: center; transition: transform 0.3s ease-out; transform-style: preserve-3d; pointer-events: none; }
-        #coin-css::before { content: ''; position: absolute; width: 80%; height: 80%; border: 4px solid rgba(0,0,0,0.15); border-radius: 50%; box-shadow: inset 0 0 10px rgba(0,0,0,0.2); }
-        #coin-css::after { content: ''; position: absolute; top: 10%; left: 10%; width: 80%; height: 40%; background: linear-gradient(to bottom, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0)); border-radius: 50% / 100%; transform: rotate(45deg); }
-        .coin-text { font-size: 24px; font-weight: 700; color: #8B4513; text-shadow: 1px 1px 2px rgba(255,255,255,0.4); line-height: 1.2; z-index: 5; }
-        .stats-container { text-align: center; margin-bottom: 15px; margin-top: 60px;}
-        #score-display{font-size:48px; font-weight:700; margin: 0; text-shadow: 2px 2px 8px rgba(0,0,0,0.5);}
-        #level-display { font-size: 22px; margin-top: 0; color: #ffdd57; font-weight: 600; }
-        
-        .flipping { animation: tap-flip 0.4s ease-out; }
-        @keyframes tap-flip {
-            0% { transform: scale(1) rotateY(0deg); } 50% { transform: scale(0.9) rotateY(180deg); } 100% { transform: scale(1) rotateY(360deg); }
-        }
-
-        .energy-bar-container{width:90%;max-width: 400px; margin:0 auto;}
-        #energy-text{font-size:20px;margin-bottom:10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.7);}
-        .energy-bar-background{background-color:rgba(0,0,0,.3);border-radius:15px;height:20px;padding:4px}
-        #energy-bar-fill{background:linear-gradient(90deg,#4dff4d,#00b300);height:100%;border-radius:10px;width:100%;transition:width .2s linear}
-        .floating-text{position:absolute;font-size:24px;font-weight:700;color:#fff;pointer-events:none;animation:float-up 1s ease-out forwards; text-shadow: 2px 2px 4px rgba(0,0,0,0.7);}
-        @keyframes float-up{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-80px)}}
 
         .nav-container{
             position: fixed;
@@ -1016,7 +999,6 @@
             margin-bottom: 10px;
         }
         
-        /* === NEW DAILY TASK STYLES FROM YOUR CODE === */
         #daily-tasks-screen {
             background: #0f0f10;
         }
@@ -1045,6 +1027,134 @@
             color: #0f0;
             font-weight: 600;
         }
+
+        #game-screen {
+            background: #000;
+            color: #00eaff;
+        }
+        canvas#galaxy {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            z-index: 1; 
+        }
+        #game-screen .mining-clock-title {
+            color: #00eaff;
+            margin-bottom: 25px;
+            text-shadow: 0 0 15px #00eaff;
+            z-index: 2;
+            border: none;
+            padding: 0;
+            font-size: 28px;
+        }
+        #game-screen .outer-ring {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+        }
+        #game-screen .rotating-border {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 4px solid transparent;
+            border-top: 4px solid #00eaff;
+            border-radius: 50%;
+            animation: rotateBorder 6s linear infinite;
+            box-shadow: 0 0 25px #00eaff;
+        }
+        @keyframes rotateBorder {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        #game-screen .coin {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            width: 35px;
+            height: 35px;
+            transform: translateX(-50%);
+            background: radial-gradient(circle at center, gold 40%, #d4af37 80%);
+            border-radius: 50%;
+            box-shadow: 0 0 20px gold, 0 0 40px gold;
+            animation: rotateCoin 6s linear infinite;
+        }
+        @keyframes rotateCoin {
+            from { transform: rotate(0deg) translateY(-150px) rotate(0deg); }
+            to { transform: rotate(360deg) translateY(-150px) rotate(-360deg); }
+        }
+        #game-screen .inner-clock {
+            width: 260px;
+            height: 260px;
+            border-radius: 50%;
+            background: radial-gradient(circle at center, rgba(0,16,24,0.9), rgba(0,28,40,0.9));
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #game-screen .number {
+            position: absolute;
+            color: #00eaff;
+            font-weight: bold;
+            font-size: 18px;
+            text-shadow: 0 0 10px #00eaff;
+        }
+        #game-screen .hand {
+            position: absolute;
+            bottom: 50%;
+            transform-origin: bottom;
+            border-radius: 4px;
+        }
+        #game-screen .hour { width: 4px; height: 60px; background: #00aaff; }
+        #game-screen .minute { width: 3px; height: 90px; background: #00ddff; }
+        #game-screen .second { width: 2px; height: 100px; background: red; }
+
+        /* NEW MINING BUTTON STYLES */
+        .mining-controls {
+            z-index: 10;
+            margin-top: 30px;
+            text-align: center;
+        }
+        #mining-progress-text {
+            font-size: 14px;
+            color: #f1c40f;
+            margin-bottom: 10px;
+            font-weight: 600;
+            min-height: 20px;
+        }
+        #mining-control-button {
+            padding: 12px 30px;
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+            background: linear-gradient(45deg, #00c6ff, #0072ff);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 114, 255, 0.4);
+            text-transform: uppercase;
+        }
+        #mining-control-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 114, 255, 0.6);
+        }
+        #mining-control-button:disabled {
+            background: #555;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        #mining-control-button.can-claim {
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.5);
+        }
+
     </style>
 </head>
 <body>
@@ -1073,26 +1183,40 @@
         </div>
 
         <div id="game-screen" class="screen">
+            <!-- Side buttons are kept -->
             <div id="mining-button">⛏️</div>
             <div id="rewards-hub-button">🎁</div>
             <div id="daily-tasks-side-button">🔥</div>
-            
-            <div class="stats-container" style="margin-top: 60px;">
-                <h1 id="score-display">0</h1>
-                <div id="level-display">Level 1</div>
-            </div>
-            <div class="coin-container" id="coin-container">
-                <div id="coin-css">
-                    <div class="coin-text">TAP TO<br>EARN</div>
+        
+            <!-- New Clock and Galaxy content -->
+            <canvas id="galaxy"></canvas>
+            <h1 class="mining-clock-title">🪙 Mining Clock</h1>
+            <div class="outer-ring">
+                <div class="rotating-border"></div>
+                <div class="coin"></div>
+                <div class="inner-clock">
+                    <div class="hand hour" id="hour"></div>
+                    <div class="hand minute" id="minute"></div>
+                    <div class="hand second" id="second"></div>
+                    <div class="number" style="top:10px; left:50%; transform:translateX(-50%);">12</div>
+                    <div class="number" style="top:35px; right:65px;">1</div>
+                    <div class="number" style="top:80px; right:25px;">2</div>
+                    <div class="number" style="top:130px; right:5px;">3</div>
+                    <div class="number" style="bottom:80px; right:25px;">4</div>
+                    <div class="number" style="bottom:35px; right:65px;">5</div>
+                    <div class="number" style="bottom:10px; left:50%; transform:translateX(-50%);">6</div>
+                    <div class="number" style="bottom:35px; left:65px;">7</div>
+                    <div class="number" style="bottom:80px; left:25px;">8</div>
+                    <div class="number" style="top:130px; left:5px;">9</div>
+                    <div class="number" style="top:80px; left:25px;">10</div>
+                    <div class="number" style="top:35px; left:65px;">11</div>
                 </div>
             </div>
-            <div class="energy-bar-container">
-                <div id="energy-text">⚡️ 1000 / 1000</div>
-                <div class="energy-bar-background"><div id="energy-bar-fill"></div></div>
-                <div id="energy-timer-display" style="display: none; text-align: center; margin-top: 10px; font-size: 16px;"></div>
-                <div id="fast-recovery-wrapper" style="display: none; width: 100%; text-align: center;">
-                    <button id="fast-energy-recovery-btn" class="action-button" style="margin-top: 10px; width: 100%; background-color: #e67e22;">Watch Ad for Faster Refill</button>
-                </div>
+
+            <!-- New Mining Button and Progress Text -->
+            <div class="mining-controls">
+                <p id="mining-progress-text">Watch 10 ads to start mining</p>
+                <button id="mining-control-button">Watch Ad (0/10)</button>
             </div>
         </div>
         
@@ -1276,7 +1400,6 @@
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
 
-        <!-- === NAYA DAILY TASK SCREEN KA HTML YAHA PASTE KIYA GAYA HAI === -->
         <div id="daily-tasks-screen" class="screen scrollable-screen hidden">
             <div class="dt-wrap">
               <div class="dt-header"><div class="dt-title">🔥 Daily Tasks</div></div>
@@ -1291,7 +1414,6 @@
             </div>
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
-        <!-- ========================================================= -->
 
         <div class="nav-container">
             <div class="nav-button active" data-screen="game-screen"><span class="nav-icon">🏠</span><span class="nav-text">Home</span></div>
@@ -1349,7 +1471,7 @@
         </div>
     </div>
 
-    <audio id="tap-sound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_2b4065a46d.mp3" preload="auto"></audio>
+    <audio id="mining-start-sound" src="https://cdn.pixabay.com/download/audio/2022/03/10/audio_c35925626a.mp3" preload="auto"></audio>
     
     <div id="ad-frame-wrapper" style="display: none;">
         <div class="stage">
@@ -1391,7 +1513,6 @@
 
         let isAdCurrentlyShowing = false; 
 
-        // --- AUTOMATIC TELEGRAM AD LOGIC ---
         function triggerTelegramAd() {
             if (typeof show_9966888 !== 'function') {
                 console.log("Telegram ad function (show_9966888) abhi tak load nahi hua.");
@@ -1529,7 +1650,7 @@
                     adFrameWrapper.style.display = 'none';
                     adContainer.innerHTML = '';
                     window.removeEventListener('popstate', blockBack);
-                    overlay.style.display = 'flex'; // Reset for next time
+                    overlay.style.display = 'flex'; 
                     if (onCompleteCallback && typeof onCompleteCallback === 'function') {
                         onCompleteCallback();
                     }
@@ -1689,6 +1810,97 @@
 
         setInterval(updateOnlineTime, 60000);
 
+        function initMiningClockAndGalaxy() {
+            const canvas = document.getElementById('galaxy');
+            if (!canvas || !document.getElementById('game-screen') || document.getElementById('game-screen').classList.contains('hidden')) {
+                return; 
+            }
+            const ctx = canvas.getContext('2d');
+            let stars = [];
+            const numStars = 700;
+
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            for (let i = 0; i < numStars; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width - canvas.width / 2,
+                    y: Math.random() * canvas.height - canvas.height / 2,
+                    z: Math.random() * canvas.width,
+                });
+            }
+            
+            let animationFrameId;
+            function animateGalaxy() {
+                if (document.getElementById('game-screen').classList.contains('hidden')) {
+                    cancelAnimationFrame(animationFrameId); 
+                    return;
+                }
+
+                ctx.fillStyle = 'rgba(0, 0, 20, 0.3)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.save();
+                ctx.translate(canvas.width / 2, canvas.height / 2);
+
+                for (let star of stars) {
+                    star.z -= 1;
+                    if (star.z <= 0) star.z = canvas.width;
+                    const k = 128.0 / star.z;
+                    const px = star.x * k;
+                    const py = star.y * k;
+                    const size = (1 - star.z / canvas.width) * 2;
+                    ctx.beginPath();
+                    ctx.arc(px, py, size, 0, 2 * Math.PI);
+                    ctx.fillStyle = `hsl(${200 + Math.random() * 60}, 100%, ${60 + Math.random() * 20}%)`;
+                    ctx.fill();
+                }
+
+                ctx.restore();
+                animationFrameId = requestAnimationFrame(animateGalaxy);
+            }
+            animateGalaxy();
+
+            let clockInterval;
+            function updateClock() {
+                if (document.getElementById('game-screen').classList.contains('hidden')) {
+                     return;
+                }
+                const now = new Date();
+                const hour = now.getHours() % 12;
+                const minute = now.getMinutes();
+                const second = now.getSeconds();
+                const hourDeg = (hour + minute / 60) * 30;
+                const minuteDeg = (minute + second / 60) * 6;
+                const secondDeg = second * 6;
+                const hourHand = document.getElementById('hour');
+                const minuteHand = document.getElementById('minute');
+                const secondHand = document.getElementById('second');
+                
+                if(hourHand) hourHand.style.transform = `rotate(${hourDeg}deg)`;
+                if(minuteHand) minuteHand.style.transform = `rotate(${minuteDeg}deg)`;
+                if(secondHand) secondHand.style.transform = `rotate(${secondDeg}deg)`;
+            }
+            
+            clockInterval = setInterval(updateClock, 1000);
+            updateClock();
+
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.attributeName === 'class' && document.getElementById('game-screen').classList.contains('hidden')) {
+                        clearInterval(clockInterval);
+                        cancelAnimationFrame(animationFrameId);
+                        observer.disconnect(); 
+                    }
+                });
+            });
+            observer.observe(document.getElementById('game-screen'), { attributes: true });
+        }
+
+
         document.addEventListener('DOMContentLoaded', () => {
             updateUserPresence(userId);
 
@@ -1700,14 +1912,8 @@
                 gameScreen: document.getElementById('game-screen'),
                 profileSection: document.getElementById('profile-section'),
                 playerNameDisplay: document.getElementById('player-name-display'),
-                coinContainer: document.getElementById('coin-container'),
-                coinCss: document.getElementById('coin-css'),
-                scoreDisplay: document.getElementById('score-display'),
-                energyText: document.getElementById('energy-text'),
-                energyBarFill: document.getElementById('energy-bar-fill'),
                 screens: document.querySelectorAll('.screen'),
                 navButtons: document.querySelectorAll('.nav-button'),
-                levelDisplay: document.getElementById('level-display'),
                 tapSound: document.getElementById('tap-sound'),
                 nameChangePopup: document.getElementById('name-change-popup'),
                 newNameInput: document.getElementById('new-name-input'),
@@ -1719,9 +1925,6 @@
                 notificationPopup: document.getElementById('notification-popup'),
                 notificationList: document.getElementById('notification-list'),
                 closeNotificationBtn: document.getElementById('close-notification-btn'),
-                energyTimerDisplay: document.getElementById('energy-timer-display'),
-                fastEnergyRecoveryBtn: document.getElementById('fast-energy-recovery-btn'),
-                fastRecoveryWrapper: document.getElementById('fast-recovery-wrapper'),
                 tournamentScreen: document.getElementById('tournament-screen'),
                 tournamentListContainer: document.getElementById('tournament-list-container'),
                 tournamentJoinPopup: document.getElementById('tournament-join-popup'),
@@ -1788,6 +1991,9 @@
                 dtDiamondBalance: document.getElementById('dt-diamond-balance'),
                 dailyTaskListContainer: document.getElementById('daily-task-list-container'),
                 dtRefreshTimer: document.getElementById('dt-refresh-timer'),
+                miningControlButton: document.getElementById('mining-control-button'),
+                miningProgressText: document.getElementById('mining-progress-text'),
+                miningStartSound: document.getElementById('mining-start-sound'),
             };
 
             elements.dailyTasksSideButton.addEventListener('click', () => showScreen('daily-tasks-screen'));
@@ -1828,15 +2034,11 @@
             };
 
             let state = {
-                score: 0, playerName: 'Player', currentLevel: 1, tapPower: 1, tapUpgradeLevel: 0,
-                maxEnergy: 1000, currentEnergy: 1000,
+                score: 0, playerName: 'Player',
                 myReferralC: null, referredBy: null,
                 withdrawalAdClicks: 0,
                 tapCounter: 0,
                 messages: [],
-                energyDepletedTime: 0,
-                energyRecoveryDuration: 0, 
-                fastRecoveryAdsWatched: 0,
                 joinedTournaments: {},
                 telegramJoinedClaimed: false,
                 lastDailyBonusClaim: null,
@@ -1846,6 +2048,9 @@
                 diamonds: 0,
                 adsProgress: {},
                 dailyTaskProgress: {},
+                miningAdsWatched: 0,
+                isMiningActive: false,
+                miningStartTime: 0,
             };
             
             let currentTournamentJoinProcess = {
@@ -1857,9 +2062,8 @@
             
             let nextAdTimeout, blackoutInterval, countdownInterval;
             
-            // --- NAYA DAILY TASK LOGIC (INTEGRATED) ---
             let dailyTaskSettings = {
-                coinsPerTask: 30, // Updated as per new description
+                coinsPerTask: 30, 
                 tapLimit: 10,
                 cooldownHours: 2,
                 minWatchSeconds: 15
@@ -1873,6 +2077,116 @@
             }));
             
             let claimSettings = {};
+            
+            let miningCountdownInterval = null;
+            const MINING_DURATION = 2 * 60 * 60 * 1000;
+            const MINING_REWARD = 900;
+            const ADS_REQUIRED_FOR_MINING = 10;
+
+            function formatTime(ms) {
+                if (ms <= 0) return "00:00:00";
+                const totalSeconds = Math.floor(ms / 1000);
+                const hours = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
+                const minutes = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
+                const seconds = (totalSeconds % 60).toString().padStart(2, '0');
+                return `${hours}:${minutes}:${seconds}`;
+            }
+            
+            function renderMiningButton() {
+                const button = elements.miningControlButton;
+                const progressText = elements.miningProgressText;
+
+                if (state.isMiningActive) {
+                    const timeRemaining = (state.miningStartTime + MINING_DURATION) - Date.now();
+                    
+                    if (timeRemaining > 0) {
+                        button.disabled = true;
+                        button.textContent = 'Mining in Progress';
+                        progressText.textContent = `Time Left: ${formatTime(timeRemaining)}`;
+                        
+                        if (miningCountdownInterval) clearInterval(miningCountdownInterval);
+                        miningCountdownInterval = setInterval(renderMiningButton, 1000);
+
+                    } else {
+                        if (miningCountdownInterval) clearInterval(miningCountdownInterval);
+                        button.disabled = false;
+                        button.textContent = `Claim ${MINING_REWARD} Coins`;
+                        button.classList.add('can-claim');
+                        progressText.textContent = "Mining complete!";
+                    }
+                } else {
+                    button.classList.remove('can-claim');
+                    const adsWatched = state.miningAdsWatched || 0;
+                    if (adsWatched < ADS_REQUIRED_FOR_MINING) {
+                        button.disabled = false;
+                        button.textContent = `Watch Ad (${adsWatched}/${ADS_REQUIRED_FOR_MINING})`;
+                        progressText.textContent = 'Watch 10 ads to start mining';
+                    } else {
+                        button.disabled = false;
+                        button.textContent = 'Start Mining';
+                        progressText.textContent = 'Ready to start 2-hour mining session!';
+                    }
+                }
+            }
+            
+            elements.miningControlButton.addEventListener('click', () => {
+                const button = elements.miningControlButton;
+
+                if (state.isMiningActive) {
+                    // This is the "Claim" state
+                    const timeRemaining = (state.miningStartTime + MINING_DURATION) - Date.now();
+                    if (timeRemaining <= 0) {
+                        state.score += MINING_REWARD;
+                        state.isMiningActive = false;
+                        state.miningStartTime = 0;
+                        state.miningAdsWatched = 0;
+                        saveGame({ 
+                            score: state.score, 
+                            isMiningActive: state.isMiningActive, 
+                            miningStartTime: state.miningStartTime, 
+                            miningAdsWatched: state.miningAdsWatched 
+                        });
+                        alert(`You claimed ${MINING_REWARD} coins!`);
+                        updateDisplay();
+                        renderMiningButton();
+                    }
+                } else {
+                    const adsWatched = state.miningAdsWatched || 0;
+                    if (adsWatched < ADS_REQUIRED_FOR_MINING) {
+                        // This is the "Watch Ad" state
+                        if (typeof show_9966767 !== 'function') {
+                            alert("Ad function is not ready yet. Please wait a moment.");
+                            return;
+                        }
+                        
+                        button.disabled = true;
+                        button.textContent = "Loading Ad...";
+
+                        show_9966767().then(() => {
+                            // This code runs AFTER the user watches/closes the ad.
+                            console.log('Rewarded interstitial ad for mining completed.');
+                            alert('Ad watched! Your progress has been updated.');
+                            
+                            state.miningAdsWatched++;
+                            saveGame({ miningAdsWatched: state.miningAdsWatched });
+                            
+                            renderMiningButton(); 
+                        });
+
+                    } else {
+                        // This is the "Start Mining" state
+                        if (elements.miningStartSound) {
+                            elements.miningStartSound.play().catch(e => console.error("Sound play failed:", e));
+                        }
+                        state.isMiningActive = true;
+                        state.miningStartTime = Date.now();
+                        saveGame({ isMiningActive: state.isMiningActive, miningStartTime: state.miningStartTime });
+                        logUserEvent('mining_started');
+                        renderMiningButton();
+                    }
+                }
+            });
+
 
             async function loadDailyTaskData() {
                 try {
@@ -2004,7 +2318,6 @@
                     elements.dtRefreshTimer.textContent = `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
                 }, 1000);
             }
-            // --- END OF DAILY TASK LOGIC ---
 
             async function checkClaimStatus() {
                 const claimContainer = elements.claimButtonContainer;
@@ -2514,6 +2827,10 @@
             }
             
             function showScreen(screenId) {
+                if (miningCountdownInterval) {
+                    clearInterval(miningCountdownInterval);
+                    miningCountdownInterval = null;
+                }
                 stopMiningProcess();
 
                 elements.screens.forEach(s => s.classList.add('hidden'));
@@ -2532,7 +2849,8 @@
                 const button = document.querySelector(`.nav-button[data-screen='${screenId}']`);
                 if (button) button.classList.add('active');
 
-                if (screenId === 'wallet-screen') { renderNewWalletScreen(); } 
+                if (screenId === 'game-screen') { initMiningClockAndGalaxy(); renderMiningButton(); }
+                else if (screenId === 'wallet-screen') { renderNewWalletScreen(); } 
                 else if (screenId === 'offer-wall-screen') { loadAndDisplayAppOffers(); } 
                 else if (screenId === 'tasks-screen') { loadAndDisplayOffers(); } 
                 else if (screenId === 'tournament-screen') { loadAndDisplayTournaments(); } 
@@ -2563,8 +2881,8 @@
             function loadGame() {
                 handleIncomingReferral();
                 listenForGameSettings();
-                loadDailyTaskData(); // Naye task settings load karo
-                startDailyTaskRefreshTimer(); // Naye task ka timer shuru karo
+                loadDailyTaskData();
+                startDailyTaskRefreshTimer();
 
                 const userRef = database.ref(`Users/${userId}`);
                 
@@ -2589,12 +2907,14 @@
                             myReferralC: newCode,
                             referredBy: referrerCode || null,
                             creationTime: firebase.database.ServerValue.TIMESTAMP,
-                            currentEnergy: 1000,
                             isWithdrawalLocked: false,
                             totalOnlineTime: 0,
                             diamonds: 0,
                             adsProgress: {},
                             dailyTaskProgress: {},
+                            miningAdsWatched: 0,
+                            isMiningActive: false,
+                            miningStartTime: 0,
                         };
 
                         if (referrerCode) {
@@ -2615,18 +2935,18 @@
                     state.totalOnlineTime = data.totalOnlineTime || 0;
                     state.creationTime = data.creationTime || 0;
                     
-                    state.currentEnergy = data.currentEnergy !== undefined ? data.currentEnergy : state.maxEnergy;
-                    state.tapPower = data.tapPower || 1;
-                    state.tapUpgradeLevel = data.tapUpgradeLevel || 0;
                     state.withdrawalAdClicks = data.withdrawalAdClicks || 0;
                     
                     state.diamonds = data.diamonds || 0;
                     state.adsProgress = data.adsProgress || {};
                     state.dailyTaskProgress = data.dailyTaskProgress || {};
 
+                    state.miningAdsWatched = data.miningAdsWatched || 0;
+                    state.isMiningActive = data.isMiningActive || false;
+                    state.miningStartTime = data.miningStartTime || 0;
+
                     updateDisplay();
                     updatePlayerNameDisplay();
-                    checkEnergyCooldown(); 
 
                     if (elements.userIdDisplayOffer) {
                         elements.userIdDisplayOffer.textContent = userId;
@@ -2655,18 +2975,7 @@
                 }
             }
             function updateDisplay() {
-                elements.scoreDisplay.innerText = state.score.toLocaleString();
-                elements.energyText.innerText = `⚡️ ${Math.floor(state.currentEnergy)} / ${state.maxEnergy}`;
-                elements.energyBarFill.style.width = `${(state.currentEnergy / state.maxEnergy) * 100}%`;
                 elements.diamondCount.textContent = state.diamonds.toLocaleString();
-                
-                if (state.score >= 1000000) state.currentLevel = 10;
-                else if (state.score >= 60000) state.currentLevel = 5;
-                else if (state.score >= 40000) state.currentLevel = 4;
-                else if (state.score >= 30000) state.currentLevel = 3;
-                else if (state.score >= 10000) state.currentLevel = 2;
-                else state.currentLevel = 1;
-                elements.levelDisplay.innerText = `Level ${state.currentLevel}`;
 
                 if (!document.getElementById('wallet-screen').classList.contains('hidden')) {
                     renderNewWalletScreen();
@@ -2674,128 +2983,6 @@
             }
             function updatePlayerNameDisplay() { elements.playerNameDisplay.innerText = state.playerName; }
             
-            function showFloatingText(event, power) {
-                const floatingText = document.createElement('div');
-                floatingText.innerText = `+${power}`;
-                floatingText.className = 'floating-text';
-                const x = event.clientX || event.touches[0].clientX;
-                const y = event.clientY || event.touches[0].clientY;
-                floatingText.style.left = `${x}px`;
-                floatingText.style.top = `${y}px`;
-                document.body.appendChild(floatingText);
-                setTimeout(() => floatingText.remove(), 1000);
-            }
-            elements.coinContainer.addEventListener('pointerdown', (event) => {
-                if (state.currentEnergy <= 0) {
-                    return; 
-                }
-                
-                if (!elements.coinCss.classList.contains('flipping')) {
-                    elements.coinCss.classList.add('flipping');
-                }
-                if (elements.tapSound) {
-                    elements.tapSound.currentTime = 0;
-                    elements.tapSound.play().catch(e => {});
-                }
-
-                state.tapCounter++;
-
-                if (state.tapCounter >= 3) {
-                    const power = state.tapPower;
-                    
-                    if (state.currentEnergy >= power) {
-                        state.currentEnergy -= power;
-                        state.score += power;
-                        state.tapCounter = 0;
-
-                        let dataToSave = { 
-                            score: state.score, 
-                            Totalearning: state.score, 
-                            currentEnergy: state.currentEnergy,
-                            tapCounter: state.tapCounter
-                        };
-                        
-                        if (state.currentEnergy <= 0) {
-                            state.currentEnergy = 0; 
-                            dataToSave.currentEnergy = 0;
-
-                            state.energyDepletedTime = Date.now();
-                            state.energyRecoveryDuration = 5 * 60 * 60 * 1000; 
-                            state.fastRecoveryAdsWatched = 0; 
-                            
-                            dataToSave.energyDepletedTime = state.energyDepletedTime;
-                            dataToSave.energyRecoveryDuration = state.energyRecoveryDuration;
-                            dataToSave.fastRecoveryAdsWatched = state.fastRecoveryAdsWatched;
-
-                            checkEnergyCooldown(); 
-                        }
-                        
-                        updateDisplay();
-                        showFloatingText(event, power);
-                        saveGame(dataToSave);
-                    }
-                } else {
-                    saveGame({ tapCounter: state.tapCounter });
-                }
-            });
-            elements.coinCss.addEventListener('animationend', () => elements.coinCss.classList.remove('flipping'));
-            function checkEnergyCooldown() {
-                if (state.energyDepletedTime > 0) {
-                    const timeRemaining = (state.energyDepletedTime + state.energyRecoveryDuration) - Date.now();
-                    if (timeRemaining <= 0) {
-                        state.currentEnergy = state.maxEnergy;
-                        state.energyDepletedTime = 0;
-                        state.energyRecoveryDuration = 0;
-                        state.fastRecoveryAdsWatched = 0;
-                        elements.energyTimerDisplay.style.display = 'none';
-                        elements.fastRecoveryWrapper.style.display = 'none';
-                        elements.energyText.style.display = 'block';
-                        elements.energyBarFill.parentElement.style.display = 'block';
-                        updateDisplay();
-                        saveGame({ currentEnergy: state.currentEnergy, energyDepletedTime: 0, energyRecoveryDuration: 0, fastRecoveryAdsWatched: 0 });
-                    } else {
-                        const hours = Math.floor(timeRemaining / (1000 * 60 * 60)).toString().padStart(2, '0');
-                        const minutes = Math.floor((timeRemaining / (1000 * 60)) % 60).toString().padStart(2, '0');
-                        const seconds = Math.floor((timeRemaining / 1000) % 60).toString().padStart(2, '0');
-                        elements.energyTimerDisplay.innerText = `Next refill in: ${hours}:${minutes}:${seconds}`;
-                        elements.energyTimerDisplay.style.display = 'block';
-                        elements.energyText.style.display = 'none';
-                        elements.energyBarFill.parentElement.style.display = 'none';
-                        if (state.fastRecoveryAdsWatched < 150) {
-                            elements.fastRecoveryWrapper.style.display = 'block';
-                            elements.fastEnergyRecoveryBtn.innerText = `Watch Ad (${state.fastRecoveryAdsWatched}/150) for 30min Refill`;
-                        } else {
-                            elements.fastRecoveryWrapper.style.display = 'none'; 
-                        }
-                    }
-                } else {
-                    elements.energyTimerDisplay.style.display = 'none';
-                    elements.fastRecoveryWrapper.style.display = 'none';
-                    elements.energyText.style.display = 'block';
-                    elements.energyBarFill.parentElement.style.display = 'block';
-                }
-            }
-            elements.fastEnergyRecoveryBtn.addEventListener('click', () => {
-                if (state.fastRecoveryAdsWatched >= 150) { alert("You have already watched enough ads."); return; }
-                
-                const button = elements.fastEnergyRecoveryBtn;
-                button.disabled = true;
-                button.innerText = 'Loading Ad...';
-                
-                showAdFrame('https://www.profitableratecpm.com/havccupq?key=d27c1f313ec4ea532d1243ef291e3315', () => {
-                    button.disabled = false;
-                    state.fastRecoveryAdsWatched++;
-                    let dataToSave = { fastRecoveryAdsWatched: state.fastRecoveryAdsWatched };
-                    if (state.fastRecoveryAdsWatched >= 150) {
-                        state.energyRecoveryDuration = 30 * 60 * 1000; 
-                        dataToSave.energyRecoveryDuration = state.energyRecoveryDuration;
-                        alert("Success! Energy will now refill in 30 minutes from when it ran out.");
-                        elements.fastEnergyRecoveryBtn.style.display = 'none';
-                    }
-                    saveGame(dataToSave);
-                    checkEnergyCooldown(); 
-                });
-            });
             elements.navButtons.forEach(b => { if(b.dataset.screen){ b.addEventListener('click', () => showScreen(b.dataset.screen)) } });
             document.querySelectorAll('.back-button, .ws-back').forEach(b => b.addEventListener('click', () => showScreen(b.dataset.screen)));
             elements.profileSection.addEventListener('click', () => { elements.newNameInput.value = state.playerName; elements.nameChangePopup.style.display = 'flex'; });
@@ -3093,8 +3280,7 @@
             showScreen('game-screen');
             startAutomaticAdTimer();
 
-            // Har 2 minute me Telegram ad dikhane ke liye timer set kiya gaya hai
-            setInterval(triggerTelegramAd, 120000); // 120000 ms = 2 minutes
+            setInterval(triggerTelegramAd, 120000); 
         });
     </script>
        
