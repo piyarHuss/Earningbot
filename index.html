@@ -10,6 +10,90 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Tap-Tap Coin Game</title>
     <style>
+        /* ===== START: NEW LOADING SCREEN STYLES ===== */
+        #new-loading-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 9999;
+            margin:0; 
+            overflow:hidden;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            background:#000;
+            font-family:Arial, sans-serif;
+            color:#fff;
+            transition: opacity 0.8s ease-out; /* For smooth fade-out */
+        }
+        #new-loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        #new-loading-screen #bg {
+            position:absolute;
+            inset:0;
+            background-size:cover;
+            background-position:center;
+            background-repeat:no-repeat;
+        }
+        #new-loading-screen #center {
+            position:absolute;
+            top:150px;
+            left:50%;
+            transform:translateX(-50%);
+            max-width:50%;
+            display:none;
+            border-radius:18px;
+            box-shadow:0 10px 30px rgba(0,0,0,0.4);
+        }
+
+        #new-loading-screen #trees {
+            position:absolute;
+            left:50%;
+            transform:translateX(-50%);
+            bottom:130px;
+            background:linear-gradient(90deg,#ffa9de,#ffcba4);
+            padding:8px 16px;
+            border-radius:20px;
+            font-weight:700;
+            color:#fff;
+            box-shadow:0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        #new-loading-screen #progress-box {
+            position:absolute;
+            left:24px;
+            right:24px;
+            bottom:40px;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+        }
+        #new-loading-screen #bar {
+            width:100%;
+            height:26px;
+            background:#512b1b;
+            border-radius:16px;
+            padding:3px;
+        }
+        #new-loading-screen #bar-inner {
+            height:100%;
+            width:0%;
+            background:linear-gradient(90deg,#65e95d,#3cc031);
+            border-radius:14px;
+            transition:width 0.25s ease-out;
+        }
+        #new-loading-screen #bar-text {
+            margin-top:8px;
+            font-weight:600;
+        }
+
+        #new-loading-screen canvas {
+            position:absolute;
+            inset:0;
+            pointer-events:none;
+        }
+        /* ===== END: NEW LOADING SCREEN STYLES ===== */
+
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap');
@@ -31,24 +115,6 @@
             user-select:none;
             -webkit-user-select:none;
         }
-
-        #loading-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% 50%, #3a4a6b, #1a1a2e);
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            z-index: 9999; transition: opacity 0.5s ease-out;
-        }
-        .loading-bear { font-size: 80px; animation: run-across 3s ease-in-out infinite; }
-        .loading-text { margin-top: 20px; font-size: 24px; color: #fff; }
-        #loading-progress-bar { width: 80%; max-width: 300px; height: 20px; background-color: rgba(0,0,0,0.3); border-radius: 10px; margin-top: 30px; overflow: hidden; }
-        #loading-progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #4dff4d, #00b300); border-radius: 10px; animation: fill-progress 5s linear forwards; }
-        @keyframes run-across {
-            0% { transform: translateX(-100px) scaleX(1); } 49% { transform: translateX(100px) scaleX(1); }
-            50% { transform: translateX(100px) scaleX(-1); } 99% { transform: translateX(-100px) scaleX(-1); }
-            100% { transform: translateX(-100px) scaleX(1); }
-        }
-        @keyframes fill-progress { from { width: 0%; } to { width: 100%; } }
-        #loading-screen.hidden { opacity: 0; pointer-events: none; }
         
         .game-container{
             width:100%; 
@@ -1158,13 +1224,19 @@
     </style>
 </head>
 <body>
-    <div id="loading-screen">
-        <div class="loading-bear">🐹</div>
-        <div class="loading-text">Loading Game...</div>
-        <div id="loading-progress-bar">
-            <div id="loading-progress-fill"></div>
+    <!-- ===== START: NEW LOADING SCREEN HTML ===== -->
+    <div id="new-loading-screen">
+        <div id="bg"></div>
+        <canvas id="sparkCanvas"></canvas>
+        <img id="center">
+        <div id="trees">Loading Trees...</div>
+        <div id="progress-box">
+          <div id="bar"><div id="bar-inner"></div></div>
+          <div id="bar-text">loading...</div>
         </div>
     </div>
+    <!-- ===== END: NEW LOADING SCREEN HTML ===== -->
+
 
     <div class="game-container">
         <div class="top-bar-container">
@@ -1902,11 +1974,88 @@
 
 
         document.addEventListener('DOMContentLoaded', () => {
-            updateUserPresence(userId);
+            // ===== START: NEW LOADING SCREEN SCRIPT =====
+            const LS_KEY = 'my_loading_settings_v1';
+            const settings = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
+            
+            if(settings.bg) document.querySelector('#new-loading-screen #bg').style.backgroundImage = `url('${settings.bg}')`;
+            if(settings.center) {
+              const c = document.querySelector('#new-loading-screen #center');
+              c.src = settings.center;
+              c.style.display = 'block';
+            }
+            document.querySelector('#new-loading-screen #trees').textContent = settings.trees || "Initializing Game...";
 
-            setTimeout(() => {
-                document.getElementById('loading-screen').classList.add('hidden');
-            }, 3000);
+            let p = 0;
+            const bar = document.querySelector('#new-loading-screen #bar-inner');
+            const txt = document.querySelector('#new-loading-screen #bar-text');
+
+            const timer = setInterval(()=>{
+              p += Math.floor(3 + Math.random()*7);
+              if(p>100) p=100;
+
+              bar.style.width = p + '%';
+
+              if(p<33) txt.textContent = 'loading assets...';
+              else if(p<66) txt.textContent = 'connecting...';
+              else txt.textContent = 'almost done...';
+
+              if(p>=100){
+                txt.textContent = 'ready!';
+                clearInterval(timer);
+
+                setTimeout(()=>{
+                  document.getElementById('new-loading-screen').classList.add('hidden');
+                }, 1000);
+              }
+            }, 440);
+
+            (function sparkles(){
+              const canvas = document.querySelector('#new-loading-screen #sparkCanvas');
+              const ctx = canvas.getContext('2d');
+              function resize(){
+                canvas.width = innerWidth;
+                canvas.height = innerHeight;
+              }
+              resize();
+              addEventListener('resize', resize);
+
+              const stars = [];
+              for(let i=0;i<25;i++){
+                stars.push({
+                  x:Math.random()*canvas.width,
+                  y:Math.random()*canvas.height,
+                  r:1+Math.random()*2.5,
+                  vx:(Math.random()-0.5)*0.3,
+                  vy:-0.3-Math.random()*0.5,
+                  life:30+Math.random()*70
+                });
+              }
+
+              function tick(){
+                if (document.getElementById('new-loading-screen').classList.contains('hidden')) {
+                    return; // Stop animation when loading screen is hidden
+                }
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+                for(let s of stars){
+                  s.x+=s.vx; s.y+=s.vy; s.life--;
+                  if(s.life<0){
+                    s.x=Math.random()*canvas.width;
+                    s.y=canvas.height+10;
+                    s.life=30+Math.random()*70;
+                  }
+                  ctx.beginPath();
+                  ctx.fillStyle="rgba(255,255,255,"+(0.4+0.6*Math.random())+")";
+                  ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+                  ctx.fill();
+                }
+                requestAnimationFrame(tick);
+              }
+              tick();
+            })();
+            // ===== END: NEW LOADING SCREEN SCRIPT =====
+
+            updateUserPresence(userId);
 
             const elements = {
                 gameScreen: document.getElementById('game-screen'),
