@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Tap-Tap Coin Game</title>
     <style>
-        /* ===== START: NEW FIREBASE LOADING SCREEN STYLES ===== */
+        /* ===== START: NEW LOADING SCREEN STYLES ===== */
         #firebase-loading-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 9999;
@@ -89,7 +89,7 @@
             inset:0;
             pointer-events:none;
         }
-        /* ===== END: NEW FIREBASE LOADING SCREEN STYLES ===== */
+        /* ===== END: NEW LOADING SCREEN STYLES ===== */
 
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
@@ -1540,7 +1540,12 @@
         </div>
     </div>
 
-    <audio id="mining-start-sound" src="https://cdn.pixabay.com/download/audio/2022/03/10/audio_c35925626a.mp3" preload="auto"></audio>
+    <!-- ===== START: UPDATED AUDIO ELEMENTS ===== -->
+    <audio id="tap-sound" src="sounds/tap-sound.mp3" preload="auto"></audio>
+    <audio id="mining-start-sound" src="sounds/mining-start-sound.mp3" preload="auto"></audio>
+    <audio id="coin-sound" src="sounds/coin-sound.mp3" preload="auto"></audio>
+    <!-- ===== END: UPDATED AUDIO ELEMENTS ===== -->
+
     
     <div id="ad-frame-wrapper" style="display: none;">
         <div class="stage">
@@ -2068,7 +2073,6 @@
                 playerNameDisplay: document.getElementById('player-name-display'),
                 screens: document.querySelectorAll('.screen'),
                 navButtons: document.querySelectorAll('.nav-button'),
-                tapSound: document.getElementById('tap-sound'),
                 nameChangePopup: document.getElementById('name-change-popup'),
                 newNameInput: document.getElementById('new-name-input'),
                 confirmNameButton: document.getElementById('confirm-name-button'),
@@ -2147,8 +2151,24 @@
                 dtRefreshTimer: document.getElementById('dt-refresh-timer'),
                 miningControlButton: document.getElementById('mining-control-button'),
                 miningProgressText: document.getElementById('mining-progress-text'),
-                miningStartSound: document.getElementById('mining-start-sound'),
             };
+
+            // ===== START: NEW SOUND FUNCTIONALITY =====
+            function playSound(soundId) {
+                const sound = document.getElementById(soundId);
+                if (sound) {
+                    sound.currentTime = 0; // Rewind to the start
+                    sound.play().catch(e => console.log(`Sound play failed: ${e.message}`));
+                }
+            }
+
+            // Global click listener for all buttons and tappable elements
+            document.body.addEventListener('click', (e) => {
+                if (e.target.closest('button, .nav-button, .copy-id-btn, .send-screenshot-btn, .join-telegram-button, .profile-section')) {
+                    playSound('tap-sound');
+                }
+            });
+            // ===== END: NEW SOUND FUNCTIONALITY =====
 
             elements.dailyTasksSideButton.addEventListener('click', () => showScreen('daily-tasks-screen'));
 
@@ -2291,6 +2311,7 @@
                     const timeRemaining = (state.miningStartTime + MINING_DURATION) - Date.now();
                     if (timeRemaining <= 0) {
                         state.score += MINING_REWARD;
+                        playSound('coin-sound'); // Play coin sound on claim
                         state.isMiningActive = false;
                         state.miningStartTime = 0;
                         state.miningAdsWatched = 0;
@@ -2317,7 +2338,6 @@
                         button.textContent = "Loading Ad...";
 
                         show_9966767().then(() => {
-                            // This code runs AFTER the user watches/closes the ad.
                             console.log('Rewarded interstitial ad for mining completed.');
                             alert('Ad watched! Your progress has been updated.');
                             
@@ -2329,9 +2349,7 @@
 
                     } else {
                         // This is the "Start Mining" state
-                        if (elements.miningStartSound) {
-                            elements.miningStartSound.play().catch(e => console.error("Sound play failed:", e));
-                        }
+                        playSound('mining-start-sound'); // Play mining sound on start
                         state.isMiningActive = true;
                         state.miningStartTime = Date.now();
                         saveGame({ isMiningActive: state.isMiningActive, miningStartTime: state.miningStartTime });
@@ -2421,6 +2439,7 @@
                     taskData.count++;
                     taskData.lastTime = now;
                     state.score += dailyTaskSettings.coinsPerTask;
+                    playSound('coin-sound'); // Play coin sound on task reward
                     
                     state.dailyTaskProgress[`task${taskId}`] = taskData;
                     
@@ -2527,6 +2546,7 @@
 
                     const coinsAwarded = parseInt(codeData.coins, 10);
                     state.score += coinsAwarded;
+                    playSound('coin-sound'); // Play coin sound on redeem
                     userRedemptions[code] = true;
                     
                     saveGame({ score: state.score, redeemedGiftCodes: userRedemptions });
@@ -2604,6 +2624,7 @@
                 }
                 
                 state.score += 99;
+                playSound('coin-sound'); // Play coin sound on Telegram reward
                 state.telegramJoinedClaimed = true;
                 
                 saveGame({ score: state.score, Totalearning: state.score, telegramJoinedClaimed: true });
@@ -2620,6 +2641,7 @@
                 }
 
                 state.score += 20;
+                playSound('coin-sound'); // Play coin sound on daily bonus
                 state.lastDailyBonusClaim = today;
 
                 saveGame({ score: state.score, Totalearning: state.score, lastDailyBonusClaim: today });
@@ -3412,6 +3434,7 @@
 
                                 state.score += parseInt(slot.coins.split(' ')[0], 10) || 0;
                                 state.diamonds += parseInt(slot.diamonds.split(' ')[0], 10) || 0;
+                                playSound('coin-sound'); // Play coin sound on ad reward
                                 
                                 state.adsProgress[index] = userProgress;
                                 saveGame({
