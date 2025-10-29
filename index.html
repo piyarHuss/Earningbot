@@ -769,6 +769,14 @@
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        /* MODIFIED: Added disabled styles for the withdrawal button */
+        #wallet-screen .ws-btn:disabled {
+            background: #555;
+            cursor: not-allowed;
+            box-shadow: none;
+            opacity: 0.7;
         }
         #wallet-screen .ws-withdraw {
             background: #9d4edd;
@@ -904,41 +912,6 @@
             color: #fff;
             transition: 0.3s;
             margin-top: 15px;
-        }
-        
-        #mining-screen {
-            background: #0d0d0d;
-        }
-        #mining-screen h2 { color: gold; padding-top: 15px; margin-bottom: 20px; font-size: 24px;}
-        #mining-ad-area {
-            background: #333;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 400px;
-            padding: 20px;
-            margin: 20px auto;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-        }
-        #age-gate p {
-            font-size: 18px;
-            color: #fff;
-            margin: 0 0 15px 0;
-        }
-        #confirm-age-btn {
-            background: #3b82f6;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 12px 30px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        #next-ad-timer {
-            font-size: 18px;
-            font-weight: bold;
-            color: #f39c12;
         }
         
         #ads-screen {
@@ -1217,6 +1190,68 @@
             background: linear-gradient(45deg, #2ecc71, #27ae60);
             box-shadow: 0 5px 15px rgba(46, 204, 113, 0.5);
         }
+        
+        /* ===== START: DRAGON VS TIGER GAME CSS ===== */
+        .dvt-game-screen-styles {
+          --bg:#071122;
+          --accent:#1ea7ff;
+          --card:#071826;
+          --white:#fff;
+          --muted:#c7d2da;
+          --win:#21d07a;
+          --lose:#ff4d4f;
+          --glass: rgba(255,255,255,0.03);
+          background: linear-gradient(180deg, var(--bg), #04111a 80%);
+        }
+        .dvt-game-screen-styles .app{ width:380px; max-width:95vw; text-align:center; font-family: "Montserrat", Arial, sans-serif; color: var(--white); }
+        .dvt-game-screen-styles header{ margin-bottom:12px; }
+        .dvt-game-screen-styles .title{ font-size:28px; letter-spacing:6px; color: #f5c542; font-weight:700; }
+        .dvt-game-screen-styles .timer { font-size: 24px; font-weight: 700; color: var(--muted); margin-top: 15px; margin-bottom: 10px; }
+        .dvt-game-screen-styles .top-row{ display:flex; align-items:center; justify-content:center; margin:16px 0 10px; }
+        .dvt-game-screen-styles .coin-box{ display:flex; gap:8px; align-items:center; }
+        .dvt-game-screen-styles .coin{ background:var(--glass); padding:8px 12px; border-radius:20px; display:flex; gap:8px; align-items:center; font-weight:700; }
+        .dvt-game-screen-styles .coin img{width:18px; height:18px}
+        .dvt-game-screen-styles .arena{ display:flex; gap:10px; align-items:center; justify-content:center; margin:10px 0 18px; }
+        
+        .dvt-game-screen-styles .side{ 
+          width:48%; 
+          min-height:210px; 
+          border-radius:10px; 
+          border:6px solid var(--accent); 
+          display:flex; 
+          align-items:center; 
+          justify-content:center; 
+          position:relative; 
+          cursor:pointer; 
+          transition: transform .15s ease, box-shadow .15s; 
+          user-select:none;
+          background-size: cover;
+          background-position: center;
+          overflow: hidden;
+          background-image: none; /* Default image ko hata diya */
+          background-color: #0c1a29; /* Placeholder color */
+        }
+        .dvt-game-screen-styles .side::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(7, 24, 38, 0.7); z-index: 1; }
+        .dvt-game-screen-styles .side > * { position: relative; z-index: 2; }
+        .dvt-game-screen-styles .side.selected{ box-shadow: 0 10px 30px rgba(0,0,0,0.6), 0 0 16px rgba(30,167,255,0.12); transform: translateY(-6px); }
+        .dvt-game-screen-styles .side-number{ font-size:72px; font-weight:900; color:var(--white); text-shadow: 0 0 15px rgba(0,0,0,0.7); }
+        .dvt-game-screen-styles .side-label{ position:absolute; top:8px; left:10px; background:rgba(0,0,0,0.35); padding:6px 10px; border-radius:8px; font-weight:700; }
+        .dvt-game-screen-styles .vs{ width:48px; height:48px; border-radius:12px; background: linear-gradient(180deg,#ffb24d,#ff8a00); display:flex; align-items:center; justify-content:center; font-weight:900; color:#fff; box-shadow:0 8px 18px rgba(255,138,0,0.18); }
+        .dvt-game-screen-styles .start-wrap{ margin:18px 0; }
+        .dvt-game-screen-styles .start-btn{ background:#fff; color:#071226; border:none; padding:14px 46px; border-radius:18px; font-size:20px; font-weight:800; cursor:pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.45); }
+        .dvt-game-screen-styles .controls{ margin-top:14px; display:flex; gap:8px; align-items:center; justify-content:center; flex-wrap:wrap; }
+        .dvt-game-screen-styles .bet-btn{ background:rgba(255,255,255,0.06); border-radius:12px; padding:8px 12px; min-width:56px; text-align:center; font-weight:700; cursor:pointer; }
+        .dvt-game-screen-styles .bet-btn.active{ background: linear-gradient(180deg,#0ea7ff,#0077c8); color:#fff; box-shadow:0 8px 20px rgba(14,167,255,0.12); }
+        .dvt-game-screen-styles .message{ margin-top:12px; min-height:24px; font-weight:700; }
+        .dvt-game-screen-styles .result.win{ color:var(--win); }
+        .dvt-game-screen-styles .result.lose{ color:var(--lose); }
+        .dvt-game-screen-styles .footer{ margin-top:18px; display:flex; align-items:center; justify-content:center; }
+        .dvt-game-screen-styles .balance{ background:rgba(255,255,255,0.03); padding:8px 12px; border-radius:12px; font-weight:800; }
+        .dvt-game-screen-styles .bet-display { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); background-color: rgba(0, 0, 0, 0.5); padding: 8px 16px; border-radius: 20px; font-size: 16px; font-weight: 700; border: 1px solid rgba(255, 255, 255, 0.1); display: none; }
+        .dvt-game-screen-styles .all-in-btn { background: linear-gradient(180deg, #ff8a00, #e74c3c); color: #fff; border: 1px solid #ffb24d; }
+        .dvt-game-screen-styles .all-in-btn.active { background: linear-gradient(180deg, #ffb24d, #ff4d4f); box-shadow: 0 8px 20px rgba(255, 77, 79, 0.2); }
+        @media (max-width:420px){ .dvt-game-screen-styles .side-number{ font-size:56px; } .dvt-game-screen-styles .app{ width:340px; } }
+        /* ===== END: DRAGON VS TIGER GAME CSS ===== */
 
     </style>
 </head>
@@ -1253,7 +1288,7 @@
 
         <div id="game-screen" class="screen">
             <!-- Side buttons are kept -->
-            <div id="mining-button">⛏️</div>
+            <div id="mining-button">🎮</div> <!-- MODIFIED: Icon changed, functionality will be changed in JS -->
             <div id="rewards-hub-button">📦</div>
             <div id="daily-tasks-side-button">🔥</div>
         
@@ -1341,14 +1376,40 @@
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
         
-        <div id="mining-screen" class="screen scrollable-screen hidden">
-            <h2>⛏️ Mining Coins ⛏️</h2>
-            <div id="mining-ad-area">
-                <div id="age-gate">
-                    <p>Are you 18+ years old?</p>
-                    <button id="confirm-age-btn">Confirm</button>
+        <!-- ===== MODIFIED: Mining Screen is now the Dragon vs Tiger Game Screen ===== -->
+        <div id="dvt-game-screen" class="screen scrollable-screen hidden dvt-game-screen-styles">
+            <div class="app" role="application">
+                <header>
+                    <div class="title">GAMES</div>
+                    <div class="timer" id="dvt-timerDisplay">⏱️ 7</div>
+                </header>
+                <div class="top-row">
+                    <div class="coin-box">
+                    <div class="coin" title="Coins"><img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><circle cx='256' cy='256' r='200' fill='%23ffd24d'/><text x='50%' y='56%' font-size='220' text-anchor='middle' font-family='Arial' fill='%23000' font-weight='700'>🪙</text></svg>" alt="coin"><span id="dvt-coinBalance">0</span></div>
+                    </div>
                 </div>
-                <div id="next-ad-timer" style="display: none;"></div>
+                <div class="arena">
+                    <div class="side" id="dvt-leftSide" data-side="left" role="button" tabindex="0">
+                        <div class="side-label">ELEPHANT</div>
+                        <div class="side-number" id="dvt-leftNum">-</div>
+                        <div class="bet-display" id="dvt-leftBetDisplay"></div>
+                    </div>
+                    <div class="vs">VS</div>
+                    <div class="side" id="dvt-rightSide" data-side="right" role="button" tabindex="0">
+                        <div class="side-label">MONKEY</div>
+                        <div class="side-number" id="dvt-rightNum">-</div>
+                        <div class="bet-display" id="dvt-rightBetDisplay"></div>
+                    </div>
+                </div>
+                <div class="start-wrap"><button class="start-btn" id="dvt-startBtn">Start</button></div>
+                <div class="controls" aria-hidden="false" id="dvt-controls">
+                    <div class="bet-btn" data-bet="100">100</div><div class="bet-btn" data-bet="500">500</div><div class="bet-btn" data-bet="1000">1000</div><div class="bet-btn" data-bet="2000">2000</div><div class="bet-btn" data-bet="5000">5000</div>
+                    <div class="bet-btn all-in-btn" id="dvt-allInBtn">All In</div>
+                </div>
+                <div class="message" id="dvt-message"></div>
+                <div class="footer">
+                    <div class="balance">Balance: <span id="dvt-balanceDisplay">0</span></div>
+                </div>
             </div>
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
@@ -1544,6 +1605,12 @@
     <audio id="tap-sound" src="tap-sound.mp3" preload="auto"></audio>
     <audio id="mining-start-sound" src="mining-start-sound.mp3" preload="auto"></audio>
     <audio id="coin-sound" src="coin-sound.mp3" preload="auto"></audio>
+    <!-- Dragon vs Tiger Game Sounds -->
+    <audio id="dvt-bg-sound" src="bg-sound.mp3" loop preload="auto"></audio>
+    <audio id="dvt-timer-sound" src="timer-sound.mp3" preload="auto"></audio>
+    <audio id="dvt-tap-sound" src="tap-sound.mp3" preload="auto"></audio>
+    <audio id="dvt-left-win-sound" src="left-win-sound.mp3" preload="auto"></audio>
+    <audio id="dvt-right-win-sound" src="right-win-sound.mp3" preload="auto"></audio>
     <!-- ===== END: UPDATED AUDIO ELEMENTS ===== -->
 
     
@@ -2126,15 +2193,11 @@
                 walletUsdtAddress: document.getElementById('wallet-usdt-address'),
                 walletUsdtCoins: document.getElementById('wallet-usdt-coins'),
                 walletUsdtReceive: document.getElementById('wallet-usdt-receive'),
-                miningButton: document.getElementById('mining-button'),
+                miningButton: document.getElementById('mining-button'), // This now opens the DVT Game
                 diamondDisplay: document.getElementById('diamond-display'),
                 diamondCount: document.getElementById('diamond-count'),
                 diamondScreen: document.getElementById('diamond-screen'),
                 diamondBalanceDisplay: document.getElementById('diamond-balance-display'),
-                miningAdArea: document.getElementById('mining-ad-area'),
-                ageGate: document.getElementById('age-gate'),
-                confirmAgeBtn: document.getElementById('confirm-age-btn'),
-                nextAdTimer: document.getElementById('next-ad-timer'),
                 adsScreen: document.getElementById('ads-screen'),
                 adsList: document.getElementById('adsList'),
                 giftScreen: document.getElementById('gift-screen'),
@@ -2233,8 +2296,6 @@
                 adsRequired: 5,
                 adUrl: 'https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6'
             };
-            
-            let nextAdTimeout, blackoutInterval, countdownInterval;
             
             let dailyTaskSettings = {
                 coinsPerTask: 30, 
@@ -2358,8 +2419,322 @@
                     }
                 }
             });
+            
+            // ===== START: DRAGON VS TIGER GAME LOGIC =====
+            const dvtGame = {
+                elements: {
+                    leftSide: document.getElementById('dvt-leftSide'),
+                    rightSide: document.getElementById('dvt-rightSide'),
+                    leftNum: document.getElementById('dvt-leftNum'),
+                    rightNum: document.getElementById('dvt-rightNum'),
+                    startBtn: document.getElementById('dvt-startBtn'),
+                    controls: document.getElementById('dvt-controls'),
+                    messageEl: document.getElementById('dvt-message'),
+                    balanceDisplay: document.getElementById('dvt-balanceDisplay'),
+                    coinBalance: document.getElementById('dvt-coinBalance'),
+                    timerDisplay: document.getElementById('dvt-timerDisplay'),
+                    leftBetDisplay: document.getElementById('dvt-leftBetDisplay'),
+                    rightBetDisplay: document.getElementById('dvt-rightBetDisplay'),
+                    allInBtn: document.getElementById('dvt-allInBtn'),
+                    bgSound: document.getElementById('dvt-bg-sound'),
+                    timerSound: document.getElementById('dvt-timer-sound'),
+                    tapSound: document.getElementById('dvt-tap-sound'),
+                    leftWinSound: document.getElementById('dvt-left-win-sound'),
+                    rightWinSound: document.getElementById('dvt-right-win-sound')
+                },
+                state: {
+                    payoutMultiplier: 1.8,
+                    selectedSide: null,
+                    betIncrement: 1000,
+                    currentBetAmount: 0,
+                    balance: 0, // This will be synced with the main game state.score
+                    timer: 7,
+                    isGameActive: false,
+                    isAllInMode: false
+                },
+                
+                init: function(initialBalance) {
+                    this.state.balance = initialBalance;
+                    this.updateBalanceDisplay();
+                    this.resetUI();
+                    this.loadImages(); 
+                    this.elements.timerDisplay.textContent = `⏱️ ${this.state.timer}`;
+                    this.elements.messageEl.innerHTML = `Tap amount select karke side par tap karein.`;
 
+                    if (!this.listenersAdded) {
+                        this.addEventListeners();
+                        this.listenersAdded = true;
+                    }
+                },
+                
+                loadImages: async function() {
+                    const settingsRef = database.ref('dvt_settings/images');
+                    try {
+                        const snapshot = await settingsRef.once('value');
+                        if (snapshot.exists()) {
+                            const images = snapshot.val();
+                            if (images.left) {
+                                this.elements.leftSide.style.backgroundImage = `url('${images.left}')`;
+                            }
+                            if (images.right) {
+                                this.elements.rightSide.style.backgroundImage = `url('${images.right}')`;
+                            }
+                        } else {
+                            // Fallback images
+                            this.elements.leftSide.style.backgroundImage = `url('https://i.imgur.com/r33y2b2.jpeg')`;
+                            this.elements.rightSide.style.backgroundImage = `url('https://i.imgur.com/i4n29i6.jpeg')`;
+                        }
+                    } catch (error) {
+                        console.error("DVT Game: Error loading images from Firebase", error);
+                    }
+                },
 
+                resetUI: function() {
+                    this.elements.startBtn.disabled = false;
+                    this.elements.startBtn.style.opacity = 1;
+                    this.elements.controls.querySelectorAll('.bet-btn, .all-in-btn').forEach(b => b.style.pointerEvents = 'auto');
+                    this.elements.leftSide.style.pointerEvents = 'auto';
+                    this.elements.rightSide.style.pointerEvents = 'auto';
+                    this.elements.leftNum.textContent = '-';
+                    this.elements.rightNum.textContent = '-';
+                    this.elements.leftSide.classList.remove('selected');
+                    this.elements.rightSide.classList.remove('selected');
+                    this.state.selectedSide = null;
+                    this.state.currentBetAmount = 0;
+                    this.state.isAllInMode = false;
+                    this.elements.allInBtn.classList.remove('active');
+                    this.updateBetDisplay();
+                },
+                
+                addEventListeners: function() {
+                    this.elements.leftSide.addEventListener('click', () => this.handleSideTap('left'));
+                    this.elements.rightSide.addEventListener('click', () => this.handleSideTap('right'));
+                    
+                    this.elements.controls.querySelectorAll('.bet-btn:not(#dvt-allInBtn)').forEach(b => {
+                        const v = parseInt(b.dataset.bet, 10);
+                        b.addEventListener('click', () => {
+                            this.state.isAllInMode = false;
+                            this.elements.allInBtn.classList.remove('active');
+                            this.state.betIncrement = v;
+                            this.state.currentBetAmount = 0;
+                            this.elements.controls.querySelectorAll('.bet-btn').forEach(x => x.classList.remove('active'));
+                            b.classList.add('active');
+                            this.elements.messageEl.textContent = `Har tap par ${this.state.betIncrement.toLocaleString()} coins lagenge.`;
+                            this.elements.messageEl.className = '';
+                            this.updateBetDisplay();
+                        });
+                    });
+                    
+                    this.elements.allInBtn.addEventListener('click', () => {
+                        if (this.state.balance <= 0) {
+                            this.elements.messageEl.textContent = 'Aapke paas bet lagane ke liye coins nahi hain!';
+                            return;
+                        }
+                        this.state.isAllInMode = true;
+                        this.state.currentBetAmount = this.state.balance;
+                        this.elements.controls.querySelectorAll('.bet-btn:not(#dvt-allInBtn)').forEach(b => b.classList.remove('active'));
+                        this.elements.allInBtn.classList.add('active');
+                        this.elements.messageEl.innerHTML = `🔥 ALL IN! Ab ek side chuno.`;
+                        if (this.state.selectedSide) { this.updateBetDisplay(); }
+                    });
+                    
+                    this.elements.startBtn.addEventListener('click', () => this.startCountdown());
+                    
+                    this.elements.controls.querySelector('.bet-btn[data-bet="1000"]').classList.add('active');
+                },
+                
+                updateBalanceDisplay: function() {
+                    this.elements.balanceDisplay.textContent = this.state.balance.toLocaleString();
+                    this.elements.coinBalance.textContent = this.state.balance.toLocaleString();
+                },
+
+                updateBetDisplay: function() {
+                    this.elements.leftBetDisplay.style.display = 'none';
+                    this.elements.rightBetDisplay.style.display = 'none';
+                    if (this.state.currentBetAmount > 0) {
+                        if (this.state.selectedSide === 'left') {
+                            this.elements.leftBetDisplay.innerHTML = `🪙 ${this.state.currentBetAmount.toLocaleString()}`;
+                            this.elements.leftBetDisplay.style.display = 'block';
+                        } else if (this.state.selectedSide === 'right') {
+                            this.elements.rightBetDisplay.innerHTML = `🪙 ${this.state.currentBetAmount.toLocaleString()}`;
+                            this.elements.rightBetDisplay.style.display = 'block';
+                        }
+                    }
+                },
+
+                handleSideTap: function(tappedSide) {
+                    if (this.elements.bgSound.paused) {
+                        this.elements.bgSound.volume = 0.3;
+                        this.elements.bgSound.play().catch(() => {});
+                    }
+
+                    if (this.state.isAllInMode) {
+                        this.state.selectedSide = tappedSide;
+                    } else {
+                        if (this.state.balance < this.state.betIncrement && this.state.currentBetAmount === 0) {
+                            this.elements.messageEl.textContent = 'Bet lagane ke liye coins nahi hain!';
+                            this.elements.messageEl.className = 'result lose';
+                            return;
+                        }
+                        if (this.state.selectedSide !== tappedSide) {
+                            this.state.currentBetAmount = 0;
+                            this.state.selectedSide = tappedSide;
+                        }
+                        if (this.state.balance < this.state.currentBetAmount + this.state.betIncrement) {
+                            this.elements.messageEl.textContent = 'Itna bet lagane ke liye balance nahi hai!';
+                            this.elements.messageEl.className = 'result lose';
+                            return;
+                        }
+                        playSound('dvt-tap-sound');
+                        this.state.currentBetAmount += this.state.betIncrement;
+                    }
+
+                    this.elements.leftSide.classList.toggle('selected', this.state.selectedSide === 'left');
+                    this.elements.rightSide.classList.toggle('selected', this.state.selectedSide === 'right');
+                    this.updateBetDisplay();
+                    const sideName = tappedSide === 'left' ? 'ELEPHANT' : 'MONKEY';
+                    this.elements.messageEl.innerHTML = this.state.isAllInMode ? `🔥 ALL IN on ${sideName}!` : `Betting on ${sideName}`;
+                    this.elements.messageEl.className = '';
+                },
+
+                startCountdown: function() {
+                    if (!this.state.selectedSide || this.state.currentBetAmount === 0) {
+                        this.elements.messageEl.textContent = 'Pehle bet lagayein!';
+                        return;
+                    }
+                    if (this.state.currentBetAmount > this.state.balance) {
+                        this.elements.messageEl.textContent = 'Aapke paas utne coins nahi hain।';
+                        this.elements.messageEl.className = 'result lose';
+                        return;
+                    }
+                    this.elements.startBtn.disabled = true;
+                    this.elements.startBtn.style.opacity = 0.7;
+                    this.elements.controls.querySelectorAll('.bet-btn, .all-in-btn').forEach(b => b.style.pointerEvents = 'none');
+                    this.elements.leftSide.style.pointerEvents = 'none';
+                    this.elements.rightSide.style.pointerEvents = 'none';
+                    this.elements.messageEl.textContent = 'Generating...';
+
+                    let t = this.state.timer;
+                    this.elements.timerDisplay.textContent = `⏱️ ${t}`;
+                    playSound('dvt-timer-sound');
+                    
+                    const countdown = setInterval(() => {
+                        t--;
+                        this.elements.timerDisplay.textContent = `⏱️ ${t}`;
+                        if (t > 0) playSound('dvt-timer-sound');
+                        if (t <= 0) {
+                            clearInterval(countdown);
+                            this.elements.timerDisplay.textContent = `⏱️ ${this.state.timer}`;
+                            this.playRound();
+                        }
+                    }, 1000);
+                },
+                
+                // ===== FINAL CORRECTED LOGIC HERE (With 40% win chance) =====
+                playRound: function() {
+                    let a, b;
+                    let playerChoice = this.state.selectedSide;
+                    const betAmount = this.state.currentBetAmount;
+                    const totalBalance = this.state.balance;
+
+                    // Yahan WIN CHANCE set hoga
+                    let winChance = 0.40; // Default win chance 40%
+
+                    // Agar bet balance ka 30% se zyada hai, to jeetne ka chance 10% kar do
+                    if (betAmount >= totalBalance * 0.3) {
+                        winChance = 0.10; // High bet ke liye 10% win chance
+                    }
+
+                    // Player ko jeetana hai ya harana hai, decide karo
+                    if (Math.random() < winChance) {
+                        // Player ko jitao
+                        if (playerChoice === 'left') {
+                            a = this.randInt(6, 10);
+                            b = this.randInt(1, 5);
+                        } else { // Player ne right chuna hai
+                            a = this.randInt(1, 5);
+                            b = this.randInt(6, 10);
+                        }
+                    } else {
+                        // Player ko harao
+                        if (playerChoice === 'left') {
+                            a = this.randInt(1, 5);
+                            b = this.randInt(6, 10);
+                        } else { // Player ne right chuna hai
+                            a = this.randInt(6, 10);
+                            b = this.randInt(1, 5);
+                        }
+                    }
+
+                    // Tie se bachne ke liye
+                    if (a === b) {
+                        if (a < 10) a++; else a--;
+                    }
+                    
+                    this.elements.leftNum.textContent = a;
+                    this.elements.rightNum.textContent = '...';
+                    this.elements.messageEl.textContent = 'Right side ka number aa raha hai...';
+                    
+                    setTimeout(() => {
+                        this.elements.rightNum.textContent = b;
+                        
+                        setTimeout(() => {
+                            const winnerSide = (a > b) ? 'left' : 'right';
+                            this.settleOutcome({ winner: winnerSide, a, b });
+                        }, 2000); // 2-second delay before showing win/loss
+
+                    }, 1500); // 1.5-second delay before showing right number
+                },
+                
+                settleOutcome: function({ winner, a, b }) {
+                    const userWon = (this.state.selectedSide === winner);
+                    const bet = this.state.currentBetAmount;
+                    
+                    if (winner === 'left') playSound('dvt-left-win-sound');
+                    else playSound('dvt-right-win-sound');
+                    
+                    if (userWon) {
+                        const grossGain = Math.round(bet * this.state.payoutMultiplier);
+                        const netGain = grossGain - bet; // Sirf jeeta hua extra paisa
+                        this.state.balance += netGain;
+                        this.elements.messageEl.innerHTML = `YOU WIN! +${netGain.toLocaleString()} coins. (E=${a} M=${b})`;
+                        this.elements.messageEl.className = 'result win';
+                    } else {
+                        this.state.balance -= bet; // Haarne par bet amount minus hoga
+                        this.elements.messageEl.innerHTML = `YOU LOSE! -${bet.toLocaleString()} coins. (E=${a} M=${b})`;
+                        this.elements.messageEl.className = 'result lose';
+                    }
+
+                    // SYNC WITH MAIN GAME STATE
+                    state.score = this.state.balance;
+                    saveGame({ score: state.score }); // Firebase mein save karein
+                    this.updateBalanceDisplay();
+                    
+                    this.resetUI();
+                    
+                    const flashEl = winner === 'left' ? this.elements.leftSide : this.elements.rightSide;
+                    flashEl.animate([{ boxShadow: '0 20px 60px rgba(0,0,0,0)' }, { boxShadow: '0 30px 80px rgba(255,255,255,0.06)' }], { duration: 600, fill: 'forwards' });
+                    
+                    if (this.state.balance <= 0) {
+                        this.elements.messageEl.textContent = 'Balance khatam ho gaya!';
+                        this.elements.messageEl.className = 'result lose';
+                    }
+                    
+                    setTimeout(() => {
+                        this.elements.leftNum.textContent = '-';
+                        this.elements.rightNum.textContent = '-';
+                        this.elements.leftSide.classList.remove('selected');
+                        this.elements.rightSide.classList.remove('selected');
+                        this.updateBetDisplay();
+                    }, 1500);
+                },
+                
+                randInt: function(min, max) {
+                    return Math.floor(Math.random() * (max - min + 1)) + min;
+                }
+            };
+            // ===== END: DRAGON VS TIGER GAME LOGIC =====
+            
             async function loadDailyTaskData() {
                 try {
                     const settingsSnap = await database.ref('dailyTaskSettings').once('value');
@@ -2996,18 +3371,15 @@
             elements.notificationBell.addEventListener('click', showNotifications);
             elements.closeNotificationBtn.addEventListener('click', closeAndClearNotifications);
 
-            function stopMiningProcess() {
-                clearTimeout(nextAdTimeout);
-                clearInterval(blackoutInterval);
-                clearInterval(countdownInterval);
-            }
-            
             function showScreen(screenId) {
                 if (miningCountdownInterval) {
                     clearInterval(miningCountdownInterval);
                     miningCountdownInterval = null;
                 }
-                stopMiningProcess();
+                // Stop DVT background music if leaving the game screen
+                if (dvtGame.elements.bgSound && !dvtGame.elements.bgSound.paused) {
+                    dvtGame.elements.bgSound.pause();
+                }
 
                 elements.screens.forEach(s => s.classList.add('hidden'));
                 document.querySelectorAll('.nav-button').forEach(b => b.classList.remove('active'));
@@ -3031,7 +3403,7 @@
                 else if (screenId === 'tasks-screen') { loadAndDisplayOffers(); } 
                 else if (screenId === 'tournament-screen') { loadAndDisplayTournaments(); } 
                 else if (screenId === 'rewards-hub-screen') { renderRewardsHubScreen(); }
-                else if (screenId === 'mining-screen') { startNewMiningProcess(); }
+                else if (screenId === 'dvt-game-screen') { dvtGame.init(state.score); } // MODIFIED: Initialize DVT game with current score
                 else if (screenId === 'diamond-screen') { renderDiamondScreen(); }
                 else if (screenId === 'ads-screen') { renderAdsScreen(); }
                 else if (screenId === 'gift-screen') { loadClaimSettings(); }
@@ -3165,10 +3537,23 @@
             elements.confirmNameButton.addEventListener('click', () => { const newName = elements.newNameInput.value.trim(); if (newName && newName !== "") { state.playerName = newName; updatePlayerNameDisplay(); saveGame({ Name: newName }); elements.nameChangePopup.style.display = 'none'; } else { alert("Name cannot be empty!"); } });
             elements.cancelNameButton.addEventListener('click', () => elements.nameChangePopup.style.display = 'none');
             
+            // ===== MODIFIED: Wallet screen and withdrawal lock logic =====
             function renderNewWalletScreen() {
+                const MIN_WITHDRAWAL_COINS = 10000;
+                const withdrawBtn = elements.walletOpenOptionsBtn;
+
                 elements.walletPlayerName.textContent = '👤 ' + state.playerName;
                 elements.walletBalance.textContent = state.score.toLocaleString();
                 elements.walletUsdValue.textContent = "Value: $" + (state.score / 100000).toFixed(2) + " USD";
+                
+                if (state.score < MIN_WITHDRAWAL_COINS) {
+                    withdrawBtn.disabled = true;
+                    withdrawBtn.textContent = `Need ${MIN_WITHDRAWAL_COINS.toLocaleString()} Coins`;
+                } else {
+                    withdrawBtn.disabled = false;
+                    withdrawBtn.textContent = 'Withdraw';
+                }
+
                 renderFirebaseHistory();
             }
 
@@ -3311,12 +3696,6 @@
                 }, { duration: 20 });
             });
             
-            function stopNewMiningProcess() {
-                clearTimeout(nextAdTimeout);
-                clearInterval(blackoutInterval);
-                clearInterval(countdownInterval);
-            }
-
             const movableAdUrls = [
                 'https://www.revenuecpmgate.com/cm8gq6fq3e?key=6fef6bfc0bafc112d36c552fc6edfee4',
                 'https://www.revenuecpmgate.com/xzdqc1h54f?key=074a291a6c883adbfdf54b6d73248800',
@@ -3448,6 +3827,11 @@
                     });
                 });
             }
+
+            // MODIFIED: This button now opens the DVT game
+            elements.miningButton.addEventListener('click', () => {
+                showScreen('dvt-game-screen');
+            });
 
             cycleMovableAd(); 
             setInterval(cycleMovableAd, 60000); 
