@@ -2447,7 +2447,7 @@
                     selectedSide: null,
                     betIncrement: 1000,
                     currentBetAmount: 0,
-                    balance: 0, // This will be synced with the main game state.score
+                    balance: 0, 
                     timer: 7,
                     isGameActive: false,
                     isAllInMode: false
@@ -2480,7 +2480,6 @@
                                 this.elements.rightSide.style.backgroundImage = `url('${images.right}')`;
                             }
                         } else {
-                            // Fallback images
                             this.elements.leftSide.style.backgroundImage = `url('https://i.imgur.com/r33y2b2.jpeg')`;
                             this.elements.rightSide.style.backgroundImage = `url('https://i.imgur.com/i4n29i6.jpeg')`;
                         }
@@ -2630,7 +2629,7 @@
                     }, 1000);
                 },
                 
-                // ===== FINAL CORRECTED LOGIC HERE (With 40% win chance) =====
+                // ===== FINAL CORRECTED LOGIC HERE (With 40% win chance and anti-high-bet) =====
                 playRound: function() {
                     let a, b;
                     let playerChoice = this.state.selectedSide;
