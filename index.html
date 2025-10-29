@@ -3863,5 +3863,7 @@
         <iframe id="movable-ad-iframe" src="about:blank" scrolling="no"></iframe>
     </div>
 
+window.showProfile = () => { WebApp.showAlert(`User Profile:\nName: ${USER_NAME}\nID: ${TELEGRAM_USER_ID}`); }
+window.showMsg = () => { WebApp.showPopup({message: 'Welcome to CoinMine!'}); }
 </body>
 </html>
