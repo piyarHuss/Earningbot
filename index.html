@@ -478,94 +478,6 @@
             z-index: -1;
         }
         
-        #offer-wall-screen {
-            background-color: #121212;
-            justify-content: flex-start;
-            padding-top: 30px;
-            color: #ffffff;
-        }
-        .offer-wall-container {
-            width: 95%;
-            max-width: 500px;
-            background-color: #1e1e2d;
-            border-radius: 12px;
-            box-shadow: 0 0 15px rgba(155, 89, 182, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 10px;
-            box-sizing: border-box;
-        }
-        .offer-wall-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            padding: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .offer-wall-item:last-child {
-            border-bottom: none;
-        }
-        .offer-wall-item img {
-            width: 55px;
-            height: 55px;
-            margin-right: 0;
-            margin-bottom: 10px;
-            flex-shrink: 0;
-            border-radius: 12px;
-        }
-        .offer-wall-text {
-            flex-grow: 1;
-            text-align: center;
-        }
-        .offer-wall-text h3 {
-            font-family: 'Poppins', sans-serif;
-            margin: 0 0 2px 0;
-            font-size: 16px;
-            font-weight: 600;
-            color: #e0e0e0;
-            text-shadow: none;
-        }
-        .offer-wall-text p {
-            margin: 0;
-            font-size: 14px;
-            color: #a0a0a0;
-        }
-        .offer-wall-action {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            flex-shrink: 0;
-            margin-left: 0;
-        }
-        .offer-wall-reward {
-            font-size: 16px;
-            font-weight: 700;
-            color: #f39c12;
-            background-color: rgba(243, 156, 18, 0.15);
-            padding: 4px 10px;
-            border-radius: 20px;
-            border: 1px solid rgba(243, 156, 18, 0.5);
-            white-space: nowrap;
-        }
-        .offer-wall-button {
-            background-color: #9b59b6;
-            color: #ffffff;
-            border: none;
-            padding: 8px 22px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 14px;
-            font-family: 'Poppins', sans-serif;
-            transition: all 0.2s ease;
-            white-space: nowrap;
-        }
-        .offer-wall-button:hover {
-            background-color: #8e44ad;
-            transform: translateY(-1px);
-        }
-
         .reward-task-card {
             display: flex;
             flex-direction: column;
@@ -1253,6 +1165,84 @@
         @media (max-width:420px){ .dvt-game-screen-styles .side-number{ font-size:56px; } .dvt-game-screen-styles .app{ width:340px; } }
         /* ===== END: DRAGON VS TIGER GAME CSS ===== */
 
+
+        /* ===== START: NEW OFFER PAGE STYLES ===== */
+        #new-offer-screen {
+          --primary-color: #6c63ff;
+          --secondary-color: #a4508b;
+          --dark-bg: #0e1220;
+          --card-bg: #1b2133;
+          --text-light: #fff;
+          --text-muted: #a0a0a0;
+          --status-pending: #f39c12;
+          --status-completed: #2ecc71;
+          --status-rejected: #e74c3c;
+          background-color: var(--dark-bg);
+          color: var(--text-light);
+          padding: 0;
+          justify-content: flex-start;
+        }
+        
+        #new-offer-screen #mainContainer { padding: 20px; width: 100%; height: calc(100% - 65px); overflow-y: auto;}
+        #new-offer-screen #mainContainer p { width: 100%; text-align: center; opacity: 0.8; font-size: 16px; color: var(--text-muted);}
+        #new-offer-screen h3 { font-size: 1.2rem; color: #fff; text-align: left; text-shadow: none; margin-bottom: 15px;}
+        
+        #new-offer-screen .tabs { display: flex; justify-content: center; margin: 0 auto 20px auto; background: var(--card-bg); border-radius: 12px; width: 100%; max-width: 600px; padding: 5px; box-sizing: border-box; }
+        #new-offer-screen .tab { flex: 1; text-align: center; padding: 12px 0; border-radius: 10px; font-weight: 600; cursor: pointer; transition: 0.3s; font-size: 0.9rem; }
+        #new-offer-screen .tab.active { background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); }
+
+        #new-offer-screen #taskContainer { width: 100%; max-width: 600px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
+
+        #new-offer-screen .task-card-list { width: 100%; background: var(--card-bg); border-radius: 16px; padding: 18px; display: flex; align-items: center; justify-content: space-between; transition: transform 0.3s; box-sizing: border-box; }
+        #new-offer-screen .task-card-list:hover { transform: scale(1.02); }
+        #new-offer-screen .task-left { display: flex; align-items: center; }
+        #new-offer-screen .task-logo { width: 50px; height: 50px; border-radius: 12px; background: #272e47; display: flex; align-items: center; justify-content: center; margin-right: 15px; flex-shrink: 0; }
+        #new-offer-screen .task-logo img { width: 35px; height: 35px; border-radius: 8px; }
+        #new-offer-screen .task-info h3 { margin: 0; font-size: 1rem; }
+        #new-offer-screen .task-info p { margin: 4px 0 0; color: var(--text-muted); font-size: 0.9rem; }
+        #new-offer-screen .task-btn { background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); border: none; padding: 10px 18px; color: #fff; font-weight: 600; border-radius: 10px; cursor: pointer; }
+        #new-offer-screen .grid-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
+        #new-offer-screen .task-card-grid { width: 110px; height: 160px; border-radius: 15px; background-size: cover; background-position: center; display: flex; align-items: flex-end; justify-content: center; padding: 10px; font-weight: 600; text-align: center; text-shadow: 0 2px 4px rgba(0,0,0,0.8); cursor: pointer; transition: transform 0.2s; box-sizing: border-box; }
+        #new-offer-screen .task-card-grid:hover { transform: scale(1.05); }
+
+        #new-offer-screen .app-install-container { align-items: flex-start; align-content: flex-start; }
+        #new-offer-screen .offerwall-card { background-color: var(--card-bg); border-radius: 10px; padding: 8px; width: 95px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); text-align: center; position: relative; overflow: hidden; cursor: pointer; }
+        #new-offer-screen .offer-logo { width: 100%; height: 65px; border-radius: 6px; overflow: hidden; margin-bottom: 6px; }
+        #new-offer-screen .offer-logo img { width: 100%; height: 100%; object-fit: cover; }
+        #new-offer-screen .offer-title { font-size: 0.7rem; font-weight: 600; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        #new-offer-screen .offer-provider { font-size: 0.6rem; color: #8a92b1; margin: 2px 0; }
+        #new-offer-screen .offer-reward { display: flex; align-items: center; justify-content: center; gap: 3px; font-weight: 600; margin-top: 4px; font-size: 0.75rem; }
+        #new-offer-screen .offer-reward img { width: 14px; height: 14px; }
+        
+        #new-offer-screen .offer-details-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(27, 33, 51, 0.95); backdrop-filter: blur(5px); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 15px; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 10; }
+        #new-offer-screen .offer-details-overlay.show { opacity: 1; visibility: visible; }
+        #new-offer-screen .details-reward-circle { width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(145deg, #6c63ff, #a4508b); color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 700; font-size: 1rem; margin-bottom: 10px; flex-shrink: 0; }
+        #new-offer-screen .details-reward-circle small { font-size: 0.6rem; font-weight: 500; }
+        #new-offer-screen .details-description { font-size: 0.8rem; text-align: center; color: #c0c8e7; margin: 0 0 15px 0; overflow-y: auto; flex-grow: 1; }
+        #new-offer-screen .install-btn { background: #11998e; border: none; padding: 10px 20px; border-radius: 8px; color: white; font-weight: 600; cursor: pointer; flex-shrink: 0; }
+        #new-offer-screen .close-btn { position: absolute; top: 5px; right: 10px; font-size: 1.5rem; color: #fff; cursor: pointer; }
+
+        #new-offer-screen .status-badge { padding: 4px 10px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; color: white; }
+        #new-offer-screen .status-pending { background-color: var(--status-pending); }
+        #new-offer-screen .status-completed { background-color: var(--status-completed); }
+        #new-offer-screen .status-rejected { background-color: var(--status-rejected); }
+
+        #new-offer-screen .support-container { display: flex; flex-direction: column; height: 100%; max-height: calc(100vh - 120px); box-sizing: border-box; }
+        #new-offer-screen .message-history { flex-grow: 1; overflow-y: auto; padding: 10px; border: 1px solid var(--card-bg); border-radius: 10px; margin-bottom: 15px; display:flex; flex-direction:column; }
+        #new-offer-screen .message { padding: 8px 12px; border-radius: 18px; margin-bottom: 8px; max-width: 80%; word-wrap: break-word; }
+        #new-offer-screen .user-message { background: var(--primary-color); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+        #new-offer-screen .admin-message { background: var(--card-bg); color: var(--text-light); align-self: flex-start; border-bottom-left-radius: 4px; }
+        #new-offer-screen .message-form { display: flex; gap: 10px; }
+        #new-offer-screen .message-input { flex-grow: 1; background: var(--card-bg); border: 1px solid #333; color: white; padding: 12px; border-radius: 10px; font-size: 1rem; }
+        #new-offer-screen .send-btn { background: var(--primary-color); border: none; padding: 0 20px; border-radius: 10px; color: white; font-weight: 600; cursor: pointer; }
+
+        #new-offer-screen .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--card-bg); display: flex; justify-content: space-around; padding: 10px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.3); z-index: 1000; padding-bottom: env(safe-area-inset-bottom, 10px); }
+        #new-offer-screen .nav-item { flex: 1; text-align: center; cursor: pointer; color: var(--text-muted); transition: color 0.3s; }
+        #new-offer-screen .nav-item.active { color: var(--primary-color); }
+        #new-offer-screen .nav-item svg { width: 24px; height: 24px; }
+        #new-offer-screen .nav-item p { margin: 4px 0 0; font-size: 0.7rem; font-weight: 500; }
+        /* ===== END: NEW OFFER PAGE STYLES ===== */
+
     </style>
 </head>
 <body>
@@ -1352,21 +1342,29 @@
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
         
-        <div id="offer-wall-screen" class="screen scrollable-screen hidden">
-            <div class="offer-submission-prompt">
-                <p>After completing any offer, send a screenshot with your User ID to our support for verification.</p>
-                <div class="user-id-container">
-                    Your User ID: <strong id="user-id-display-offer"></strong> 
-                    <span class="copy-id-btn" title="Copy User ID">📋</span>
+        <!-- ===== START: NEW OFFER PAGE HTML ===== -->
+        <div id="new-offer-screen" class="screen hidden">
+            <div id="mainContainer"></div>
+            <div class="bottom-nav">
+                <div class="nav-item" id="new-offer-home-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z"></path></svg>
+                    <p>Home</p>
                 </div>
-                <a href="https://t.me/Costumer_123" target="_blank" class="send-screenshot-btn">Send Offer Screenshot</a>
+                <div class="nav-item active" data-page="tasks">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M3,4H21V6H3V4M3,11H21V13H3V11M3,18H21V20H3V18Z"></path></svg>
+                    <p>Tasks</p>
+                </div>
+                <div class="nav-item" data-page="completed">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z"></path></svg>
+                    <p>Completed</p>
+                </div>
+                <div class="nav-item" data-page="support">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2Z"></path></svg>
+                    <p>Support</p>
+                </div>
             </div>
-
-            <div id="offer-wall-container" class="offer-wall-container">
-                 <p style="color: #6c757d; text-align: center;">Loading offers...</p>
-            </div>
-            <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
+        <!-- ===== END: NEW OFFER PAGE HTML ===== -->
 
         <div id="tasks-screen" class="screen hidden">
             <h2>📝 Offers & Tasks 📝</h2>
@@ -1548,7 +1546,7 @@
         <div class="nav-container">
             <div class="nav-button active" data-screen="game-screen"><span class="nav-icon">🏚️</span><span class="nav-text">Home</span></div>
             <div class="nav-button" data-screen="tournament-screen"><span class="nav-icon">🏆</span><span class="nav-text">All</span></div>
-            <div class="nav-button" id="offer-nav-button" data-screen="offer-wall-screen"><span class="nav-icon">📲</span><span class="nav-text">Offer</span></div>
+            <div class="nav-button" id="offer-nav-button" data-screen="new-offer-screen"><span class="nav-icon">📲</span><span class="nav-text">Offer</span></div>
             <div class="nav-button" data-screen="ads-screen"><span class="nav-icon">📺</span><span class="nav-text">ADS</span></div>
             <div class="nav-button" data-screen="gift-screen"><span class="nav-icon">🎁</span><span class="nav-text">Gift</span></div>
             <div class="nav-button" data-screen="wallet-screen"><span class="nav-icon">🏛️</span><span class="nav-text">Wallet</span></div>
@@ -2040,7 +2038,277 @@
             });
             observer.observe(document.getElementById('game-screen'), { attributes: true });
         }
+        
+        // ===== START: NEW OFFER PAGE SCRIPT =====
+        let newOfferScreenInitialized = false;
+        function initializeNewOfferScreen() {
+            if (newOfferScreenInitialized) {
+                // If already initialized, just make sure the default page is shown
+                showNewOfferPage('tasks');
+                return;
+            }
+            
+            const offerScreen = document.getElementById('new-offer-screen');
+            const mainContainer = offerScreen.querySelector('#mainContainer');
+            const navItems = offerScreen.querySelectorAll('.nav-item');
+            const homeButton = offerScreen.querySelector('#new-offer-home-btn');
 
+            function showNewOfferPage(pageId) {
+                mainContainer.innerHTML = '';
+                navItems.forEach(item => {
+                    if (item.dataset.page) { // Ensure we don't try to toggle the home button
+                        item.classList.toggle('active', item.dataset.page === pageId)
+                    }
+                });
+                switch (pageId) {
+                    case 'tasks': renderTasksPage(); break;
+                    case 'completed': renderCompletedPage(); break;
+                    case 'support': renderSupportPage(); break;
+                }
+            }
+            
+            function renderTasksPage() {
+                mainContainer.innerHTML = `
+                    <div class="tabs">
+                        <div class="tab active" data-task-type="tasks">Tasks</div>
+                        <div class="tab" data-task-type="appInstalls">App Install</div>
+                        <div class="tab" data-task-type="dailyTasks">Daily Tasks</div>
+                    </div>
+                    <div id="taskContainer"><p>Loading...</p></div>`;
+                const taskTabs = mainContainer.querySelectorAll('.tab');
+                taskTabs.forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        taskTabs.forEach(t => t.classList.remove('active'));
+                        tab.classList.add('active');
+                        loadAndDisplayTasks(tab.dataset.taskType);
+                    });
+                });
+                loadAndDisplayTasks('tasks');
+            }
+            
+            function renderCompletedPage() {
+                mainContainer.innerHTML = `<h3>My Task Status</h3><div id="completedTaskContainer"><p>Loading your tasks...</p></div>`;
+                const container = document.getElementById('completedTaskContainer');
+                const appInstallsRef = database.ref('appInstalls');
+                const userTasksRef = database.ref('userTasks/' + userId);
+
+                appInstallsRef.once('value').then(appInstallsSnapshot => {
+                    const appInstallsData = appInstallsSnapshot.val() || {};
+                    userTasksRef.on('value', (snapshot) => {
+                        container.innerHTML = '';
+                        if (!snapshot.exists()) {
+                            container.innerHTML = "<p>You haven't started any tasks yet.</p>";
+                            return;
+                        }
+                        const userTasks = snapshot.val();
+                        let hasTasks = false;
+                        Object.values(userTasks).forEach(userTask => {
+                            const taskDetails = appInstallsData[userTask.taskId];
+                            if (taskDetails) {
+                                hasTasks = true;
+                                container.appendChild(renderUserTaskCard(userTask, taskDetails));
+                            }
+                        });
+                        if (!hasTasks) {
+                           container.innerHTML = "<p>You haven't started any tasks yet.</p>";
+                        }
+                    });
+                }).catch(error => {
+                    console.error("Error loading completed tasks:", error);
+                    container.innerHTML = "<p>Could not load tasks. Please try again.</p>";
+                });
+            }
+
+            function renderUserTaskCard(userTask, taskDetails) {
+                const card = document.createElement("div");
+                card.className = "task-card-list"; 
+
+                let statusText = 'Pending';
+                let statusClass = 'status-pending';
+
+                if (userTask.status === 'completed') {
+                    statusText = 'Completed';
+                    statusClass = 'status-completed';
+                } else if (userTask.status === 'rejected') {
+                    statusText = 'Rejected';
+                    statusClass = 'status-rejected';
+                }
+
+                card.innerHTML = `
+                    <div class="task-left">
+                        <div class="task-logo"><img src="${taskDetails.image}" alt="${taskDetails.name}"></div>
+                        <div class="task-info">
+                            <h3>${taskDetails.name}</h3>
+                            <p>💰 ${taskDetails.reward || 0} Coins</p>
+                        </div>
+                    </div>
+                    <div class="status-badge ${statusClass}">${statusText}</div>`;
+                return card;
+            }
+
+            function renderSupportPage() {
+                mainContainer.innerHTML = `<h3>Support Chat</h3><div class="support-container"><div class="message-history" id="messageHistory"><p>Loading...</p></div><form class="message-form" id="messageForm"><input type="text" id="messageInput" class="message-input" placeholder="Type..." required><button type="submit" class="send-btn">Send</button></form></div>`;
+                document.getElementById('messageForm').addEventListener('submit', sendMessage);
+                loadMessages();
+            }
+            
+            function loadMessages() {
+                const historyContainer = document.getElementById('messageHistory');
+                const messagesRef = database.ref('supportMessages/' + userId);
+                messagesRef.on('value', (snapshot) => {
+                    historyContainer.innerHTML = '';
+                    if (snapshot.exists()) {
+                        snapshot.forEach(childSnapshot => {
+                            const messageData = childSnapshot.val();
+                            const messageDiv = document.createElement('div');
+                            messageDiv.className = `message ${messageData.from === 'user' ? 'user-message' : 'admin-message'}`;
+                            messageDiv.textContent = messageData.text;
+                            historyContainer.appendChild(messageDiv);
+                        });
+                    } else { historyContainer.innerHTML = '<p>No messages yet.</p>'; }
+                    historyContainer.scrollTop = historyContainer.scrollHeight;
+                });
+            }
+
+            function sendMessage(event) {
+                event.preventDefault();
+                const messageInput = document.getElementById('messageInput');
+                const messageText = messageInput.value.trim();
+                if (messageText === '' || !userId) return;
+                database.ref('supportMessages/' + userId).push({
+                    text: messageText, from: 'user', timestamp: firebase.database.ServerValue.TIMESTAMP
+                }).then(() => { messageInput.value = ''; }).catch(error => { console.error(error); alert("Could not send."); });
+            }
+
+            function loadAndDisplayTasks(tabName) {
+              const container = document.getElementById('taskContainer');
+              if (!container) return;
+              container.innerHTML = "<p>Loading...</p>";
+              container.className = ''; 
+              
+              if (tabName === 'appInstalls') {
+                  container.classList.add('app-install-container');
+                  database.ref('appInstalls').once('value').then(snapshot => {
+                      container.innerHTML = "";
+                      if (snapshot.exists()) {
+                          let activeTasksFound = false;
+                          snapshot.forEach(childSnapshot => {
+                              const taskId = childSnapshot.key;
+                              const task = childSnapshot.val();
+                              if (task.active) {
+                                  activeTasksFound = true;
+                                  container.appendChild(renderOfferwallCard(task, taskId));
+                              }
+                          });
+                          if(!activeTasksFound) container.innerHTML = "<p>No apps to install.</p>";
+                      } else { container.innerHTML = "<p>No apps found.</p>"; }
+                  });
+                  return;
+              }
+              
+              database.ref(`settings/${tabName}View`).once('value').then((settingSnapshot) => {
+                  const viewMode = settingSnapshot.exists() ? settingSnapshot.val() : 'list';
+                  database.ref(tabName).once('value').then((taskSnapshot) => {
+                      container.innerHTML = "";
+                      if (viewMode === 'grid') container.classList.add('grid-container');
+                      if (taskSnapshot.exists()) {
+                          let activeTasksFound = false;
+                          taskSnapshot.forEach((childSnapshot) => {
+                              const t = childSnapshot.val();
+                              if (t.active) {
+                                  activeTasksFound = true;
+                                  container.appendChild((viewMode === 'grid') ? renderGridCard(t) : renderListCard(t));
+                              }
+                          });
+                           if(!activeTasksFound) container.innerHTML = "<p>No active tasks found.</p>";
+                      } else { container.innerHTML = "<p>No tasks found.</p>"; }
+                  });
+              });
+            }
+
+            function startAppInstallTask(taskId, taskLink) {
+                if (!userId || !taskId) return;
+                const userTasksRef = database.ref(`userTasks/${userId}`);
+                const q = userTasksRef.orderByChild('taskId').equalTo(taskId);
+                q.once('value').then(snapshot => {
+                    if (snapshot.exists()) {
+                        alert("You have already started this task. Check the 'Completed' page for status.");
+                    } else {
+                        const newUserTaskRef = userTasksRef.push();
+                        newUserTaskRef.set({
+                            taskId: taskId,
+                            status: 'pending',
+                            timestamp: firebase.database.ServerValue.TIMESTAMP
+                        });
+                        alert("Task started! We will review your completion. Check the 'Completed' page for status.");
+                    }
+                    window.open(taskLink, '_blank');
+                });
+            }
+
+            function renderOfferwallCard(task, taskId) {
+                const card = document.createElement("div");
+                card.className = "offerwall-card";
+                const coinIconURL = "https://img.icons8.com/fluency/48/coin.png";
+
+                card.innerHTML = `
+                    <div class="offer-logo"><img src="${task.image}" alt="${task.name}"></div>
+                    <h3 class="offer-title">${task.name}</h3>
+                    <p class="offer-provider">${task.provider}</p>
+                    <div class="offer-reward"><img src="${coinIconURL}" alt="coin"><span>${task.reward}</span></div>
+                    
+                    <div class="offer-details-overlay">
+                        <span class="close-btn">&times;</span>
+                        <div class="details-reward-circle">
+                            <span>${task.reward}</span>
+                            <small>Coins</small>
+                        </div>
+                        <p class="details-description">${task.description || 'Install the app to earn rewards.'}</p>
+                        <button class="install-btn">Install</button>
+                    </div>
+                `;
+                
+                const overlay = card.querySelector('.offer-details-overlay');
+                const installButton = card.querySelector('.install-btn');
+                const closeButton = card.querySelector('.close-btn');
+
+                card.addEventListener('click', (e) => {
+                    if (e.target === installButton || e.target === closeButton) return;
+                    overlay.classList.add('show');
+                });
+                closeButton.addEventListener('click', (e) => { e.stopPropagation(); overlay.classList.remove('show'); });
+                installButton.addEventListener('click', (e) => { e.stopPropagation(); startAppInstallTask(taskId, task.link); });
+                return card;
+            }
+
+            function renderListCard(task) {
+                const card = document.createElement("div");
+                card.className = "task-card-list";
+                card.innerHTML = `<div class="task-left"><div class="task-logo"><img src="${task.image}" alt=""></div><div class="task-info"><h3>${task.name}</h3> <p>💰 ${task.reward || 0} Coins</p></div></div><button class="task-btn">View ›</button>`;
+                card.querySelector(".task-btn").addEventListener("click", () => window.open(task.link, "_blank"));
+                return card;
+            }
+
+            function renderGridCard(task) {
+                const card = document.createElement("div");
+                card.className = "task-card-grid";
+                card.style.backgroundImage = `linear-gradient(to top, rgba(0,0,0,0.8), transparent 50%), url('${task.image}')`;
+                card.textContent = task.name;
+                card.addEventListener("click", () => window.open(task.link, "_blank"));
+                return card;
+            }
+
+            navItems.forEach(item => {
+                if (item.dataset.page) {
+                    item.addEventListener('click', () => showNewOfferPage(item.dataset.page))
+                }
+            });
+            homeButton.addEventListener('click', () => showScreen('game-screen'));
+
+            showNewOfferPage('tasks'); // Initial page load
+            newOfferScreenInitialized = true;
+        }
+        // ===== END: NEW OFFER PAGE SCRIPT =====
 
         document.addEventListener('DOMContentLoaded', () => {
             // ===== START: NEW FIREBASE LOADING SCREEN SCRIPT =====
@@ -2165,13 +2433,11 @@
                 tournamentAdProgress: document.getElementById('tournament-ad-progress'),
                 tournamentWatchAdBtn: document.getElementById('tournament-watch-ad-btn'),
                 tournamentAdCancelBtn: document.getElementById('tournament-ad-cancel-btn'),
-                offerWallContainer: document.getElementById('offer-wall-container'),
                 rewardsHubButton: document.getElementById('rewards-hub-button'),
                 rewardsHubScreen: document.getElementById('rewards-hub-screen'),
                 joinTelegramLink: document.getElementById('join-telegram-link'),
                 claimTelegramRewardBtn: document.getElementById('claim-telegram-reward-btn'),
                 claimDailyBonusBtn: document.getElementById('claim-daily-bonus-btn'),
-                userIdDisplayOffer: document.getElementById('user-id-display-offer'),
                 walletPlayerName: document.getElementById('wallet-player-name'),
                 walletBalance: document.getElementById('wallet-balance'),
                 walletUsdValue: document.getElementById('wallet-usd-value'),
@@ -2234,29 +2500,7 @@
             // ===== END: NEW SOUND FUNCTIONALITY =====
 
             elements.dailyTasksSideButton.addEventListener('click', () => showScreen('daily-tasks-screen'));
-
-            document.querySelector('.copy-id-btn').addEventListener('click', () => {
-                if (userId) {
-                    const originalAlert = window.alert;
-                    window.alert = function(msg) {
-                        if (msg.includes('Copied to your clipboard!')) {
-                            originalAlert('User ID Copied!');
-                        } else {
-                            originalAlert(msg);
-                        }
-                    };
-                    copyTextToClipboard(userId);
-                    window.alert = originalAlert;
-                    
-                    const copyBtn = document.querySelector('.copy-id-btn');
-                    const originalIcon = copyBtn.textContent;
-                    copyBtn.textContent = '✅';
-                    setTimeout(() => {
-                        copyBtn.textContent = originalIcon;
-                    }, 1500);
-                }
-            });
-
+            
             let gameSettings = {
                 withdrawalsLocked: false,
                 withdrawalButtonText: 'Withdraw All Coins',
@@ -2467,25 +2711,20 @@
                     }
                 },
                 
-                loadImages: async function() {
+                loadImages: function() {
                     const settingsRef = database.ref('dvt_settings/images');
-                    try {
-                        const snapshot = await settingsRef.once('value');
+                    settingsRef.once('value').then(snapshot => {
                         if (snapshot.exists()) {
                             const images = snapshot.val();
-                            if (images.left) {
-                                this.elements.leftSide.style.backgroundImage = `url('${images.left}')`;
-                            }
-                            if (images.right) {
-                                this.elements.rightSide.style.backgroundImage = `url('${images.right}')`;
-                            }
+                            if (images.left) this.elements.leftSide.style.backgroundImage = `url('${images.left}')`;
+                            if (images.right) this.elements.rightSide.style.backgroundImage = `url('${images.right}')`;
                         } else {
                             this.elements.leftSide.style.backgroundImage = `url('https://i.imgur.com/r33y2b2.jpeg')`;
                             this.elements.rightSide.style.backgroundImage = `url('https://i.imgur.com/i4n29i6.jpeg')`;
                         }
-                    } catch (error) {
+                    }).catch(error => {
                         console.error("DVT Game: Error loading images from Firebase", error);
-                    }
+                    });
                 },
 
                 resetUI: function() {
@@ -2629,46 +2868,24 @@
                     }, 1000);
                 },
                 
-                // ===== FINAL CORRECTED LOGIC HERE (With 40% win chance and anti-high-bet) =====
                 playRound: function() {
                     let a, b;
                     let playerChoice = this.state.selectedSide;
                     const betAmount = this.state.currentBetAmount;
                     const totalBalance = this.state.balance;
-
-                    // Yahan WIN CHANCE set hoga
-                    let winChance = 0.40; // Default win chance 40%
-
-                    // Agar bet balance ka 30% se zyada hai, to jeetne ka chance 10% kar do
+                    let winChance = 0.40;
                     if (betAmount >= totalBalance * 0.3) {
-                        winChance = 0.10; // High bet ke liye 10% win chance
+                        winChance = 0.10;
                     }
 
-                    // Player ko jeetana hai ya harana hai, decide karo
                     if (Math.random() < winChance) {
-                        // Player ko jitao
-                        if (playerChoice === 'left') {
-                            a = this.randInt(6, 10);
-                            b = this.randInt(1, 5);
-                        } else { // Player ne right chuna hai
-                            a = this.randInt(1, 5);
-                            b = this.randInt(6, 10);
-                        }
+                        if (playerChoice === 'left') { a = this.randInt(6, 10); b = this.randInt(1, 5); } 
+                        else { a = this.randInt(1, 5); b = this.randInt(6, 10); }
                     } else {
-                        // Player ko harao
-                        if (playerChoice === 'left') {
-                            a = this.randInt(1, 5);
-                            b = this.randInt(6, 10);
-                        } else { // Player ne right chuna hai
-                            a = this.randInt(6, 10);
-                            b = this.randInt(1, 5);
-                        }
+                        if (playerChoice === 'left') { a = this.randInt(1, 5); b = this.randInt(6, 10); } 
+                        else { a = this.randInt(6, 10); b = this.randInt(1, 5); }
                     }
-
-                    // Tie se bachne ke liye
-                    if (a === b) {
-                        if (a < 10) a++; else a--;
-                    }
+                    if (a === b) { if (a < 10) a++; else a--; }
                     
                     this.elements.leftNum.textContent = a;
                     this.elements.rightNum.textContent = '...';
@@ -2676,13 +2893,11 @@
                     
                     setTimeout(() => {
                         this.elements.rightNum.textContent = b;
-                        
                         setTimeout(() => {
                             const winnerSide = (a > b) ? 'left' : 'right';
                             this.settleOutcome({ winner: winnerSide, a, b });
-                        }, 2000); // 2-second delay before showing win/loss
-
-                    }, 1500); // 1.5-second delay before showing right number
+                        }, 2000);
+                    }, 1500);
                 },
                 
                 settleOutcome: function({ winner, a, b }) {
@@ -2694,21 +2909,19 @@
                     
                     if (userWon) {
                         const grossGain = Math.round(bet * this.state.payoutMultiplier);
-                        const netGain = grossGain - bet; // Sirf jeeta hua extra paisa
+                        const netGain = grossGain - bet;
                         this.state.balance += netGain;
                         this.elements.messageEl.innerHTML = `YOU WIN! +${netGain.toLocaleString()} coins. (E=${a} M=${b})`;
                         this.elements.messageEl.className = 'result win';
                     } else {
-                        this.state.balance -= bet; // Haarne par bet amount minus hoga
+                        this.state.balance -= bet;
                         this.elements.messageEl.innerHTML = `YOU LOSE! -${bet.toLocaleString()} coins. (E=${a} M=${b})`;
                         this.elements.messageEl.className = 'result lose';
                     }
 
-                    // SYNC WITH MAIN GAME STATE
                     state.score = this.state.balance;
-                    saveGame({ score: state.score }); // Firebase mein save karein
+                    saveGame({ score: state.score });
                     this.updateBalanceDisplay();
-                    
                     this.resetUI();
                     
                     const flashEl = winner === 'left' ? this.elements.leftSide : this.elements.rightSide;
@@ -2872,7 +3085,7 @@
 
                 const claimCode = claimSettings.claim1 ? claimSettings.claim1.code : null;
                 if (!claimCode) return;
-
+                
                 const snapshot = await database.ref(`Users/${userId}/redeemedGiftCodes`).once('value');
                 const userRedemptions = snapshot.val() || {};
                 
@@ -3023,49 +3236,6 @@
                 renderRewardsHubScreen();
                 alert('You have claimed your daily bonus of 20 coins!');
             });
-
-            function loadAndDisplayAppOffers() {
-                const offersRef = database.ref('appOffers');
-                const container = elements.offerWallContainer;
-                container.innerHTML = '<p style="color: #6c757d; text-align: center;">Loading offers...</p>';
-
-                offersRef.once('value').then(snapshot => {
-                    container.innerHTML = ''; 
-                    let activeOffersFound = false;
-                    if (snapshot.exists()) {
-                        snapshot.forEach(childSnapshot => {
-                            const offerData = childSnapshot.val();
-                            if (offerData && offerData.isActive) {
-                                activeOffersFound = true;
-                                const offerElement = document.createElement('div');
-                                offerElement.className = 'offer-wall-item';
-                                offerElement.innerHTML = `
-                                    <img src="${offerData.icon}" alt="${offerData.title} Icon">
-                                    <div class="offer-wall-text">
-                                        <h3>${offerData.title}</h3>
-                                        <p>${offerData.description}</p>
-                                    </div>
-                                    <div class="offer-wall-action">
-                                        <div class="offer-wall-reward">
-                                            <strong>+${new Intl.NumberFormat().format(offerData.reward || 0)}</strong> 🪙
-                                        </div>
-                                        <a href="${offerData.link}" target="_blank" class="offer-wall-button">Start</a>
-                                    </div>
-                                `;
-                                container.appendChild(offerElement);
-                            }
-                        });
-                    }
-                    
-                    if (!activeOffersFound) {
-                        container.innerHTML = '<p style="color: #6c757d; text-align: center;">No offers available right now. Check back later!</p>';
-                    }
-
-                }).catch(error => {
-                    console.error("Error loading app offers:", error);
-                    container.innerHTML = '<p style="color: red; text-align: center;">Could not load offers.</p>';
-                });
-            }
 
             function loadAndDisplayTournaments() {
                 const tournamentsRef = database.ref('tournaments');
@@ -3371,11 +3541,27 @@
             elements.closeNotificationBtn.addEventListener('click', closeAndClearNotifications);
 
             function showScreen(screenId) {
+                const mainNav = document.querySelector('.nav-container');
+                const topBar = document.querySelector('.top-bar-container');
+                const diamondDisplay = document.getElementById('diamond-display');
+                const notificationBell = document.getElementById('notification-bell');
+                
+                if (screenId === 'new-offer-screen') {
+                    mainNav.style.display = 'none';
+                    topBar.style.display = 'none';
+                    diamondDisplay.style.display = 'none';
+                    notificationBell.style.display = 'none';
+                } else {
+                    mainNav.style.display = 'flex';
+                    topBar.style.display = 'block';
+                    diamondDisplay.style.display = 'flex';
+                    notificationBell.style.display = 'flex';
+                }
+
                 if (miningCountdownInterval) {
                     clearInterval(miningCountdownInterval);
                     miningCountdownInterval = null;
                 }
-                // Stop DVT background music if leaving the game screen
                 if (dvtGame.elements.bgSound && !dvtGame.elements.bgSound.paused) {
                     dvtGame.elements.bgSound.pause();
                 }
@@ -3398,11 +3584,11 @@
 
                 if (screenId === 'game-screen') { initMiningClockAndGalaxy(); renderMiningButton(); }
                 else if (screenId === 'wallet-screen') { renderNewWalletScreen(); } 
-                else if (screenId === 'offer-wall-screen') { loadAndDisplayAppOffers(); } 
+                else if (screenId === 'new-offer-screen') { initializeNewOfferScreen(); }
                 else if (screenId === 'tasks-screen') { loadAndDisplayOffers(); } 
                 else if (screenId === 'tournament-screen') { loadAndDisplayTournaments(); } 
                 else if (screenId === 'rewards-hub-screen') { renderRewardsHubScreen(); }
-                else if (screenId === 'dvt-game-screen') { dvtGame.init(state.score); } // MODIFIED: Initialize DVT game with current score
+                else if (screenId === 'dvt-game-screen') { dvtGame.init(state.score); }
                 else if (screenId === 'diamond-screen') { renderDiamondScreen(); }
                 else if (screenId === 'ads-screen') { renderAdsScreen(); }
                 else if (screenId === 'gift-screen') { loadClaimSettings(); }
@@ -3494,10 +3680,6 @@
 
                     updateDisplay();
                     updatePlayerNameDisplay();
-
-                    if (elements.userIdDisplayOffer) {
-                        elements.userIdDisplayOffer.textContent = userId;
-                    }
                     
                     if (isNewUser) {
                         database.ref(`Users/${userId}/messages`).on('child_added', (msgSnapshot) => {
@@ -3536,7 +3718,6 @@
             elements.confirmNameButton.addEventListener('click', () => { const newName = elements.newNameInput.value.trim(); if (newName && newName !== "") { state.playerName = newName; updatePlayerNameDisplay(); saveGame({ Name: newName }); elements.nameChangePopup.style.display = 'none'; } else { alert("Name cannot be empty!"); } });
             elements.cancelNameButton.addEventListener('click', () => elements.nameChangePopup.style.display = 'none');
             
-            // ===== MODIFIED: Wallet screen and withdrawal lock logic =====
             function renderNewWalletScreen() {
                 const MIN_WITHDRAWAL_COINS = 10000;
                 const withdrawBtn = elements.walletOpenOptionsBtn;
@@ -3827,7 +4008,6 @@
                 });
             }
 
-            // MODIFIED: This button now opens the DVT game
             elements.miningButton.addEventListener('click', () => {
                 showScreen('dvt-game-screen');
             });
