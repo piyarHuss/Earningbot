@@ -683,7 +683,6 @@
             cursor: pointer;
             transition: all 0.2s ease;
         }
-        /* MODIFIED: Added disabled styles for the withdrawal button */
         #wallet-screen .ws-btn:disabled {
             background: #555;
             cursor: not-allowed;
@@ -1140,8 +1139,8 @@
           background-size: cover;
           background-position: center;
           overflow: hidden;
-          background-image: none; /* Default image ko hata diya */
-          background-color: #0c1a29; /* Placeholder color */
+          background-image: none;
+          background-color: #0c1a29;
         }
         .dvt-game-screen-styles .side::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(7, 24, 38, 0.7); z-index: 1; }
         .dvt-game-screen-styles .side > * { position: relative; z-index: 2; }
@@ -1165,83 +1164,103 @@
         @media (max-width:420px){ .dvt-game-screen-styles .side-number{ font-size:56px; } .dvt-game-screen-styles .app{ width:340px; } }
         /* ===== END: DRAGON VS TIGER GAME CSS ===== */
 
-
-        /* ===== START: NEW OFFER PAGE STYLES ===== */
-        #new-offer-screen {
-          --primary-color: #6c63ff;
-          --secondary-color: #a4508b;
-          --dark-bg: #0e1220;
-          --card-bg: #1b2133;
-          --text-light: #fff;
-          --text-muted: #a0a0a0;
-          --status-pending: #f39c12;
-          --status-completed: #2ecc71;
-          --status-rejected: #e74c3c;
-          background-color: var(--dark-bg);
-          color: var(--text-light);
-          padding: 0;
-          justify-content: flex-start;
+        /* ===== START: NEW OFFERWALL PAGE STYLES (FROM USER) ===== */
+        #offerwall-screen {
+            --primary-color: #6c63ff;
+            --secondary-color: #a4508b;
+            --dark-bg: #0e1220;
+            --card-bg: #1b2133;
+            --text-light: #fff;
+            --text-muted: #a0a0a0;
+            --status-pending: #f39c12;
+            --status-completed: #2ecc71;
+            --status-rejected: #e74c3c;
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            padding: 0;
+            justify-content: flex-start;
         }
+        #offerwall-screen #mainContainer { padding: 20px; width: 100%; height: 100%; overflow-y: auto; padding-bottom: 80px; box-sizing: border-box; }
+        #offerwall-screen #mainContainer p { width: 100%; text-align: center; opacity: 0.8; font-size: 16px; color: var(--text-muted);}
+        #offerwall-screen h3 { font-size: 1.2rem; color: #fff; text-align: left; text-shadow: none; margin-bottom: 15px;}
         
-        #new-offer-screen #mainContainer { padding: 20px; width: 100%; height: calc(100% - 65px); overflow-y: auto;}
-        #new-offer-screen #mainContainer p { width: 100%; text-align: center; opacity: 0.8; font-size: 16px; color: var(--text-muted);}
-        #new-offer-screen h3 { font-size: 1.2rem; color: #fff; text-align: left; text-shadow: none; margin-bottom: 15px;}
-        
-        #new-offer-screen .tabs { display: flex; justify-content: center; margin: 0 auto 20px auto; background: var(--card-bg); border-radius: 12px; width: 100%; max-width: 600px; padding: 5px; box-sizing: border-box; }
-        #new-offer-screen .tab { flex: 1; text-align: center; padding: 12px 0; border-radius: 10px; font-weight: 600; cursor: pointer; transition: 0.3s; font-size: 0.9rem; }
-        #new-offer-screen .tab.active { background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); }
-
-        #new-offer-screen #taskContainer { width: 100%; max-width: 600px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
-
-        #new-offer-screen .task-card-list { width: 100%; background: var(--card-bg); border-radius: 16px; padding: 18px; display: flex; align-items: center; justify-content: space-between; transition: transform 0.3s; box-sizing: border-box; }
-        #new-offer-screen .task-card-list:hover { transform: scale(1.02); }
-        #new-offer-screen .task-left { display: flex; align-items: center; }
-        #new-offer-screen .task-logo { width: 50px; height: 50px; border-radius: 12px; background: #272e47; display: flex; align-items: center; justify-content: center; margin-right: 15px; flex-shrink: 0; }
-        #new-offer-screen .task-logo img { width: 35px; height: 35px; border-radius: 8px; }
-        #new-offer-screen .task-info h3 { margin: 0; font-size: 1rem; }
-        #new-offer-screen .task-info p { margin: 4px 0 0; color: var(--text-muted); font-size: 0.9rem; }
-        #new-offer-screen .task-btn { background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); border: none; padding: 10px 18px; color: #fff; font-weight: 600; border-radius: 10px; cursor: pointer; }
-        #new-offer-screen .grid-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
-        #new-offer-screen .task-card-grid { width: 110px; height: 160px; border-radius: 15px; background-size: cover; background-position: center; display: flex; align-items: flex-end; justify-content: center; padding: 10px; font-weight: 600; text-align: center; text-shadow: 0 2px 4px rgba(0,0,0,0.8); cursor: pointer; transition: transform 0.2s; box-sizing: border-box; }
-        #new-offer-screen .task-card-grid:hover { transform: scale(1.05); }
-
-        #new-offer-screen .app-install-container { align-items: flex-start; align-content: flex-start; }
-        #new-offer-screen .offerwall-card { background-color: var(--card-bg); border-radius: 10px; padding: 8px; width: 95px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); text-align: center; position: relative; overflow: hidden; cursor: pointer; }
-        #new-offer-screen .offer-logo { width: 100%; height: 65px; border-radius: 6px; overflow: hidden; margin-bottom: 6px; }
-        #new-offer-screen .offer-logo img { width: 100%; height: 100%; object-fit: cover; }
-        #new-offer-screen .offer-title { font-size: 0.7rem; font-weight: 600; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        #new-offer-screen .offer-provider { font-size: 0.6rem; color: #8a92b1; margin: 2px 0; }
-        #new-offer-screen .offer-reward { display: flex; align-items: center; justify-content: center; gap: 3px; font-weight: 600; margin-top: 4px; font-size: 0.75rem; }
-        #new-offer-screen .offer-reward img { width: 14px; height: 14px; }
-        
-        #new-offer-screen .offer-details-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(27, 33, 51, 0.95); backdrop-filter: blur(5px); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 15px; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 10; }
-        #new-offer-screen .offer-details-overlay.show { opacity: 1; visibility: visible; }
-        #new-offer-screen .details-reward-circle { width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(145deg, #6c63ff, #a4508b); color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 700; font-size: 1rem; margin-bottom: 10px; flex-shrink: 0; }
-        #new-offer-screen .details-reward-circle small { font-size: 0.6rem; font-weight: 500; }
-        #new-offer-screen .details-description { font-size: 0.8rem; text-align: center; color: #c0c8e7; margin: 0 0 15px 0; overflow-y: auto; flex-grow: 1; }
-        #new-offer-screen .install-btn { background: #11998e; border: none; padding: 10px 20px; border-radius: 8px; color: white; font-weight: 600; cursor: pointer; flex-shrink: 0; }
-        #new-offer-screen .close-btn { position: absolute; top: 5px; right: 10px; font-size: 1.5rem; color: #fff; cursor: pointer; }
-
-        #new-offer-screen .status-badge { padding: 4px 10px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; color: white; }
-        #new-offer-screen .status-pending { background-color: var(--status-pending); }
-        #new-offer-screen .status-completed { background-color: var(--status-completed); }
-        #new-offer-screen .status-rejected { background-color: var(--status-rejected); }
-
-        #new-offer-screen .support-container { display: flex; flex-direction: column; height: 100%; max-height: calc(100vh - 120px); box-sizing: border-box; }
-        #new-offer-screen .message-history { flex-grow: 1; overflow-y: auto; padding: 10px; border: 1px solid var(--card-bg); border-radius: 10px; margin-bottom: 15px; display:flex; flex-direction:column; }
-        #new-offer-screen .message { padding: 8px 12px; border-radius: 18px; margin-bottom: 8px; max-width: 80%; word-wrap: break-word; }
-        #new-offer-screen .user-message { background: var(--primary-color); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
-        #new-offer-screen .admin-message { background: var(--card-bg); color: var(--text-light); align-self: flex-start; border-bottom-left-radius: 4px; }
-        #new-offer-screen .message-form { display: flex; gap: 10px; }
-        #new-offer-screen .message-input { flex-grow: 1; background: var(--card-bg); border: 1px solid #333; color: white; padding: 12px; border-radius: 10px; font-size: 1rem; }
-        #new-offer-screen .send-btn { background: var(--primary-color); border: none; padding: 0 20px; border-radius: 10px; color: white; font-weight: 600; cursor: pointer; }
-
-        #new-offer-screen .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--card-bg); display: flex; justify-content: space-around; padding: 10px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.3); z-index: 1000; padding-bottom: env(safe-area-inset-bottom, 10px); }
-        #new-offer-screen .nav-item { flex: 1; text-align: center; cursor: pointer; color: var(--text-muted); transition: color 0.3s; }
-        #new-offer-screen .nav-item.active { color: var(--primary-color); }
-        #new-offer-screen .nav-item svg { width: 24px; height: 24px; }
-        #new-offer-screen .nav-item p { margin: 4px 0 0; font-size: 0.7rem; font-weight: 500; }
-        /* ===== END: NEW OFFER PAGE STYLES ===== */
+        #offerwall-screen .tabs { display: flex; justify-content: center; margin: 0 auto 20px auto; background: var(--card-bg); border-radius: 12px; width: 100%; max-width: 600px; padding: 5px; box-sizing: border-box; }
+        #offerwall-screen .tab { flex: 1; text-align: center; padding: 12px 0; border-radius: 10px; font-weight: 600; cursor: pointer; transition: 0.3s; font-size: 0.9rem; }
+        #offerwall-screen .tab.active { background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); }
+        #offerwall-screen #taskContainer { width: 100%; max-width: 600px; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
+        #offerwall-screen .task-card-list { width: 100%; background: var(--card-bg); border-radius: 16px; padding: 18px; display: flex; align-items: center; justify-content: space-between; transition: transform 0.3s; box-sizing: border-box; }
+        #offerwall-screen .task-card-list:hover { transform: scale(1.02); }
+        #offerwall-screen .task-left { display: flex; align-items: center; }
+        #offerwall-screen .task-logo { width: 50px; height: 50px; border-radius: 12px; background: #272e47; display: flex; align-items: center; justify-content: center; margin-right: 15px; flex-shrink: 0; }
+        #offerwall-screen .task-logo img { width: 35px; height: 35px; border-radius: 8px; }
+        #offerwall-screen .task-info h3 { margin: 0; font-size: 1rem; }
+        #offerwall-screen .task-info p { margin: 4px 0 0; color: var(--text-muted); font-size: 0.9rem; }
+        #offerwall-screen .task-btn { background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); border: none; padding: 10px 18px; color: #fff; font-weight: 600; border-radius: 10px; cursor: pointer; }
+        #offerwall-screen .grid-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
+        #offerwall-screen .task-card-grid { width: 110px; height: 160px; border-radius: 15px; background-size: cover; background-position: center; display: flex; align-items: flex-end; justify-content: center; padding: 10px; font-weight: 600; text-align: center; text-shadow: 0 2px 4px rgba(0,0,0,0.8); cursor: pointer; transition: transform 0.2s; box-sizing: border-box; }
+        #offerwall-screen .task-card-grid:hover { transform: scale(1.05); }
+        #offerwall-screen .app-install-container { align-items: flex-start; align-content: flex-start; }
+        #offerwall-screen .offerwall-card { background-color: var(--card-bg); border-radius: 10px; padding: 8px; width: 95px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); text-align: center; position: relative; overflow: hidden; cursor: pointer; }
+        #offerwall-screen .offer-logo { width: 100%; height: 65px; border-radius: 6px; overflow: hidden; margin-bottom: 6px; }
+        #offerwall-screen .offer-logo img { width: 100%; height: 100%; object-fit: cover; }
+        #offerwall-screen .offer-title { font-size: 0.7rem; font-weight: 600; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        #offerwall-screen .offer-provider { font-size: 0.6rem; color: #8a92b1; margin: 2px 0; }
+        #offerwall-screen .offer-reward { display: flex; align-items: center; justify-content: center; gap: 3px; font-weight: 600; margin-top: 4px; font-size: 0.75rem; }
+        #offerwall-screen .offer-reward img { width: 14px; height: 14px; }
+        #offerwall-screen .offer-page-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #1a1a2e; z-index: 2000; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 20px; box-sizing: border-box; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; }
+        #offerwall-screen .offer-page-overlay.show { opacity: 1; visibility: visible; }
+        #offerwall-screen .offer-page-content { display: flex; flex-direction: column; align-items: center; text-align: center; width: 100%; max-width: 400px; margin-top: 5vh; flex-grow: 1; overflow-y: auto; }
+        #offerwall-screen .offer-page-close-btn { position: absolute; top: 20px; right: 20px; font-size: 2rem; color: #fff; cursor: pointer; line-height: 1; z-index: 10; }
+        #offerwall-screen .offer-page-reward-circle { width: 130px; height: 130px; border-radius: 50%; background: linear-gradient(145deg, #a4508b, #6c63ff); color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 700; font-size: 2rem; box-shadow: 0 0 25px rgba(164, 80, 139, 0.6); flex-shrink: 0; }
+        #offerwall-screen .offer-page-reward-circle small { font-size: 1rem; font-weight: 500; margin-top: 5px; text-transform: capitalize; }
+        #offerwall-screen .offer-page-title { font-size: 1.8rem; font-weight: 600; margin: 30px 0 10px 0; }
+        #offerwall-screen .offer-page-subtitle { font-size: 1rem; color: #c0c8e7; margin: 0 0 25px 0; font-weight: 500;}
+        #offerwall-screen .offer-page-steps { background-color: rgba(0, 0, 0, 0.2); border-radius: 12px; padding: 15px 20px; text-align: left; width: 100%; color: #e0e5ff; font-size: 0.9rem; line-height: 1.6; white-space: pre-line; border: 1px solid rgba(255, 255, 255, 0.1); }
+        #offerwall-screen .offer-page-start-btn { background-color: #1abc9c; border: none; width: 100%; max-width: 400px; padding: 15px 20px; border-radius: 12px; color: white; font-weight: 600; font-size: 1.1rem; cursor: pointer; margin-top: 20px; margin-bottom: 20px; flex-shrink: 0; }
+        #offerwall-screen .status-badge { padding: 4px 10px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; color: white; }
+        #offerwall-screen .status-pending { background-color: var(--status-pending); }
+        #offerwall-screen .status-completed { background-color: var(--status-completed); }
+        #offerwall-screen .status-rejected { background-color: var(--status-rejected); }
+        #offerwall-screen .support-container { display: flex; flex-direction: column; height: calc(100% - 40px); box-sizing: border-box; }
+        #offerwall-screen .message-history { flex-grow: 1; overflow-y: auto; padding: 10px; border: 1px solid var(--card-bg); border-radius: 10px; margin-bottom: 15px; display:flex; flex-direction:column; }
+        #offerwall-screen .message { padding: 8px 12px; border-radius: 18px; margin-bottom: 8px; max-width: 80%; word-wrap: break-word; }
+        #offerwall-screen .user-message { background: var(--primary-color); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+        #offerwall-screen .admin-message { background: var(--card-bg); color: var(--text-light); align-self: flex-start; border-bottom-left-radius: 4px; }
+        #offerwall-screen .message-form { display: flex; gap: 10px; }
+        #offerwall-screen .message-input { flex-grow: 1; background: var(--card-bg); border: 1px solid #333; color: white; padding: 12px; border-radius: 10px; font-size: 1rem; }
+        #offerwall-screen .send-btn { background: var(--primary-color); border: none; padding: 0 20px; border-radius: 10px; color: white; font-weight: 600; cursor: pointer; }
+        #offerwall-screen .bottom-nav { position: absolute; bottom: 0; left: 0; width: 100%; background-color: var(--card-bg); display: flex; justify-content: space-around; padding: 10px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.3); z-index: 1000; }
+        #offerwall-screen .nav-item { flex: 1; text-align: center; cursor: pointer; color: var(--text-muted); transition: color 0.3s; }
+        #offerwall-screen .nav-item.active { color: var(--primary-color); }
+        #offerwall-screen .nav-item svg { width: 24px; height: 24px; }
+        #offerwall-screen .nav-item p { margin: 4px 0 0; font-size: 0.7rem; font-weight: 500; }
+        /* NEW BACK BUTTON STYLE */
+        .offerwall-back-button {
+            position: fixed;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 45px;
+            height: 45px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border: 2px solid #6c63ff;
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 2001;
+            backdrop-filter: blur(5px);
+            transition: all 0.2s ease;
+        }
+        .offerwall-back-button:hover {
+            background-color: #6c63ff;
+            transform: translateY(-50%) scale(1.1);
+        }
+        /* ===== END: NEW OFFERWALL PAGE STYLES ===== */
 
     </style>
 </head>
@@ -1278,7 +1297,7 @@
 
         <div id="game-screen" class="screen">
             <!-- Side buttons are kept -->
-            <div id="mining-button">🎮</div> <!-- MODIFIED: Icon changed, functionality will be changed in JS -->
+            <div id="mining-button">🎮</div>
             <div id="rewards-hub-button">📦</div>
             <div id="daily-tasks-side-button">🔥</div>
         
@@ -1342,29 +1361,18 @@
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
         
-        <!-- ===== START: NEW OFFER PAGE HTML ===== -->
-        <div id="new-offer-screen" class="screen hidden">
+        <!-- ===== START: NEW OFFERWALL PAGE HTML ===== -->
+        <div id="offerwall-screen" class="screen hidden">
+            <div id="offerwall-back-button" class="offerwall-back-button">←</div>
             <div id="mainContainer"></div>
+            <div id="fullPageOffer" class="offer-page-overlay"></div>
             <div class="bottom-nav">
-                <div class="nav-item" id="new-offer-home-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z"></path></svg>
-                    <p>Home</p>
-                </div>
-                <div class="nav-item active" data-page="tasks">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M3,4H21V6H3V4M3,11H21V13H3V11M3,18H21V20H3V18Z"></path></svg>
-                    <p>Tasks</p>
-                </div>
-                <div class="nav-item" data-page="completed">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z"></path></svg>
-                    <p>Completed</p>
-                </div>
-                <div class="nav-item" data-page="support">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2Z"></path></svg>
-                    <p>Support</p>
-                </div>
+                <div class="nav-item active" data-page="tasks"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M3,4H21V6H3V4M3,11H21V13H3V11M3,18H21V20H3V18Z"></path></svg><p>Tasks</p></div>
+                <div class="nav-item" data-page="completed"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z"></path></svg><p>Completed</p></div>
+                <div class="nav-item" data-page="support"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2Z"></path></svg><p>Support</p></div>
             </div>
         </div>
-        <!-- ===== END: NEW OFFER PAGE HTML ===== -->
+        <!-- ===== END: NEW OFFERWALL PAGE HTML ===== -->
 
         <div id="tasks-screen" class="screen hidden">
             <h2>📝 Offers & Tasks 📝</h2>
@@ -1374,7 +1382,6 @@
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
         
-        <!-- ===== MODIFIED: Mining Screen is now the Dragon vs Tiger Game Screen ===== -->
         <div id="dvt-game-screen" class="screen scrollable-screen hidden dvt-game-screen-styles">
             <div class="app" role="application">
                 <header>
@@ -1546,7 +1553,7 @@
         <div class="nav-container">
             <div class="nav-button active" data-screen="game-screen"><span class="nav-icon">🏚️</span><span class="nav-text">Home</span></div>
             <div class="nav-button" data-screen="tournament-screen"><span class="nav-icon">🏆</span><span class="nav-text">All</span></div>
-            <div class="nav-button" id="offer-nav-button" data-screen="new-offer-screen"><span class="nav-icon">📲</span><span class="nav-text">Offer</span></div>
+            <div class="nav-button" id="offer-nav-button" data-screen="offerwall-screen"><span class="nav-icon">📲</span><span class="nav-text">Offer</span></div>
             <div class="nav-button" data-screen="ads-screen"><span class="nav-icon">📺</span><span class="nav-text">ADS</span></div>
             <div class="nav-button" data-screen="gift-screen"><span class="nav-icon">🎁</span><span class="nav-text">Gift</span></div>
             <div class="nav-button" data-screen="wallet-screen"><span class="nav-icon">🏛️</span><span class="nav-text">Wallet</span></div>
@@ -1599,18 +1606,14 @@
         </div>
     </div>
 
-    <!-- ===== START: UPDATED AUDIO ELEMENTS ===== -->
     <audio id="tap-sound" src="tap-sound.mp3" preload="auto"></audio>
     <audio id="mining-start-sound" src="mining-start-sound.mp3" preload="auto"></audio>
     <audio id="coin-sound" src="coin-sound.mp3" preload="auto"></audio>
-    <!-- Dragon vs Tiger Game Sounds -->
     <audio id="dvt-bg-sound" src="bg-sound.mp3" loop preload="auto"></audio>
     <audio id="dvt-timer-sound" src="timer-sound.mp3" preload="auto"></audio>
     <audio id="dvt-tap-sound" src="tap-sound.mp3" preload="auto"></audio>
     <audio id="dvt-left-win-sound" src="left-win-sound.mp3" preload="auto"></audio>
     <audio id="dvt-right-win-sound" src="right-win-sound.mp3" preload="auto"></audio>
-    <!-- ===== END: UPDATED AUDIO ELEMENTS ===== -->
-
     
     <div id="ad-frame-wrapper" style="display: none;">
         <div class="stage">
@@ -2039,27 +2042,24 @@
             observer.observe(document.getElementById('game-screen'), { attributes: true });
         }
         
-        // ===== START: NEW OFFER PAGE SCRIPT =====
-        let newOfferScreenInitialized = false;
-        function initializeNewOfferScreen() {
-            if (newOfferScreenInitialized) {
-                // If already initialized, just make sure the default page is shown
-                showNewOfferPage('tasks');
+        // ===== START: NEW OFFERWALL SCRIPT (ADAPTED FOR THIS GAME) =====
+        let offerwallScreenInitialized = false;
+        function initializeOfferwallScreen() {
+            if (offerwallScreenInitialized) {
+                showOfferwallPage('tasks');
                 return;
             }
             
-            const offerScreen = document.getElementById('new-offer-screen');
+            const offerScreen = document.getElementById('offerwall-screen');
             const mainContainer = offerScreen.querySelector('#mainContainer');
             const navItems = offerScreen.querySelectorAll('.nav-item');
-            const homeButton = offerScreen.querySelector('#new-offer-home-btn');
+            const backButton = offerScreen.querySelector('#offerwall-back-button');
 
-            function showNewOfferPage(pageId) {
+            backButton.addEventListener('click', () => showScreen('game-screen'));
+
+            function showOfferwallPage(pageId) {
                 mainContainer.innerHTML = '';
-                navItems.forEach(item => {
-                    if (item.dataset.page) { // Ensure we don't try to toggle the home button
-                        item.classList.toggle('active', item.dataset.page === pageId)
-                    }
-                });
+                navItems.forEach(item => item.classList.toggle('active', item.dataset.page === pageId));
                 switch (pageId) {
                     case 'tasks': renderTasksPage(); break;
                     case 'completed': renderCompletedPage(); break;
@@ -2068,13 +2068,7 @@
             }
             
             function renderTasksPage() {
-                mainContainer.innerHTML = `
-                    <div class="tabs">
-                        <div class="tab active" data-task-type="tasks">Tasks</div>
-                        <div class="tab" data-task-type="appInstalls">App Install</div>
-                        <div class="tab" data-task-type="dailyTasks">Daily Tasks</div>
-                    </div>
-                    <div id="taskContainer"><p>Loading...</p></div>`;
+                mainContainer.innerHTML = `<div class="tabs"><div class="tab active" data-task-type="tasks">Tasks</div><div class="tab" data-task-type="appInstalls">App Install</div><div class="tab" data-task-type="dailyTasks">Daily Tasks</div></div><div id="taskContainer"><p>Loading...</p></div>`;
                 const taskTabs = mainContainer.querySelectorAll('.tab');
                 taskTabs.forEach(tab => {
                     tab.addEventListener('click', () => {
@@ -2096,10 +2090,7 @@
                     const appInstallsData = appInstallsSnapshot.val() || {};
                     userTasksRef.on('value', (snapshot) => {
                         container.innerHTML = '';
-                        if (!snapshot.exists()) {
-                            container.innerHTML = "<p>You haven't started any tasks yet.</p>";
-                            return;
-                        }
+                        if (!snapshot.exists()) { container.innerHTML = "<p>You haven't started any tasks yet.</p>"; return; }
                         const userTasks = snapshot.val();
                         let hasTasks = false;
                         Object.values(userTasks).forEach(userTask => {
@@ -2113,43 +2104,21 @@
                            container.innerHTML = "<p>You haven't started any tasks yet.</p>";
                         }
                     });
-                }).catch(error => {
-                    console.error("Error loading completed tasks:", error);
-                    container.innerHTML = "<p>Could not load tasks. Please try again.</p>";
-                });
+                }).catch(error => { console.error("Error loading completed tasks:", error); container.innerHTML = "<p>Could not load tasks. Please try again.</p>"; });
             }
-
+            
             function renderUserTaskCard(userTask, taskDetails) {
-                const card = document.createElement("div");
-                card.className = "task-card-list"; 
-
-                let statusText = 'Pending';
-                let statusClass = 'status-pending';
-
-                if (userTask.status === 'completed') {
-                    statusText = 'Completed';
-                    statusClass = 'status-completed';
-                } else if (userTask.status === 'rejected') {
-                    statusText = 'Rejected';
-                    statusClass = 'status-rejected';
-                }
-
-                card.innerHTML = `
-                    <div class="task-left">
-                        <div class="task-logo"><img src="${taskDetails.image}" alt="${taskDetails.name}"></div>
-                        <div class="task-info">
-                            <h3>${taskDetails.name}</h3>
-                            <p>💰 ${taskDetails.reward || 0} Coins</p>
-                        </div>
-                    </div>
-                    <div class="status-badge ${statusClass}">${statusText}</div>`;
+                const card = document.createElement("div"); card.className = "task-card-list"; 
+                let statusText = 'Pending', statusClass = 'status-pending';
+                if (userTask.status === 'completed') { statusText = 'Completed'; statusClass = 'status-completed'; } 
+                else if (userTask.status === 'rejected') { statusText = 'Rejected'; statusClass = 'status-rejected'; }
+                card.innerHTML = `<div class="task-left"><div class="task-logo"><img src="${taskDetails.image}" alt="${taskDetails.name}"></div><div class="task-info"><h3>${taskDetails.name}</h3><p>💰 ${taskDetails.reward || 0} Coins</p></div></div><div class="status-badge ${statusClass}">${statusText}</div>`;
                 return card;
             }
 
             function renderSupportPage() {
                 mainContainer.innerHTML = `<h3>Support Chat</h3><div class="support-container"><div class="message-history" id="messageHistory"><p>Loading...</p></div><form class="message-form" id="messageForm"><input type="text" id="messageInput" class="message-input" placeholder="Type..." required><button type="submit" class="send-btn">Send</button></form></div>`;
-                document.getElementById('messageForm').addEventListener('submit', sendMessage);
-                loadMessages();
+                document.getElementById('messageForm').addEventListener('submit', sendMessage); loadMessages();
             }
             
             function loadMessages() {
@@ -2162,8 +2131,7 @@
                             const messageData = childSnapshot.val();
                             const messageDiv = document.createElement('div');
                             messageDiv.className = `message ${messageData.from === 'user' ? 'user-message' : 'admin-message'}`;
-                            messageDiv.textContent = messageData.text;
-                            historyContainer.appendChild(messageDiv);
+                            messageDiv.textContent = messageData.text; historyContainer.appendChild(messageDiv);
                         });
                     } else { historyContainer.innerHTML = '<p>No messages yet.</p>'; }
                     historyContainer.scrollTop = historyContainer.scrollHeight;
@@ -2172,40 +2140,28 @@
 
             function sendMessage(event) {
                 event.preventDefault();
-                const messageInput = document.getElementById('messageInput');
-                const messageText = messageInput.value.trim();
+                const messageInput = document.getElementById('messageInput'); const messageText = messageInput.value.trim();
                 if (messageText === '' || !userId) return;
-                database.ref('supportMessages/' + userId).push({
-                    text: messageText, from: 'user', timestamp: firebase.database.ServerValue.TIMESTAMP
-                }).then(() => { messageInput.value = ''; }).catch(error => { console.error(error); alert("Could not send."); });
+                database.ref('supportMessages/' + userId).push({ text: messageText, from: 'user', timestamp: firebase.database.ServerValue.TIMESTAMP }).then(() => { messageInput.value = ''; }).catch(error => { console.error(error); alert("Could not send."); });
             }
 
             function loadAndDisplayTasks(tabName) {
-              const container = document.getElementById('taskContainer');
-              if (!container) return;
-              container.innerHTML = "<p>Loading...</p>";
-              container.className = ''; 
-              
+              const container = document.getElementById('taskContainer'); container.innerHTML = "<p>Loading...</p>"; container.className = ''; 
               if (tabName === 'appInstalls') {
                   container.classList.add('app-install-container');
-                  database.ref('appInstalls').once('value').then(snapshot => {
+                  database.ref('appInstalls').once('value').then((snapshot) => {
                       container.innerHTML = "";
                       if (snapshot.exists()) {
                           let activeTasksFound = false;
                           snapshot.forEach(childSnapshot => {
-                              const taskId = childSnapshot.key;
-                              const task = childSnapshot.val();
-                              if (task.active) {
-                                  activeTasksFound = true;
-                                  container.appendChild(renderOfferwallCard(task, taskId));
-                              }
+                              const taskId = childSnapshot.key, task = childSnapshot.val();
+                              if (task.active) { activeTasksFound = true; container.appendChild(renderOfferwallCard(task, taskId)); }
                           });
                           if(!activeTasksFound) container.innerHTML = "<p>No apps to install.</p>";
                       } else { container.innerHTML = "<p>No apps found.</p>"; }
                   });
                   return;
               }
-              
               database.ref(`settings/${tabName}View`).once('value').then((settingSnapshot) => {
                   const viewMode = settingSnapshot.exists() ? settingSnapshot.val() : 'list';
                   database.ref(tabName).once('value').then((taskSnapshot) => {
@@ -2215,24 +2171,22 @@
                           let activeTasksFound = false;
                           taskSnapshot.forEach((childSnapshot) => {
                               const t = childSnapshot.val();
-                              if (t.active) {
-                                  activeTasksFound = true;
-                                  container.appendChild((viewMode === 'grid') ? renderGridCard(t) : renderListCard(t));
-                              }
+                              if (t.active) { activeTasksFound = true; container.appendChild((viewMode === 'grid') ? renderGridCard(t) : renderListCard(t)); }
                           });
                            if(!activeTasksFound) container.innerHTML = "<p>No active tasks found.</p>";
                       } else { container.innerHTML = "<p>No tasks found.</p>"; }
                   });
               });
             }
-
-            function startAppInstallTask(taskId, taskLink) {
+            
+            function startAppInstallTask(taskId) {
                 if (!userId || !taskId) return;
                 const userTasksRef = database.ref(`userTasks/${userId}`);
                 const q = userTasksRef.orderByChild('taskId').equalTo(taskId);
+                
                 q.once('value').then(snapshot => {
                     if (snapshot.exists()) {
-                        alert("You have already started this task. Check the 'Completed' page for status.");
+                        console.log(`User has already started task: ${taskId}`);
                     } else {
                         const newUserTaskRef = userTasksRef.push();
                         newUserTaskRef.set({
@@ -2240,75 +2194,67 @@
                             status: 'pending',
                             timestamp: firebase.database.ServerValue.TIMESTAMP
                         });
-                        alert("Task started! We will review your completion. Check the 'Completed' page for status.");
+                        console.log(`Task started and logged to DB for user: ${userId}, task: ${taskId}`);
                     }
-                    window.open(taskLink, '_blank');
                 });
             }
 
-            function renderOfferwallCard(task, taskId) {
-                const card = document.createElement("div");
-                card.className = "offerwall-card";
-                const coinIconURL = "https://img.icons8.com/fluency/48/coin.png";
-
-                card.innerHTML = `
-                    <div class="offer-logo"><img src="${task.image}" alt="${task.name}"></div>
-                    <h3 class="offer-title">${task.name}</h3>
-                    <p class="offer-provider">${task.provider}</p>
-                    <div class="offer-reward"><img src="${coinIconURL}" alt="coin"><span>${task.reward}</span></div>
-                    
-                    <div class="offer-details-overlay">
-                        <span class="close-btn">&times;</span>
-                        <div class="details-reward-circle">
-                            <span>${task.reward}</span>
-                            <small>Coins</small>
-                        </div>
-                        <p class="details-description">${task.description || 'Install the app to earn rewards.'}</p>
-                        <button class="install-btn">Install</button>
+            function showOfferPage(task, taskId) {
+                const offerPage = document.getElementById('fullPageOffer');
+                const descriptionText = task.description || 'Install and open the app to get your reward.';
+                offerPage.innerHTML = `
+                    <span class="offer-page-close-btn">&times;</span>
+                    <div class="offer-page-content">
+                        <div class="offer-page-reward-circle"><span>${task.reward}</span><small>Coins</small></div>
+                        <h2 class="offer-page-title">Complete the Task</h2>
+                        <p class="offer-page-subtitle">${task.name || 'High earning app'}</p>
+                        <div class="offer-page-steps">${descriptionText}</div>
                     </div>
+                    <button class="offer-page-start-btn">Start Task</button>
                 `;
-                
-                const overlay = card.querySelector('.offer-details-overlay');
-                const installButton = card.querySelector('.install-btn');
-                const closeButton = card.querySelector('.close-btn');
 
-                card.addEventListener('click', (e) => {
-                    if (e.target === installButton || e.target === closeButton) return;
-                    overlay.classList.add('show');
+                offerPage.querySelector('.offer-page-close-btn').addEventListener('click', () => {
+                    offerPage.classList.remove('show');
                 });
-                closeButton.addEventListener('click', (e) => { e.stopPropagation(); overlay.classList.remove('show'); });
-                installButton.addEventListener('click', (e) => { e.stopPropagation(); startAppInstallTask(taskId, task.link); });
+                
+                offerPage.querySelector('.offer-page-start-btn').addEventListener('click', () => {
+                    window.open(task.link, '_blank');
+                    startAppInstallTask(taskId);
+                    offerPage.classList.remove('show');
+                });
+
+                offerPage.classList.add('show');
+            }
+
+            function renderOfferwallCard(task, taskId) {
+                const card = document.createElement("div"); card.className = "offerwall-card";
+                const coinIconURL = "https://img.icons8.com/fluency/48/coin.png";
+                card.innerHTML = `<div class="offer-logo"><img src="${task.image}" alt="${task.name}"></div><h3 class="offer-title">${task.name}</h3><p class="offer-provider">${task.provider}</p><div class="offer-reward"><img src="${coinIconURL}" alt="coin"><span>${task.reward}</span></div>`;
+                card.addEventListener('click', () => { showOfferPage(task, taskId); });
                 return card;
             }
 
             function renderListCard(task) {
-                const card = document.createElement("div");
-                card.className = "task-card-list";
+                const card = document.createElement("div"); card.className = "task-card-list";
                 card.innerHTML = `<div class="task-left"><div class="task-logo"><img src="${task.image}" alt=""></div><div class="task-info"><h3>${task.name}</h3> <p>💰 ${task.reward || 0} Coins</p></div></div><button class="task-btn">View ›</button>`;
                 card.querySelector(".task-btn").addEventListener("click", () => window.open(task.link, "_blank"));
                 return card;
             }
 
             function renderGridCard(task) {
-                const card = document.createElement("div");
-                card.className = "task-card-grid";
+                const card = document.createElement("div"); card.className = "task-card-grid";
                 card.style.backgroundImage = `linear-gradient(to top, rgba(0,0,0,0.8), transparent 50%), url('${task.image}')`;
                 card.textContent = task.name;
                 card.addEventListener("click", () => window.open(task.link, "_blank"));
                 return card;
             }
 
-            navItems.forEach(item => {
-                if (item.dataset.page) {
-                    item.addEventListener('click', () => showNewOfferPage(item.dataset.page))
-                }
-            });
-            homeButton.addEventListener('click', () => showScreen('game-screen'));
-
-            showNewOfferPage('tasks'); // Initial page load
-            newOfferScreenInitialized = true;
+            navItems.forEach(item => item.addEventListener('click', () => showOfferwallPage(item.dataset.page)));
+            
+            showOfferwallPage('tasks');
+            offerwallScreenInitialized = true;
         }
-        // ===== END: NEW OFFER PAGE SCRIPT =====
+        // ===== END: NEW OFFERWALL SCRIPT =====
 
         document.addEventListener('DOMContentLoaded', () => {
             // ===== START: NEW FIREBASE LOADING SCREEN SCRIPT =====
@@ -2612,11 +2558,10 @@
                 const button = elements.miningControlButton;
 
                 if (state.isMiningActive) {
-                    // This is the "Claim" state
                     const timeRemaining = (state.miningStartTime + MINING_DURATION) - Date.now();
                     if (timeRemaining <= 0) {
                         state.score += MINING_REWARD;
-                        playSound('coin-sound'); // Play coin sound on claim
+                        playSound('coin-sound');
                         state.isMiningActive = false;
                         state.miningStartTime = 0;
                         state.miningAdsWatched = 0;
@@ -2633,7 +2578,6 @@
                 } else {
                     const adsWatched = state.miningAdsWatched || 0;
                     if (adsWatched < ADS_REQUIRED_FOR_MINING) {
-                        // This is the "Watch Ad" state
                         if (typeof show_9966767 !== 'function') {
                             alert("Ad function is not ready yet. Please wait a moment.");
                             return;
@@ -2653,8 +2597,7 @@
                         });
 
                     } else {
-                        // This is the "Start Mining" state
-                        playSound('mining-start-sound'); // Play mining sound on start
+                        playSound('mining-start-sound');
                         state.isMiningActive = true;
                         state.miningStartTime = Date.now();
                         saveGame({ isMiningActive: state.isMiningActive, miningStartTime: state.miningStartTime });
@@ -2664,7 +2607,6 @@
                 }
             });
             
-            // ===== START: DRAGON VS TIGER GAME LOGIC =====
             const dvtGame = {
                 elements: {
                     leftSide: document.getElementById('dvt-leftSide'),
@@ -2945,7 +2887,6 @@
                     return Math.floor(Math.random() * (max - min + 1)) + min;
                 }
             };
-            // ===== END: DRAGON VS TIGER GAME LOGIC =====
             
             async function loadDailyTaskData() {
                 try {
@@ -3026,7 +2967,7 @@
                     taskData.count++;
                     taskData.lastTime = now;
                     state.score += dailyTaskSettings.coinsPerTask;
-                    playSound('coin-sound'); // Play coin sound on task reward
+                    playSound('coin-sound');
                     
                     state.dailyTaskProgress[`task${taskId}`] = taskData;
                     
@@ -3133,7 +3074,7 @@
 
                     const coinsAwarded = parseInt(codeData.coins, 10);
                     state.score += coinsAwarded;
-                    playSound('coin-sound'); // Play coin sound on redeem
+                    playSound('coin-sound');
                     userRedemptions[code] = true;
                     
                     saveGame({ score: state.score, redeemedGiftCodes: userRedemptions });
@@ -3211,7 +3152,7 @@
                 }
                 
                 state.score += 99;
-                playSound('coin-sound'); // Play coin sound on Telegram reward
+                playSound('coin-sound');
                 state.telegramJoinedClaimed = true;
                 
                 saveGame({ score: state.score, Totalearning: state.score, telegramJoinedClaimed: true });
@@ -3228,7 +3169,7 @@
                 }
 
                 state.score += 20;
-                playSound('coin-sound'); // Play coin sound on daily bonus
+                playSound('coin-sound');
                 state.lastDailyBonusClaim = today;
 
                 saveGame({ score: state.score, Totalearning: state.score, lastDailyBonusClaim: today });
@@ -3546,7 +3487,8 @@
                 const diamondDisplay = document.getElementById('diamond-display');
                 const notificationBell = document.getElementById('notification-bell');
                 
-                if (screenId === 'new-offer-screen') {
+                // Hide main game UI for the self-contained offerwall screen
+                if (screenId === 'offerwall-screen') {
                     mainNav.style.display = 'none';
                     topBar.style.display = 'none';
                     diamondDisplay.style.display = 'none';
@@ -3584,7 +3526,7 @@
 
                 if (screenId === 'game-screen') { initMiningClockAndGalaxy(); renderMiningButton(); }
                 else if (screenId === 'wallet-screen') { renderNewWalletScreen(); } 
-                else if (screenId === 'new-offer-screen') { initializeNewOfferScreen(); }
+                else if (screenId === 'offerwall-screen') { initializeOfferwallScreen(); } // <-- INITIALIZE NEW SCREEN
                 else if (screenId === 'tasks-screen') { loadAndDisplayOffers(); } 
                 else if (screenId === 'tournament-screen') { loadAndDisplayTournaments(); } 
                 else if (screenId === 'rewards-hub-screen') { renderRewardsHubScreen(); }
@@ -3619,6 +3561,39 @@
 
                 const userRef = database.ref(`Users/${userId}`);
                 
+                // ===== START: NEW TASK COMPLETION REWARD LISTENER =====
+                const userTasksRef = database.ref('userTasks/' + userId);
+                const processCompletedTask = (taskSnapshot) => {
+                    const taskData = taskSnapshot.val();
+                    if (taskData && taskData.status === 'completed' && !taskData.rewardClaimed) {
+                        const taskId = taskData.taskId;
+                        const taskRef = database.ref('appInstalls/' + taskId);
+                        
+                        taskRef.once('value').then(appInstallSnapshot => {
+                            if (appInstallSnapshot.exists()) {
+                                const appData = appInstallSnapshot.val();
+                                const reward = parseInt(appData.reward, 10) || 0;
+
+                                if (reward > 0) {
+                                    const updates = {};
+                                    updates[`/Users/${userId}/score`] = firebase.database.ServerValue.increment(reward);
+                                    updates[`/Users/${userId}/Totalearning`] = firebase.database.ServerValue.increment(reward);
+                                    updates[`/userTasks/${userId}/${taskSnapshot.key}/rewardClaimed`] = true;
+                                    
+                                    database.ref().update(updates).then(() => {
+                                        const notificationText = `🎉 Task '${appData.name}' completed! You earned ${reward} coins.`;
+                                        alert(notificationText);
+                                        database.ref(`Users/${userId}/messages`).push({ text: notificationText });
+                                    });
+                                }
+                            }
+                        });
+                    }
+                };
+                userTasksRef.on('child_added', processCompletedTask);
+                userTasksRef.on('child_changed', processCompletedTask);
+                // ===== END: NEW TASK COMPLETION REWARD LISTENER =====
+
                 database.ref('withdrawalMethods').on('value', (snapshot) => {
                     withdrawalMethods = snapshot.val() || { upi: {}, usdt: {} };
                 });
@@ -3993,7 +3968,7 @@
 
                                 state.score += parseInt(slot.coins.split(' ')[0], 10) || 0;
                                 state.diamonds += parseInt(slot.diamonds.split(' ')[0], 10) || 0;
-                                playSound('coin-sound'); // Play coin sound on ad reward
+                                playSound('coin-sound');
                                 
                                 state.adsProgress[index] = userProgress;
                                 saveGame({
