@@ -9,8 +9,6 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Tap-Tap Coin Game</title>
-    <!-- Font Awesome for Referral Page Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
         /* ===== START: NEW LOADING SCREEN STYLES ===== */
         #firebase-loading-screen {
@@ -96,10 +94,6 @@
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@400;700&display=swap');
-        /* Google Fonts for Referral Page */
-        @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:wght@400;500;700&display=swap');
-
 
         html, body {
             height: 100%;
@@ -220,8 +214,7 @@
             100% { transform: scale(1); box-shadow: 0 0 5px rgba(243, 156, 18, 0.3); }
         }
 
-        /* --- STYLES FOR ALL SIDE BUTTONS --- */
-        #rewards-hub-button, #mining-button, #daily-tasks-side-button, #refer-button {
+        #rewards-hub-button, #mining-button, #daily-tasks-side-button {
             position: absolute;
             left: 20px;
             width: 40px; 
@@ -237,43 +230,33 @@
             transition: transform 0.2s, box-shadow 0.2s;
             animation: pulse-boost 2s infinite;
         }
-
-        #mining-button {
-            top: 130px;
-            background: linear-gradient(45deg, #f39c12, #e67e22);
-            box-shadow: 0 5px 15px rgba(243, 156, 18, 0.5);
-        }
         #rewards-hub-button {
             top: 180px;
             background: linear-gradient(45deg, #2ecc71, #27ae60);
             box-shadow: 0 5px 15px rgba(46, 204, 113, 0.5);
+        }
+        #mining-button {
+            top: 130px;
+            background: linear-gradient(45deg, #f39c12, #e67e22);
+            box-shadow: 0 5px 15px rgba(243, 156, 18, 0.5);
         }
         #daily-tasks-side-button {
             top: 230px;
             background: linear-gradient(45deg, #ff416c, #ff4b2b);
             box-shadow: 0 5px 15px rgba(255, 65, 108, 0.5);
         }
-        /* --- NEW REFER BUTTON STYLE --- */
-        #refer-button {
-            top: 280px;
-            background: linear-gradient(45deg, #3498db, #2980b9);
-            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.5);
-        }
 
-        #rewards-hub-button:hover, #mining-button:hover, #daily-tasks-side-button:hover, #refer-button:hover {
+        #rewards-hub-button:hover, #mining-button:hover, #daily-tasks-side-button:hover {
             transform: scale(1.1);
-        }
-         #mining-button:hover {
-            box-shadow: 0 8px 25px rgba(230, 126, 34, 0.7);
         }
          #rewards-hub-button:hover {
             box-shadow: 0 8px 25px rgba(39, 174, 96, 0.7);
         }
+         #mining-button:hover {
+            box-shadow: 0 8px 25px rgba(230, 126, 34, 0.7);
+        }
         #daily-tasks-side-button:hover {
             box-shadow: 0 8px 25px rgba(255, 75, 43, 0.7);
-        }
-        #refer-button:hover {
-            box-shadow: 0 8px 25px rgba(41, 128, 185, 0.7);
         }
 
         @keyframes pulse-boost {
@@ -1279,168 +1262,6 @@
         }
         /* ===== END: NEW OFFERWALL PAGE STYLES ===== */
 
-        /* ===== START: NEW TASK UNLOCKER PAGE STYLES ===== */
-        #task-unlocker-screen {
-            --background-color: #004445;
-            --primary-color: #FF57A5;
-            --text-color: #F0F0F0;
-            --dark-color: #0F0F0F;
-            background-color: var(--dark-color);
-            color: var(--text-color);
-            overflow: hidden;
-        }
-        #task-unlocker-screen #lock-overlay {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background-color: var(--background-color);
-            display: flex; justify-content: center; align-items: center;
-            z-index: 1000;
-            transition: opacity 0.5s ease;
-        }
-        #task-unlocker-screen .user-page {
-            background-color: rgba(0, 0, 0, 0.3);
-            padding: 40px 30px;
-            border-radius: 15px;
-            text-align: center;
-            border: 2px solid var(--primary-color);
-            box-shadow: 0 0 25px rgba(255, 87, 165, 0.6);
-            max-width: 500px;
-            width: 90%;
-        }
-        #task-unlocker-screen .user-page h1 {
-            font-family: 'Bebas Neue', cursive;
-            font-size: 2.5em;
-            color: var(--primary-color);
-            margin-bottom: 25px;
-            letter-spacing: 2px;
-            text-shadow: 0 0 10px var(--primary-color);
-        }
-        #task-unlocker-screen #tu-task-area { margin: 20px 0; display: block; }
-        #task-unlocker-screen .task-link {
-            display: inline-block;
-            padding: 12px 25px;
-            background-color: #f0f0f0;
-            color: var(--dark-color);
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: transform 0.2s;
-        }
-        #task-unlocker-screen .main-button {
-            font-family: 'Bebas Neue', cursive;
-            background-color: var(--primary-color);
-            color: var(--dark-color);
-            border: none;
-            padding: 15px 40px;
-            font-size: 1.8em;
-            font-weight: bold;
-            letter-spacing: 1px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            margin-top: 20px;
-            display: none;
-        }
-        #task-unlocker-screen #squid-animation-overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: radial-gradient(circle at center, #000 40%, #060017 100%);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-            overflow: hidden;
-        }
-        #task-unlocker-screen #squid-shape {
-            width: 150px;
-            height: 150px;
-            opacity: 0;
-            filter: drop-shadow(0 0 20px #ff57a5) drop-shadow(0 0 40px #ff57a5);
-            transform: scale(0);
-        }
-        #task-unlocker-screen #squid-shape.animate {
-            animation: squid-reveal 3s forwards cubic-bezier(0.77, 0, 0.175, 1);
-        }
-        #task-unlocker-screen #squid-animation-overlay::after {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(255, 87, 165, 0.15) 0%, transparent 70%);
-            animation: bg-pulse 2s infinite alternate ease-in-out;
-        }
-        @keyframes bg-pulse {
-            0% { opacity: 0.4; transform: scale(1); }
-            100% { opacity: 0.8; transform: scale(1.1); }
-        }
-        @keyframes squid-reveal {
-            0% { opacity: 0; transform: scale(0); border-radius: 50%; background: radial-gradient(circle, #ff57a5 20%, #a00057 100%); filter: drop-shadow(0 0 25px #ff57a5); }
-            10% { opacity: 1; transform: scale(1.2); border-radius: 50%; }
-            30% { transform: scale(1); filter: drop-shadow(0 0 30px #ff57a5); }
-            40% { border-radius: 0; clip-path: polygon(50% 0%, 0% 100%, 100% 100%); background: radial-gradient(circle, #00ffff 20%, #0077ff 100%); transform: scale(1.2) rotate(5deg); filter: drop-shadow(0 0 30px #00ffff); }
-            55% { transform: scale(1) rotate(-5deg); opacity: 1; }
-            70% { clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); background: radial-gradient(circle, #ffffff 20%, #d0d0d0 100%); transform: scale(1.3) rotate(0deg); filter: drop-shadow(0 0 50px #ffffff); }
-            85% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(25); opacity: 0; background-color: #ffffff; filter: drop-shadow(0 0 120px #ffffff); }
-        }
-        /* ===== END: NEW TASK UNLOCKER PAGE STYLES ===== */
-
-        /* ===== START: NEW REFERRAL PAGE STYLES ===== */
-        #referral-screen { 
-            background-color: #12121e; 
-            color: #e0e0e0; 
-            font-family: 'Roboto', sans-serif; 
-            padding: 0; 
-            justify-content: flex-start; 
-            min-height: 100vh;
-        }
-        #referral-screen .mobile-screen { width: 100%; height: 100%; max-width: 420px; background-color: #1e1e2f; box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); overflow: hidden; display: flex; flex-direction: column; }
-        #referral-screen .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; flex-shrink: 0; }
-        #referral-screen .header .user-info { display: flex; align-items: center; }
-        #referral-screen .header .user-info .fa-arrow-left { cursor: pointer; }
-        #referral-screen .header .user-info i { font-size: 20px; margin-right: 15px; }
-        #referral-screen .header .user-info .text-details .username { font-size: 18px; font-weight: 500; }
-        #referral-screen .header .user-info .text-details .timestamp { font-size: 12px; color: #888; }
-        #referral-screen .header .actions i { font-size: 20px; margin-left: 20px; cursor: pointer; }
-        #referral-screen .main-content { padding: 0 20px 20px 20px; flex-grow: 1; overflow-y: auto; }
-        #referral-screen .content-card { background-color: #2c2c3e; border-radius: 15px; padding: 20px; margin-bottom: 25px; }
-        #referral-screen .referral-card { display: flex; justify-content: space-between; align-items: center; }
-        #referral-screen .referral-card .code-info .code { font-size: 18px; font-weight: 500; letter-spacing: 1px; color: #fff; }
-        #referral-screen .referral-card .code-info .label { font-size: 14px; color: #a0a0a0; margin-top: 5px; }
-        #referral-screen .copy-btn { background-color: #4a7dff; color: white; border: none; border-radius: 25px; padding: 10px 20px; font-size: 14px; cursor: pointer; display: flex; align-items: center; transition: background-color 0.3s; }
-        #referral-screen .copy-btn:active { background-color: #3a6dcf; }
-        #referral-screen .copy-btn i { margin-left: 8px; }
-        #referral-screen .bonus-link { text-align: left; margin: 0 0 20px 5px; color: #a0a0a0; font-size: 16px; }
-        #referral-screen .stats-card { display: flex; justify-content: space-around; position: relative; }
-        #referral-screen .stat-item { text-align: left; flex-basis: 50%; z-index: 2; }
-        #referral-screen .stat-item .label { font-size: 16px; color: #a0a0a0; }
-        #referral-screen .stat-item .value { font-size: 22px; font-weight: 700; color: #fff; margin-top: 8px; display: flex; align-items: center; }
-        #referral-screen .stat-item .value i { color: #f1c40f; margin-right: 8px; }
-        #referral-screen .sticker-banner { position: absolute; background-color: white; color: #333; padding: 5px 15px; border-radius: 15px; font-family: 'Pacifico', cursive; font-size: 16px; transform: rotate(-8deg); top: -20px; left: 10px; box-shadow: 2px 2px 5px rgba(0,0,0,0.3); z-index: 1; }
-        #referral-screen .section-title { font-size: 18px; font-weight: 500; margin-bottom: 15px; color: #e0e0e0; }
-        #referral-screen .how-it-works ol { list-style: none; padding-left: 0; }
-        #referral-screen .how-it-works li { display: flex; align-items: center; margin-bottom: 15px; font-size: 14px; color: #c0c0c0; }
-        #referral-screen .how-it-works .step-number { background-color: #4a7dff; color: white; border-radius: 50%; min-width: 25px; height: 25px; display: inline-flex; justify-content: center; align-items: center; font-weight: 700; margin-right: 15px; }
-        #referral-screen .referral-list .referral-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #3a3a4a; }
-        #referral-screen .referral-list .referral-item:last-child { border-bottom: none; }
-        #referral-screen .referral-list .user-details { display: flex; align-items: center; }
-        #referral-screen .referral-list .user-details i { font-size: 18px; margin-right: 15px; color: #a0a0a0; }
-        #referral-screen .status { font-size: 14px; color: #2ecc71; font-weight: 500; }
-        #referral-screen .share-buttons { display: flex; justify-content: space-around; }
-        #referral-screen .share-btn { color: white; font-size: 24px; text-decoration: none; transition: transform 0.2s; }
-        #referral-screen .share-btn:hover { transform: scale(1.1); }
-        #referral-screen .share-btn.whatsapp { color: #25D366; }
-        #referral-screen .share-btn.telegram { color: #0088cc; }
-        #referral-screen .share-btn.twitter { color: #1DA1F2; }
-        #referral-screen .footer { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; flex-shrink: 0; }
-        #referral-screen .footer .emoji-btn i { font-size: 24px; cursor: pointer; }
-        #referral-screen .reply-btn { background-color: #3a3a4a; color: white; border: none; border-radius: 25px; padding: 10px 20px; font-weight: 500; cursor: pointer; display: flex; align-items: center; }
-        #referral-screen .reply-btn i { margin-right: 8px; }
-        /* ===== END: NEW REFERRAL PAGE STYLES ===== */
-
     </style>
 </head>
 <body>
@@ -1479,7 +1300,6 @@
             <div id="mining-button">🎮</div>
             <div id="rewards-hub-button">📦</div>
             <div id="daily-tasks-side-button">🔥</div>
-            <div id="refer-button">🫂</div>
         
             <!-- New Clock and Galaxy content -->
             <canvas id="galaxy"></canvas>
@@ -1615,26 +1435,6 @@
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
 
-        <!-- ===== START: NEW TASK UNLOCKER PAGE (INTEGRATED) ===== -->
-        <div id="task-unlocker-screen" class="screen hidden">
-            <div id="lock-overlay">
-                <div class="user-page">
-                    <h1 id="tu-instruction-text">Loading...</h1>
-                    <div id="tu-task-area">
-                        <p>Click the link below to complete your task:</p><br>
-                        <a href="#" id="tu-dummy-task" class="task-link" target="_blank">Complete Task</a>
-                    </div>
-                    <button id="tu-main-action-button" class="main-button">Open</button>
-                </div>
-            </div>
-            <div id="squid-animation-overlay">
-                <div id="squid-shape"></div>
-            </div>
-            <audio id="tu-unlock-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-unlock-game-notification-253.mp3" preload="auto"></audio>
-            <button class="back-button" data-screen="game-screen" style="position: absolute; bottom: 20px; z-index: 1001;">Back to Game</button>
-        </div>
-        <!-- ===== END: NEW TASK UNLOCKER PAGE (INTEGRATED) ===== -->
-        
         <div id="wallet-screen" class="screen hidden">
             <div class="ws-container">
                 <div class="ws-profile">
@@ -1744,83 +1544,11 @@
               </div>
               <div class="dt-list" id="daily-task-list-container"></div>
               <div class="dt-timerBox">
-                Next refresh: <span id="dt-refresh-timer">--:--:--</span>
+                अगला refresh: <span id="dt-refresh-timer">--:--:--</span>
               </div>
             </div>
             <button class="back-button" data-screen="game-screen">Back to Game</button>
         </div>
-
-        <!-- ===== NEW REFERRAL SCREEN HTML ===== -->
-        <div id="referral-screen" class="screen hidden">
-             <div class="mobile-screen">
-                <header class="header">
-                    <div class="user-info">
-                        <i class="fas fa-arrow-left"></i>
-                        <div class="text-details">
-                            <div class="username">You</div>
-                            <div class="timestamp">Just now</div>
-                        </div>
-                    </div>
-                    <div class="actions">
-                        <i class="far fa-star"></i>
-                        <i class="fas fa-share"></i>
-                        <i class="fas fa-ellipsis-v"></i>
-                    </div>
-                </header>
-                
-                <main class="main-content">
-                    <div class="content-card referral-card">
-                        <div class="code-info">
-                            <div id="referral-code" class="code">Loading...</div>
-                            <div class="label">Your Referral code</div>
-                        </div>
-                        <button class="copy-btn" id="copy-btn">COPY LINK <i class="fas fa-link"></i></button>
-                    </div>
-
-                    <p id="bonus-link-text" class="bonus-link">Loading...</p>
-
-                    <div class="content-card stats-card">
-                        <div id="sticker-banner-text" class="sticker-banner">Loading...</div>
-                        <div class="stat-item">
-                            <div class="label">Bonus earned</div>
-                            <div id="bonus-earned" class="value"><i class="fas fa-coins"></i> 0</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="label">Friends referred</div>
-                            <div id="friends-referred" class="value"><i class="fas fa-user-friends"></i>&nbsp;0</div>
-                        </div>
-                    </div>
-
-                    <div class="content-card how-it-works">
-                        <h3 id="how-it-works-title" class="section-title">Loading...</h3>
-                        <ol id="how-it-works-list"></ol>
-                    </div>
-                    
-                    <div class="content-card my-referrals">
-                        <h3 id="my-referrals-title" class="section-title">Loading...</h3>
-                        <div class="referral-list" id="referral-list">
-                            <p style="text-align: center; color: #a0a0a0;">No referrals yet.</p>
-                        </div>
-                    </div>
-
-                    <div class="content-card share-section">
-                        <h3 class="section-title">Share Your Link</h3>
-                        <div class="share-buttons">
-                            <a href="#" class="share-btn whatsapp"><i class="fab fa-whatsapp"></i></a>
-                            <a href="#" class="share-btn telegram"><i class="fab fa-telegram-plane"></i></a>
-                            <a href="#" class="share-btn twitter"><i class="fab fa-twitter"></i></a>
-                            <a href="#" class="share-btn"><i class="fas fa-comment-dots"></i></a>
-                        </div>
-                    </div>
-                </main>
-
-                <footer class="footer">
-                    <div class="emoji-btn"><i class="far fa-smile"></i></div>
-                    <button class="reply-btn"><i class="fas fa-reply"></i> Reply</button>
-                </footer>
-            </div>
-        </div>
-        <!-- ===== END OF REFERRAL SCREEN HTML ===== -->
 
         <div class="nav-container">
             <div class="nav-button active" data-screen="game-screen"><span class="nav-icon">🏚️</span><span class="nav-text">Home</span></div>
@@ -1878,14 +1606,14 @@
         </div>
     </div>
 
-    <audio id="tap-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-game-ball-tap-2073.mp3" preload="auto"></audio>
-    <audio id="mining-start-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-futuristic-interface-sound-2511.mp3" preload="auto"></audio>
-    <audio id="coin-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-retro-arcade-casino-notification-211.mp3" preload="auto"></audio>
-    <audio id="dvt-bg-sound" src="https://assets.mixkit.co/music/preview/mixkit-a-very-happy-christmas-897.mp3" loop preload="auto"></audio>
-    <audio id="dvt-timer-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-short-tick-tock-of-a-clock-2213.mp3" preload="auto"></audio>
-    <audio id="dvt-tap-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-game-ball-tap-2073.mp3" preload="auto"></audio>
-    <audio id="dvt-left-win-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-video-game-win-2016.mp3" preload="auto"></audio>
-    <audio id="dvt-right-win-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-ethereal-fairy-win-sound-2019.mp3" preload="auto"></audio>
+    <audio id="tap-sound" src="tap-sound.mp3" preload="auto"></audio>
+    <audio id="mining-start-sound" src="mining-start-sound.mp3" preload="auto"></audio>
+    <audio id="coin-sound" src="coin-sound.mp3" preload="auto"></audio>
+    <audio id="dvt-bg-sound" src="bg-sound.mp3" loop preload="auto"></audio>
+    <audio id="dvt-timer-sound" src="timer-sound.mp3" preload="auto"></audio>
+    <audio id="dvt-tap-sound" src="tap-sound.mp3" preload="auto"></audio>
+    <audio id="dvt-left-win-sound" src="left-win-sound.mp3" preload="auto"></audio>
+    <audio id="dvt-right-win-sound" src="right-win-sound.mp3" preload="auto"></audio>
     
     <div id="ad-frame-wrapper" style="display: none;">
         <div class="stage">
@@ -1924,8 +1652,6 @@
         };
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
-
-        const TELEGRAM_BOT_BASE_URL = 'https://t.me/Squid_456_bot';
 
         let isAdCurrentlyShowing = false; 
 
@@ -2101,22 +1827,41 @@
             return result;
         }
         
-        function copyTextToClipboard(text, buttonElement) {
-            navigator.clipboard.writeText(text).then(() => {
-                if (buttonElement) {
-                    const originalText = buttonElement.innerHTML;
-                    buttonElement.innerHTML = 'COPIED! <i class="fas fa-check"></i>';
-                    setTimeout(() => { buttonElement.innerHTML = originalText; }, 2000);
-                }
-                 else {
-                    alert('Link Copied!');
-                }
-            }).catch(err => {
-                console.error('Failed to copy text: ', err);
-                alert('Could not copy link. Please copy it manually.');
-            });
+        function copyTextToClipboard(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('Copied to your clipboard!');
+                }).catch(err => {
+                    console.error('Modern copy failed, trying fallback: ', err);
+                    fallbackCopyTextToClipboard(text);
+                });
+            } else {
+                fallbackCopyTextToClipboard(text);
+            }
         }
 
+        function fallbackCopyTextToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.top = '-9999px';
+            textArea.style.left = '-9999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    alert('Copied to your clipboard!');
+                } else {
+                    alert('Could not copy. Please copy it manually.');
+                }
+            } catch (err) {
+                console.error('Fallback copy failed: ', err);
+                alert('Could not copy. Please copy it manually.');
+            }
+            document.body.removeChild(textArea);
+        }
 
         function handleIncomingReferral() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -2136,14 +1881,12 @@
                     const referrerUserRef = database.ref(`Users/${referrerId}`);
                     referrerUserRef.transaction(userData => {
                         if (userData) {
-                            userData.score = (userData.score || 0) + 400;
-                            userData.Totalearning = (userData.Totalearning || 0) + 400;
-                            userData.referralsMade = (userData.referralsMade || 0) + 1;
-                            userData.referralBonusEarned = (userData.referralBonusEarned || 0) + 400;
+                            userData.score = (userData.score || 0) + 700;
+                            userData.Totalearning = (userData.Totalearning || 0) + 700;
                         }
                         return userData;
                     });
-                    console.log(`Credited 400 coins to referrer ${referrerId}`);
+                    console.log(`Credited 700 coins to referrer ${referrerId}`);
                 }
             });
         }
@@ -2513,99 +2256,6 @@
         }
         // ===== END: NEW OFFERWALL SCRIPT =====
 
-        // ===== START: NEW TASK UNLOCKER SCRIPT =====
-        let taskUnlockerInitialized = false;
-        function initializeTaskUnlockerScreen() {
-            if (taskUnlockerInitialized) {
-                return;
-            }
-
-            const screen = document.getElementById('task-unlocker-screen');
-            const instructionText = screen.querySelector('#tu-instruction-text');
-            const mainButton = screen.querySelector('#tu-main-action-button');
-            const taskArea = screen.querySelector('#tu-task-area');
-            const dummyTask = screen.querySelector('#tu-dummy-task');
-            const unlockSound = screen.querySelector('#tu-unlock-sound');
-            const squidOverlay = screen.querySelector('#squid-animation-overlay');
-            const squidShape = screen.querySelector('#squid-shape');
-
-            function logTaskUnlockerAction(action) {
-                database.ref('activityLogs/taskUnlocker').push({
-                    id: userId,
-                    action: action,
-                    timestamp: firebase.database.ServerValue.TIMESTAMP
-                });
-            }
-
-            function showUnlockedUI(settings) {
-                instructionText.textContent = settings.unlockedHeading || 'Task Complete! You Can Proceed';
-                mainButton.textContent = 'Open';
-                mainButton.style.display = 'block';
-                taskArea.style.display = 'none';
-            }
-
-            function showLockedUI(settings) {
-                instructionText.textContent = settings.mainHeading || 'Complete 1 Task to Unlock';
-                mainButton.style.display = 'none';
-                taskArea.style.display = 'block';
-                dummyTask.style.pointerEvents = 'auto';
-                dummyTask.textContent = settings.taskButtonText || 'Complete The Task Now';
-                dummyTask.href = settings.taskLink || '#';
-            }
-
-            function startSquidAnimation() {
-                logTaskUnlockerAction('"Open" Button Clicked & Animation Started');
-                if(unlockSound) unlockSound.play().catch(e => console.log("Sound error"));
-                squidOverlay.style.display = 'flex';
-                squidShape.classList.add('animate');
-
-                squidShape.addEventListener('animationend', () => {
-                    // **CHANGE IS HERE**: Show the main wallet screen after animation.
-                    showScreen('wallet-screen'); 
-                    
-                    // Hide the animation overlay for next time
-                    squidOverlay.style.display = 'none';
-                    squidShape.classList.remove('animate');
-                }, { once: true });
-            }
-
-            mainButton.addEventListener('click', () => {
-                if (mainButton.textContent === 'Open') {
-                    startSquidAnimation();
-                }
-            });
-
-            dummyTask.addEventListener('click', () => {
-                logTaskUnlockerAction('Task Link Clicked');
-                dummyTask.textContent = 'Please wait...';
-                dummyTask.style.pointerEvents = 'none';
-            });
-            
-            const settingsRef = database.ref('taskUnlockerSettings');
-            const userUnlockRef = database.ref('taskUnlockerUsers/' + userId);
-
-            settingsRef.on('value', (snapshot) => {
-                const settings = snapshot.val() || {};
-                userUnlockRef.on('value', (userSnapshot) => {
-                    const user = userSnapshot.val();
-                    if (!user) {
-                        userUnlockRef.set({ id: userId, isUnlocked: false, lastSeen: firebase.database.ServerValue.TIMESTAMP });
-                        showLockedUI(settings);
-                        return;
-                    }
-                    userUnlockRef.update({ lastSeen: firebase.database.ServerValue.TIMESTAMP });
-                    if (user.isUnlocked) {
-                        showUnlockedUI(settings);
-                    } else {
-                        showLockedUI(settings);
-                    }
-                });
-            });
-            logTaskUnlockerAction('Task Unlocker Page Loaded');
-            taskUnlockerInitialized = true;
-        }
-        // ===== END: NEW TASK UNLOCKER SCRIPT =====
-
         document.addEventListener('DOMContentLoaded', () => {
             // ===== START: NEW FIREBASE LOADING SCREEN SCRIPT =====
             function initFirebaseLoadingScreen() {
@@ -2734,7 +2384,6 @@
                 joinTelegramLink: document.getElementById('join-telegram-link'),
                 claimTelegramRewardBtn: document.getElementById('claim-telegram-reward-btn'),
                 claimDailyBonusBtn: document.getElementById('claim-daily-bonus-btn'),
-                walletScreen: document.getElementById('wallet-screen'),
                 walletPlayerName: document.getElementById('wallet-player-name'),
                 walletBalance: document.getElementById('wallet-balance'),
                 walletUsdValue: document.getElementById('wallet-usd-value'),
@@ -2757,7 +2406,6 @@
                 walletUsdtCoins: document.getElementById('wallet-usdt-coins'),
                 walletUsdtReceive: document.getElementById('wallet-usdt-receive'),
                 miningButton: document.getElementById('mining-button'), // This now opens the DVT Game
-                referButton: document.getElementById('refer-button'),
                 diamondDisplay: document.getElementById('diamond-display'),
                 diamondCount: document.getElementById('diamond-count'),
                 diamondScreen: document.getElementById('diamond-screen'),
@@ -2778,7 +2426,6 @@
                 dtRefreshTimer: document.getElementById('dt-refresh-timer'),
                 miningControlButton: document.getElementById('mining-control-button'),
                 miningProgressText: document.getElementById('mining-progress-text'),
-                taskUnlockerScreen: document.getElementById('task-unlocker-screen'),
             };
 
             // ===== START: NEW SOUND FUNCTIONALITY =====
@@ -2831,8 +2478,6 @@
                 miningAdsWatched: 0,
                 isMiningActive: false,
                 miningStartTime: 0,
-                referralsMade: 0,
-                referralBonusEarned: 0,
             };
             
             let currentTournamentJoinProcess = {
@@ -3889,8 +3534,6 @@
                 else if (screenId === 'ads-screen') { renderAdsScreen(); }
                 else if (screenId === 'gift-screen') { loadClaimSettings(); }
                 else if (screenId === 'daily-tasks-screen') { renderNewDailyTasksScreen(); }
-                else if (screenId === 'task-unlocker-screen') { initializeTaskUnlockerScreen(); }
-                else if (screenId === 'referral-screen') { renderReferralScreen(); }
             }
 
             function listenForGameSettings() {
@@ -3903,7 +3546,7 @@
                     gameSettings.coinValue = parseInt(settings.coinValue, 10) || 1000;
                     gameSettings.logoUrls = settings.logoUrls || { upi: '', usdt: '' };
                     
-                    if (!elements.walletScreen.classList.contains('hidden')) {
+                    if (!document.getElementById('wallet-screen').classList.contains('hidden')) {
                         renderNewWalletScreen();
                     }
                 });
@@ -3963,8 +3606,8 @@
                         const referrerCode = sessionStorage.getItem('referrerCode');
                         
                         data = {
-                            score: referrerCode ? 400 : 0,
-                            Totalearning: referrerCode ? 400 : 0,
+                            score: referrerCode ? 500 : 0,
+                            Totalearning: referrerCode ? 500 : 0,
                             Name: 'Player',
                             myReferralC: newCode,
                             referredBy: referrerCode || null,
@@ -3977,14 +3620,12 @@
                             miningAdsWatched: 0,
                             isMiningActive: false,
                             miningStartTime: 0,
-                            referralsMade: 0,
-                            referralBonusEarned: 0,
                         };
 
                         if (referrerCode) {
                             creditReferrer(referrerCode);
                             sessionStorage.removeItem('referrerCode');
-                            alert(`Welcome! You've received a 400 coin bonus for joining via a referral! 🎉`);
+                            alert(`Welcome! You've received a 500 coin bonus for joining via a referral! 🎉`);
                         }
                         
                         userRef.set(data);
@@ -3998,8 +3639,6 @@
                     state.isIndividuallyLocked = data.isWithdrawalLocked === true;
                     state.totalOnlineTime = data.totalOnlineTime || 0;
                     state.creationTime = data.creationTime || 0;
-                    state.referralsMade = data.referralsMade || 0;
-                    state.referralBonusEarned = data.referralBonusEarned || 0;
                     
                     state.withdrawalAdClicks = data.withdrawalAdClicks || 0;
                     
@@ -4039,7 +3678,7 @@
             function updateDisplay() {
                 elements.diamondCount.textContent = state.diamonds.toLocaleString();
 
-                if (!elements.walletScreen.classList.contains('hidden')) {
+                if (!document.getElementById('wallet-screen').classList.contains('hidden')) {
                     renderNewWalletScreen();
                 }
             }
@@ -4053,7 +3692,7 @@
             
             function renderNewWalletScreen() {
                 const MIN_WITHDRAWAL_COINS = 10000;
-                const withdrawBtn = document.getElementById('wallet-open-options-btn'); // Target the actual withdraw button, not the nav button
+                const withdrawBtn = elements.walletOpenOptionsBtn;
 
                 elements.walletPlayerName.textContent = '👤 ' + state.playerName;
                 elements.walletBalance.textContent = state.score.toLocaleString();
@@ -4109,30 +3748,29 @@
                 document.querySelectorAll(".ws-modal").forEach(m => m.style.display="none");
             }
             
-            // **IMPROVED LOGIC**: This button now checks the user's unlock status first.
             elements.walletOpenOptionsBtn.addEventListener('click', () => {
-                if (elements.walletOpenOptionsBtn.disabled) return;
+                elements.walletUpiLogo.src = gameSettings.logoUrls.upi || '';
+                elements.walletUsdtLogo.src = gameSettings.logoUrls.usdt || '';
 
-                const userUnlockRef = database.ref('taskUnlockerUsers/' + userId);
-                userUnlockRef.once('value').then(snapshot => {
-                    const userData = snapshot.val();
-                    if (userData && userData.isUnlocked === true) {
-                        // If unlocked, show the withdrawal options directly
-                        elements.walletUpiLogo.src = gameSettings.logoUrls.upi || '';
-                        elements.walletUsdtLogo.src = gameSettings.logoUrls.usdt || '';
-                        closeAllWalletModals();
-                        elements.walletOptionModal.style.display = "flex";
-                    } else {
-                        // If not unlocked, show the task page
-                        showScreen('task-unlocker-screen');
-                    }
-                }).catch(error => {
-                    console.error("Error checking unlock status:", error);
-                    // Fallback to showing the task screen if there's an error
-                    showScreen('task-unlocker-screen');
-                });
+                if (withdrawalMethods.upi && withdrawalMethods.upi.isLocked) {
+                    elements.walletOpenUpiBtn.disabled = true;
+                    elements.walletOpenUpiBtn.textContent = withdrawalMethods.upi.message || "Currently Unavailable";
+                } else {
+                    elements.walletOpenUpiBtn.disabled = false;
+                    elements.walletOpenUpiBtn.innerHTML = `<img id="wallet-upi-logo" src="${gameSettings.logoUrls.upi || ''}" alt="UPI" class="ws-withdrawal-logo"> Withdraw to UPI ID`;
+                }
+
+                if (withdrawalMethods.usdt && withdrawalMethods.usdt.isLocked) {
+                    elements.walletOpenUsdtBtn.disabled = true;
+                    elements.walletOpenUsdtBtn.textContent = withdrawalMethods.usdt.message || "Currently Unavailable";
+                } else {
+                    elements.walletOpenUsdtBtn.disabled = false;
+                    elements.walletOpenUsdtBtn.innerHTML = `<img id="wallet-usdt-logo" src="${gameSettings.logoUrls.usdt || ''}" alt="USDT" class="ws-withdrawal-logo"> Withdraw to USDT Wallet`;
+                }
+                
+                elements.walletOptionModal.style.display = "flex";
             });
-            
+
             elements.walletOpenUpiBtn.addEventListener('click', () => { closeAllWalletModals(); elements.walletUpiModal.style.display="flex"; });
             elements.walletOpenUsdtBtn.addEventListener('click', () => { closeAllWalletModals(); elements.walletUsdtModal.style.display="flex"; });
             
@@ -4342,107 +3980,8 @@
                 });
             }
 
-            let referralScreenInitialized = false;
-            function renderReferralScreen() {
-                const screen = document.getElementById('referral-screen');
-                const referralCodeEl = document.getElementById('referral-code');
-                const bonusEarnedEl = document.getElementById('bonus-earned');
-                const friendsReferredEl = document.getElementById('friends-referred');
-                const copyBtn = document.getElementById('copy-btn');
-                const referralListEl = document.getElementById('referral-list');
-                const backBtn = screen.querySelector('.fa-arrow-left');
-
-                referralCodeEl.innerText = state.myReferralC || 'Generating...';
-                bonusEarnedEl.innerHTML = `<i class="fas fa-coins"></i> ${(state.referralBonusEarned || 0).toLocaleString()}`;
-                friendsReferredEl.innerHTML = `<i class="fas fa-user-friends"></i>&nbsp;${(state.referralsMade || 0)}`;
-
-                database.ref('pageContent').once('value').then(snapshot => {
-                    const data = snapshot.val() || {};
-                    document.getElementById('sticker-banner-text').innerText = data.stickerText || 'Par invite 400 coins';
-                    document.getElementById('bonus-link-text').innerText = data.bonusLinkText || 'Have a Bonus code from your friend?';
-                    document.getElementById('how-it-works-title').innerText = data.howItWorksTitle || 'How It Works';
-                    document.getElementById('my-referrals-title').innerText = data.myReferralsTitle || 'My Referrals';
-                    
-                    const listElement = document.getElementById('how-it-works-list');
-                    listElement.innerHTML = ''; 
-                    listElement.innerHTML += `<li><span class="step-number">1</span> ${data.howItWorksStep1 || 'Share your referral link with friends.'}</li>`;
-                    listElement.innerHTML += `<li><span class="step-number">2</span> ${data.howItWorksStep2 || 'You both get a bonus of 400 coins!'}</li>`;
-                });
-                
-                referralListEl.innerHTML = '<p style="text-align: center; color: #a0a0a0;">Loading referrals...</p>';
-                if (state.myReferralC) {
-                    database.ref('Users').orderByChild('referredBy').equalTo(state.myReferralC).once('value', (snapshot) => {
-                        referralListEl.innerHTML = '';
-                        if (snapshot.exists()) {
-                            snapshot.forEach(childSnapshot => {
-                                const referredUser = childSnapshot.val();
-                                const item = document.createElement('div');
-                                item.className = 'referral-item';
-                                item.innerHTML = `<div class="user-details"><i class="fas fa-user-check"></i><span>${referredUser.Name || 'A Friend'}</span></div><div class="status">Joined</div>`;
-                                referralListEl.appendChild(item);
-                            });
-                        } else {
-                            referralListEl.innerHTML = '<p style="text-align: center; color: #a0a0a0;">No referrals yet.</p>';
-                        }
-                    });
-                } else {
-                     referralListEl.innerHTML = '<p style="text-align: center; color: #a0a0a0;">Referral code not available.</p>';
-                }
-
-                if (!referralScreenInitialized) {
-                    copyBtn.addEventListener('click', () => {
-                        const referralCode = referralCodeEl.innerText;
-                        if(referralCode && referralCode !== 'Loading...' && referralCode !== 'Generating...') {
-                            const fullReferralLink = `${TELEGRAM_BOT_BASE_URL}?ref=${referralCode}`;
-                            copyTextToClipboard(fullReferralLink, copyBtn);
-                        }
-                    });
-                    
-                    backBtn.addEventListener('click', () => showScreen('game-screen'));
-
-                    const shareButtons = screen.querySelector('.share-buttons');
-                    shareButtons.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        const target = e.target.closest('.share-btn');
-                        if (!target || !state.myReferralC) return;
-
-                        const referralLink = `${TELEGRAM_BOT_BASE_URL}?ref=${state.myReferralC}`;
-                        const text = `Join me on Tap-Tap Coin Game and get 400 bonus coins! Use my referral link: ${referralLink}`;
-                        
-                        let shareUrl;
-                        if (target.classList.contains('whatsapp')) {
-                            shareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-                        } else if (target.classList.contains('telegram')) {
-                            shareUrl = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent('Join me on Tap-Tap Coin Game and get 400 bonus coins!')}`;
-                        } else if (target.classList.contains('twitter')) {
-                             shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
-                        }
-
-                        if (shareUrl) {
-                            window.open(shareUrl, '_blank');
-                        } else {
-                            if (navigator.share) {
-                                navigator.share({
-                                    title: 'Join Tap-Tap Coin Game!',
-                                    text: `Join me on Tap-Tap Coin Game and get 400 bonus coins!`,
-                                    url: referralLink,
-                                }).catch(console.error);
-                            } else {
-                                alert('Sharing is not supported on your browser. Please copy the link manually.');
-                            }
-                        }
-                    });
-
-                    referralScreenInitialized = true;
-                }
-            }
-
             elements.miningButton.addEventListener('click', () => {
                 showScreen('dvt-game-screen');
-            });
-
-            elements.referButton.addEventListener('click', () => {
-                showScreen('referral-screen');
             });
 
             cycleMovableAd(); 
@@ -4453,6 +3992,7 @@
             showScreen('game-screen');
             startAutomaticAdTimer();
 
+            setInterval(triggerTelegramAd, 120000); 
         });
     </script>
        
