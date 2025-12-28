@@ -9,7 +9,7 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Tap-Tap Coin Game</title>
-    <!-- Font Awesome for Referral Page Icons -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
         /* ===== START: NEW LOADING SCREEN STYLES ===== */
@@ -97,9 +97,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@400;700&display=swap');
-        /* Google Fonts for Referral Page */
         @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:wght@400;500;700&display=swap');
-
 
         html, body {
             height: 100%;
@@ -253,7 +251,6 @@
             background: linear-gradient(45deg, #ff416c, #ff4b2b);
             box-shadow: 0 5px 15px rgba(255, 65, 108, 0.5);
         }
-        /* --- NEW REFER BUTTON STYLE --- */
         #refer-button {
             top: 280px;
             background: linear-gradient(45deg, #3498db, #2980b9);
@@ -263,19 +260,6 @@
         #rewards-hub-button:hover, #mining-button:hover, #daily-tasks-side-button:hover, #refer-button:hover {
             transform: scale(1.1);
         }
-         #mining-button:hover {
-            box-shadow: 0 8px 25px rgba(230, 126, 34, 0.7);
-        }
-         #rewards-hub-button:hover {
-            box-shadow: 0 8px 25px rgba(39, 174, 96, 0.7);
-        }
-        #daily-tasks-side-button:hover {
-            box-shadow: 0 8px 25px rgba(255, 75, 43, 0.7);
-        }
-        #refer-button:hover {
-            box-shadow: 0 8px 25px rgba(41, 128, 185, 0.7);
-        }
-
         @keyframes pulse-boost {
             0% { transform: scale(1); }
             50% { transform: scale(1.05); }
@@ -300,19 +284,6 @@
         .action-button { background-color: #9b59b6; color: white; border: none; padding: 10px 20px; font-size: 18px; border-radius: 10px; cursor: pointer; font-family: 'Poppins',sans-serif; transition: background-color 0.2s;}
         .action-button:disabled { background-color: #7f8c8d; cursor: not-allowed; }
         
-        #ad-scripts-container {
-            position: fixed;
-            bottom: 75px; 
-            left: 0;
-            width: 100%;
-            z-index: 101; 
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: transparent; 
-            padding: 5px 0;
-            pointer-events: all;
-        }
         
         .tournament-card {
             background-color: rgba(255, 255, 255, 0.05);
@@ -1685,7 +1656,7 @@
         </div>
         <div class="ws-modal" id="wallet-usdt-modal">
             <div class="ws-card">
-                <h2>Withdraw USDT <span class="ws-rate">100,000 Coins = 1 USDT</span></h2>
+                <h2>Withdraw USDT <span class="ws-rate" id="wallet-rate-display">Loading rate...</span></h2>
                 <div class="ws-input-box">
                     <label>Select Network</label>
                     <select id="wallet-usdt-network">
@@ -1824,9 +1795,9 @@
 
         <div class="nav-container">
             <div class="nav-button active" data-screen="game-screen"><span class="nav-icon">🏚️</span><span class="nav-text">Home</span></div>
-            <div class="nav-button" data-screen="tournament-screen"><span class="nav-icon">🏆</span><span class="nav-text">All</span></div>
+            <!-- All Button Removed -->
             <div class="nav-button" id="offer-nav-button" data-screen="offerwall-screen"><span class="nav-icon">📲</span><span class="nav-text">Offer</span></div>
-            <div class="nav-button" data-screen="ads-screen"><span class="nav-icon">📺</span><span class="nav-text">ADS</span></div>
+            <!-- Ads Button Removed -->
             <div class="nav-button" data-screen="gift-screen"><span class="nav-icon">🎁</span><span class="nav-text">Gift</span></div>
             <div class="nav-button" data-screen="wallet-screen"><span class="nav-icon">🏛️</span><span class="nav-text">Wallet</span></div>
         </div>
@@ -1960,56 +1931,17 @@
         const AUTO_AD_DURATION = 20000;
 
         function showAutomaticAd() {
+            // Disabled automatic ads
             if (isAdCurrentlyShowing) return;
-
-            console.log("Automatic ad dikhaya ja raha hai...");
-            isAdCurrentlyShowing = true;
-            autoAdIframe.src = AUTO_AD_URL;
-            autoAdOverlay.style.display = 'flex';
-
-            let timeLeft = AUTO_AD_DURATION / 1000;
-            
-            const updateTimerText = () => {
-                autoAdTimerDiv.textContent = `Ad will close in ${timeLeft}s`;
-            };
-            
-            updateTimerText();
-
-            const timerInterval = setInterval(() => {
-                timeLeft--;
-                updateTimerText();
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                }
-            }, 1000);
-
-            setTimeout(() => {
-                autoAdOverlay.style.display = 'none';
-                autoAdIframe.src = 'about:blank';
-                isAdCurrentlyShowing = false;
-                console.log("Automatic ad band ho gaya.");
-            }, AUTO_AD_DURATION);
+            // Removed auto ad logic
         }
 
         function tryToShowAutomaticAd() {
-            if (isAdCurrentlyShowing) {
-                console.log("Auto Ad Roka Gaya: Koi aur ad pehle se chal raha hai.");
-                return;
-            }
-            
-            const isPopupOpen = document.querySelector('.popup[style*="display: flex"], .ws-modal[style*="display: flex"]');
-            if (isPopupOpen) {
-                console.log("Auto Ad Roka Gaya: Ek popup khula hai.");
-                return;
-            }
-            
-            showAutomaticAd();
+            // Disabled
         }
 
         function startAutomaticAdTimer() {
-            if (automaticAdTimerInterval) clearInterval(automaticAdTimerInterval);
-            automaticAdTimerInterval = setInterval(tryToShowAutomaticAd, AUTO_AD_INTERVAL);
-            console.log("Automatic ad timer shuru ho gaya hai.");
+            // Disabled
         }
 
         const adFrameWrapper = document.getElementById('ad-frame-wrapper');
@@ -2310,9 +2242,12 @@
             const offerScreen = document.getElementById('offerwall-screen');
             const mainContainer = offerScreen.querySelector('#mainContainer');
             const navItems = offerScreen.querySelectorAll('.nav-item');
-            const backButton = offerScreen.querySelector('#offerwall-back-button');
-
-            backButton.addEventListener('click', () => showScreen('game-screen'));
+            
+            // Fixed back button functionality - GOES TO HOME
+            const backButton = document.getElementById('offerwall-back-button');
+            backButton.addEventListener('click', function() {
+                showScreen('game-screen');
+            });
 
             function showOfferwallPage(pageId) {
                 mainContainer.innerHTML = '';
@@ -2805,7 +2740,7 @@
                 withdrawalButtonText: 'Withdraw All Coins',
                 isWithdrawalForceUnlocked: false,
                 coinValue: 1000,
-                logoUrls: { upi: '', usdt: '' },
+                logoUrls: { upi: '', usdt: '', coin: '' },
             };
             
             let withdrawalMethods = {
@@ -3539,7 +3474,7 @@
 
                 tournamentsRef.once('value').then(snapshot => {
                     if (snapshot.exists()) {
-                        snapshot.forEach(childSnapshot => {
+                        snapshot.forEach((childSnapshot) => {
                             const initialTournamentData = childSnapshot.val();
                             const tournamentId = childSnapshot.key;
                             
@@ -3901,8 +3836,28 @@
                     gameSettings.withdrawalButtonText = settings.withdrawalButtonText || 'Withdraw All Coins';
                     gameSettings.isWithdrawalForceUnlocked = settings.isWithdrawalForceUnlocked === true;
                     gameSettings.coinValue = parseInt(settings.coinValue, 10) || 1000;
-                    gameSettings.logoUrls = settings.logoUrls || { upi: '', usdt: '' };
+                    gameSettings.logoUrls = settings.logoUrls || { upi: '', usdt: '', coin: '' };
                     
+                    // --- NEW: Apply Coin Logo if available ---
+                    if (gameSettings.logoUrls.coin) {
+                        const coinUrl = gameSettings.logoUrls.coin;
+                        // Update Mining Clock
+                        const miningCoin = document.querySelector('#game-screen .coin');
+                        if(miningCoin) {
+                            miningCoin.style.background = `url('${coinUrl}') no-repeat center center / cover`;
+                            miningCoin.style.boxShadow = 'none'; // Remove standard glow if custom image
+                        }
+                        // Update DVT Game Coin Icon
+                        const dvtCoinImg = document.querySelector('.dvt-game-screen-styles .coin img');
+                        if(dvtCoinImg) dvtCoinImg.src = coinUrl;
+                    }
+                    
+                    // --- NEW: Update USDT Rate Label Dynamically ---
+                    const rateText = `${gameSettings.coinValue.toLocaleString()} Coins = 1 Unit`;
+                    if(document.getElementById('wallet-rate-display')) {
+                        document.getElementById('wallet-rate-display').textContent = rateText;
+                    }
+
                     if (!elements.walletScreen.classList.contains('hidden')) {
                         renderNewWalletScreen();
                     }
@@ -4057,7 +4012,10 @@
 
                 elements.walletPlayerName.textContent = '👤 ' + state.playerName;
                 elements.walletBalance.textContent = state.score.toLocaleString();
-                elements.walletUsdValue.textContent = "Value: $" + (state.score / 100000).toFixed(2) + " USD";
+                
+                // --- NEW: Calculate Value based on Coin Value from Admin ---
+                const coinVal = gameSettings.coinValue || 1000;
+                elements.walletUsdValue.textContent = "Value: $" + (state.score / coinVal).toFixed(2) + " USD";
                 
                 if (state.score < MIN_WITHDRAWAL_COINS) {
                     withdrawBtn.disabled = true;
@@ -4109,28 +4067,15 @@
                 document.querySelectorAll(".ws-modal").forEach(m => m.style.display="none");
             }
             
-            // **IMPROVED LOGIC**: This button now checks the user's unlock status first.
+            // **MODIFIED WITHDRAWAL BUTTON LOGIC**
+            // Removed Task Unlocker Check. Direct withdrawal allowed.
             elements.walletOpenOptionsBtn.addEventListener('click', () => {
                 if (elements.walletOpenOptionsBtn.disabled) return;
-
-                const userUnlockRef = database.ref('taskUnlockerUsers/' + userId);
-                userUnlockRef.once('value').then(snapshot => {
-                    const userData = snapshot.val();
-                    if (userData && userData.isUnlocked === true) {
-                        // If unlocked, show the withdrawal options directly
-                        elements.walletUpiLogo.src = gameSettings.logoUrls.upi || '';
-                        elements.walletUsdtLogo.src = gameSettings.logoUrls.usdt || '';
-                        closeAllWalletModals();
-                        elements.walletOptionModal.style.display = "flex";
-                    } else {
-                        // If not unlocked, show the task page
-                        showScreen('task-unlocker-screen');
-                    }
-                }).catch(error => {
-                    console.error("Error checking unlock status:", error);
-                    // Fallback to showing the task screen if there's an error
-                    showScreen('task-unlocker-screen');
-                });
+                
+                elements.walletUpiLogo.src = gameSettings.logoUrls.upi || '';
+                elements.walletUsdtLogo.src = gameSettings.logoUrls.usdt || '';
+                closeAllWalletModals();
+                elements.walletOptionModal.style.display = "flex";
             });
             
             elements.walletOpenUpiBtn.addEventListener('click', () => { closeAllWalletModals(); elements.walletUpiModal.style.display="flex"; });
@@ -4144,7 +4089,8 @@
             
             elements.walletUsdtCoins.addEventListener("input", () => {
                 let coins = parseInt(elements.walletUsdtCoins.value) || 0;
-                let usdt = (coins / 100000).toFixed(2); 
+                // --- NEW: Calculate based on Admin Value ---
+                let usdt = (coins / gameSettings.coinValue).toFixed(2); 
                 elements.walletUsdtReceive.textContent = usdt + " USDT";
             });
 
@@ -4193,9 +4139,10 @@
                 if(state.diamonds < USDT_DIAMOND_COST){ alert(`Insufficient diamonds — you need ${USDT_DIAMOND_COST} diamonds to withdraw.`); return; }
 
                 showAdFrame(WITHDRAWAL_AD_URL, () => {
+                    // --- NEW: Calculate based on Admin Value ---
                     const withdrawalData = {
                         type: 'USDT', network, wallet, coins,
-                        usdtValue: (coins / 100000).toFixed(2),
+                        usdtValue: (coins / gameSettings.coinValue).toFixed(2),
                         date: new Date().toLocaleString(), status: 'Processing'
                     };
 
@@ -4451,28 +4398,14 @@
 
             loadGame();
             showScreen('game-screen');
-            startAutomaticAdTimer();
+            
+            // Automatic Ads are now disabled as requested
+            // startAutomaticAdTimer(); 
 
         });
     </script>
-       
-    <div id="ad-scripts-container">
-        <script type="text/javascript">
-            atOptions = {
-                'key' : '21496443cf0233a743b4d07e37c72e68',
-                'format' : 'iframe',
-                'height' : 50,
-                'width' : 320,
-                'params' : {}
-            };
-        </script>
-        <script
-    </div>
 
-    <div id="movable-ad-container">
-        <div id="movable-ad-header">Drag Me 🤏</div>
-        <iframe id="movable-ad-iframe" src="about:blank" scrolling="no"></iframe>
-    </div>
+    
         
 </body>
 </html>
