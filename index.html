@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta name="monetag" content="22d6e8efe3a929cb1e541a157eff8963">
-    <!-- Old Ad Script -->
+    <!-- Old Ad Script (Used for Daily Task) -->
     <script src='//libtl.com/sdk.js' data-zone='9966888' data-sdk='show_9966888'></script>
     <!-- NEW Rewarded Ad Script for Mining -->
     <script src='//libtl.com/sdk.js' data-zone='9966767' data-sdk='show_9966767'></script>
@@ -2777,19 +2777,13 @@
                 adUrl: 'https://www.profitableratecpm.com/kai5w8e7dq?key=850326c1545833ae57d991cbb7ea5bd6'
             };
             
+            // ===== REPLACED DAILY TASK SETTINGS =====
             let dailyTaskSettings = {
-                coinsPerTask: 30, 
-                tapLimit: 10,
-                cooldownHours: 2,
-                minWatchSeconds: 15
+                adsTarget: 20,       // Total ads to watch
+                rewardCoins: 15,     // Reward after 20 ads
+                cooldownHours: 8,    // 8 Hours wait time
+                minWatchSeconds: 15  // Ad viewing duration
             };
-            let dailyTaskLinks = {};
-            const dailyTasksList = Array.from({length:25},(_,i)=>({
-              id: i+1,
-              icon:"🔥",
-              name:`Task ${i+1}`,
-              desc:`Watch 15s Ad to Earn ${dailyTaskSettings.coinsPerTask} Coins`
-            }));
             
             let claimSettings = {};
             
@@ -3179,130 +3173,169 @@
             };
             
             async function loadDailyTaskData() {
+                // Keep minimal loading if settings are hardcoded
                 try {
                     const settingsSnap = await database.ref('dailyTaskSettings').once('value');
-                    if (settingsSnap.exists()) dailyTaskSettings = { ...dailyTaskSettings, ...settingsSnap.val() };
-                    
-                    const linksSnap = await database.ref('taskLinks').once('value');
-                    if (linksSnap.exists()) dailyTaskLinks = linksSnap.val();
+                    // if (settingsSnap.exists()) dailyTaskSettings = { ...dailyTaskSettings, ...settingsSnap.val() };
                 } catch (error) {
-                    console.error("Failed to load daily task settings/links from Firebase:", error);
+                    console.error("Failed to load daily task settings from Firebase:", error);
                 }
             }
 
+            // ===== REPLACED RENDER FUNCTION FOR DAILY TASKS =====
             function renderNewDailyTasksScreen() {
                 elements.dtCoinBalance.textContent = state.score.toLocaleString();
                 elements.dtDiamondBalance.textContent = state.diamonds.toLocaleString();
-                const userTasks = state.dailyTaskProgress || {};
                 
-                elements.dailyTaskListContainer.innerHTML = "";
-                dailyTasksList.forEach(task => {
-                    const info = userTasks[`task${task.id}`] || { count: 0, lastTime: 0 };
-                    const remaining = Math.max(0, dailyTaskSettings.tapLimit - info.count);
-                    const card = document.createElement("div");
-                    card.className = "dt-card";
+                const taskData = state.dailyTaskProgress || { adsWatched: 0, lastCompletionTime: 0 };
+                
+                // Cooldown Check
+                const now = Date.now();
+                const msPassed = now - (taskData.lastCompletionTime || 0);
+                const msCooldown = dailyTaskSettings.cooldownHours * 60 * 60 * 1000;
+                const isCooldownActive = msPassed < msCooldown;
+
+                elements.dailyTaskListContainer.innerHTML = ""; 
+
+                const card = document.createElement("div");
+                card.className = "dt-card";
+                
+                card.style.flexDirection = "column";
+                card.style.padding = "20px";
+                card.style.alignItems = "center";
+                card.style.gap = "15px";
+                card.style.background = "linear-gradient(135deg, #2c3e50, #000)";
+                card.style.border = "1px solid #f39c12";
+
+                if (isCooldownActive) {
+                    const timeLeft = msCooldown - msPassed;
+                    const h = Math.floor(timeLeft / (1000 * 60 * 60));
+                    const m = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                    const s = Math.floor((timeLeft % (1000 * 60)) / 1000);
+                    
                     card.innerHTML = `
-                      <div class="dt-left">
-                        <div class="dt-avatar">${task.icon}</div>
-                        <div class="dt-meta">
-                          <div class="dt-name">${task.name}</div>
-                          <div class="dt-desc">${task.desc.replace('30', dailyTaskSettings.coinsPerTask)}</div>
+                        <div style="font-size: 40px;">⏳</div>
+                        <h3 style="margin:0; color:#e74c3c;">Cooldown Active</h3>
+                        <p style="color:#aaa;">Please wait before watching more ads.</p>
+                        <div style="font-size: 24px; font-weight:bold; color:#fff;">
+                            ${h}h ${m}m ${s}s
                         </div>
-                      </div>
-                      <div class="dt-task-right">
-                        <span class="dt-counter">${remaining}</span>
-                        <button class="dt-claim" data-task-id="${task.id}" ${remaining <= 0 ? 'disabled' : ''}>Claim</button>
-                      </div>
                     `;
-                    elements.dailyTaskListContainer.appendChild(card);
-                });
+                    
+                    if(!window.dailyTaskTimerInterval) {
+                        window.dailyTaskTimerInterval = setInterval(() => {
+                            if(!document.getElementById('daily-tasks-screen').classList.contains('hidden')) {
+                                renderNewDailyTasksScreen();
+                            } else {
+                                clearInterval(window.dailyTaskTimerInterval);
+                                window.dailyTaskTimerInterval = null;
+                            }
+                        }, 1000);
+                    }
+
+                } else {
+                    const adsDone = taskData.adsWatched || 0;
+                    const target = dailyTaskSettings.adsTarget;
+                    const progressPercent = (adsDone / target) * 100;
+
+                    card.innerHTML = `
+                        <div style="font-size: 40px;">📺</div>
+                        <h3 style="margin:0; color:#f1c40f;">Daily Ad Challenge</h3>
+                        <p style="text-align:center; color:#ddd;">
+                            Watch <strong>${target} Ads</strong> to get <br>
+                            <span style="font-size:18px; color:#2ecc71; font-weight:bold;">${dailyTaskSettings.rewardCoins} Coins</span>
+                        </p>
+                        
+                        <div style="width:100%; background:#444; height:20px; border-radius:10px; overflow:hidden; margin: 10px 0;">
+                            <div style="width:${progressPercent}%; height:100%; background:linear-gradient(90deg, #f1c40f, #e67e22); transition: width 0.3s;"></div>
+                        </div>
+                        <p style="margin:0; font-weight:bold;">Progress: ${adsDone} / ${target}</p>
+
+                        <button id="start-daily-ad-btn" class="action-button" style="margin-top:10px; width:100%; background:#3498db;">
+                            ${adsDone === 0 ? "Start Watching" : "Watch Next Ad"} 
+                        </button>
+                    `;
+                }
+
+                elements.dailyTaskListContainer.appendChild(card);
+
+                const btn = document.getElementById('start-daily-ad-btn');
+                if(btn) {
+                    btn.addEventListener('click', handleDailyAdWatch);
+                }
             }
             
-            async function handleDailyTaskClick(taskId) {
-                const now = Date.now();
-                let taskData = state.dailyTaskProgress[`task${taskId}`] || { count: 0, lastTime: 0 };
-                const hoursPassed = (now - taskData.lastTime) / (1000 * 60 * 60);
+            // ===== NEW HANDLER FOR SINGLE DAILY TASK =====
+            async function handleDailyAdWatch() {
+                const btn = document.getElementById('start-daily-ad-btn');
+                if(btn) btn.disabled = true;
 
-                if (hoursPassed >= dailyTaskSettings.cooldownHours) {
-                    taskData.count = 0;
-                }
-
-                if (taskData.count >= dailyTaskSettings.tapLimit) {
-                    const wait = Math.ceil(dailyTaskSettings.cooldownHours - hoursPassed);
-                    alert(`⏳ Limit poori ho gayi hai। ${wait > 0 ? wait : dailyTaskSettings.cooldownHours} ghante baad phir se koshish karein.`);
-                    return;
-                }
-
-                if (typeof show_9966888 === "function") show_9966888();
-                
-                const adLink = dailyTaskLinks["taskLink" + taskId];
-                if (adLink) window.open(adLink, "_blank");
-                alert(`📺 Kam se kam ${dailyTaskSettings.minWatchSeconds} second tak ads dekhein taki reward mile.`);
-
-                const button = document.querySelector(`.dt-claim[data-task-id='${taskId}']`);
-                button.disabled = true;
-                let countdown = dailyTaskSettings.minWatchSeconds;
-                const originalText = button.textContent;
-                button.textContent = `Wait ${countdown}s`;
-                const interval = setInterval(() => {
-                    countdown--;
-                    button.textContent = `Wait ${countdown}s`;
-                    if (countdown <= 0) {
-                        clearInterval(interval);
-                        button.textContent = originalText; 
-                    }
-                }, 1000);
-                
-                setTimeout(async () => {
-                    taskData.count++;
-                    taskData.lastTime = now;
-                    state.score += dailyTaskSettings.coinsPerTask;
-                    playSound('coin-sound');
-                    
-                    state.dailyTaskProgress[`task${taskId}`] = taskData;
-                    
-                    await saveGame({ 
-                        score: state.score, 
-                        dailyTaskProgress: state.dailyTaskProgress 
+                if (typeof show_9966888 === "function") {
+                    show_9966888().then(() => {
+                         processAdSuccess();
+                    }).catch(err => {
+                        console.log("Ad script promise error", err);
+                        processAdSuccess(); // Fallback
                     });
-
-                    updateDisplay();
-                    renderNewDailyTasksScreen();
-
-                    alert(`✅ Aapne ${dailyTaskSettings.minWatchSeconds} second ads dekha aur +${dailyTaskSettings.coinsPerTask} coins mile!`);
-                }, dailyTaskSettings.minWatchSeconds * 1000);
+                } else {
+                    alert("Ad Script not loaded yet. Please wait or refresh.");
+                    if(btn) btn.disabled = false;
+                }
             }
 
-            elements.dailyTaskListContainer.addEventListener('click', (e) => {
-                if(e.target.classList.contains('dt-claim')) {
-                    const taskId = e.target.dataset.taskId;
-                    handleDailyTaskClick(taskId);
-                }
-            });
+            async function processAdSuccess() {
+                const btn = document.getElementById('start-daily-ad-btn');
+                let countdown = dailyTaskSettings.minWatchSeconds;
+                if(btn) btn.innerText = `Please wait ${countdown}s...`;
+                
+                const interval = setInterval(() => {
+                    countdown--;
+                    if(btn) btn.innerText = `Please wait ${countdown}s...`;
+                    
+                    if (countdown <= 0) {
+                        clearInterval(interval);
+                        
+                        let taskData = state.dailyTaskProgress || { adsWatched: 0, lastCompletionTime: 0 };
+                        taskData.adsWatched = (taskData.adsWatched || 0) + 1;
+
+                        if (taskData.adsWatched >= dailyTaskSettings.adsTarget) {
+                            state.score += dailyTaskSettings.rewardCoins;
+                            playSound('coin-sound');
+                            
+                            taskData.adsWatched = 0;
+                            taskData.lastCompletionTime = Date.now();
+                            
+                            alert(`🎉 Congratulations! You watched 20 ads and earned ${dailyTaskSettings.rewardCoins} Coins! Cooldown started.`);
+                        } else {
+                            alert(`✅ Ad Watched! Progress: ${taskData.adsWatched}/${dailyTaskSettings.adsTarget}`);
+                        }
+
+                        state.dailyTaskProgress = taskData;
+                        saveGame({ 
+                            score: state.score, 
+                            dailyTaskProgress: state.dailyTaskProgress 
+                        });
+
+                        updateDisplay();
+                        renderNewDailyTasksScreen();
+                    }
+                }, 1000);
+            }
 
             function startDailyTaskRefreshTimer() {
+                // Legacy support - not strictly needed with new cooldown logic but kept for safety
                 const REFRESH_INTERVAL = 9 * 60 * 60 * 1000;
                 let lastRefresh = localStorage.getItem("dailyTaskLastRefresh");
                 const now = Date.now();
 
                 if (!lastRefresh || now - lastRefresh > REFRESH_INTERVAL) {
                     localStorage.setItem("dailyTaskLastRefresh", now);
-                    state.dailyTaskProgress = {};
-                    saveGame({ dailyTaskProgress: {} });
                 }
                 
                 const nextRefreshTime = parseInt(localStorage.getItem("dailyTaskLastRefresh")) + REFRESH_INTERVAL;
 
                 setInterval(() => {
                     const left = nextRefreshTime - Date.now();
-                    if (left <= 0) {
-                        localStorage.setItem("dailyTaskLastRefresh", Date.now());
-                        state.dailyTaskProgress = {};
-                        saveGame({ dailyTaskProgress: {} });
-                        if(!elements.dailyTasksScreen.classList.contains('hidden')) {
-                            renderNewDailyTasksScreen();
-                        }
-                    }
                     const hrs = Math.floor(left / (1000 * 60 * 60));
                     const mins = Math.floor((left % (1000 * 60 * 60)) / (1000 * 60));
                     const secs = Math.floor((left % (1000 * 60)) / 1000);
