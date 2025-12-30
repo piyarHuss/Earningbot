@@ -6,8 +6,10 @@
     <!-- ===== AdsGram SDK ===== -->
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 
-    <!-- ===== RESTORED: Monetag Ad Script ===== -->
+    <!-- ===== Monetag Ad Script (Daily Task) ===== -->
     <script src='//libtl.com/sdk.js' data-zone='9966888' data-sdk='show_9966888'></script>
+    <!-- ===== Monetag Ad Script (Mining - Rewarded) ===== -->
+    <script src='//libtl.com/sdk.js' data-zone='9966767' data-sdk='show_9966767'></script>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Tap-Tap Coin Game</title>
@@ -1715,7 +1717,9 @@
                 <div>🪙 Coins: <span id="dt-coin-balance">0</span></div>
                 <div>💎 Diamonds: <span id="dt-diamond-balance">0</span></div>
               </div>
+              <!-- This container will now hold TWO cards -->
               <div class="dt-list" id="daily-task-list-container"></div>
+              
               <div class="dt-timerBox">
                 Next refresh: <span id="dt-refresh-timer">--:--:--</span>
               </div>
@@ -1917,6 +1921,22 @@
                 }).catch((result) => {
                     // Error or skipped
                     reject(result);
+                });
+            });
+        }
+        
+        // Helper function for Monetag Ads
+        function showMonetagAd(zoneId, sdkFunction) {
+            return new Promise((resolve, reject) => {
+                if (typeof window[sdkFunction] !== 'function') {
+                    alert("Monetag Ad script not ready. Please wait.");
+                    reject("Script missing");
+                    return;
+                }
+                window[sdkFunction]().then(() => {
+                    resolve(true);
+                }).catch(err => {
+                    reject(err);
                 });
             });
         }
@@ -2762,6 +2782,7 @@
                 diamonds: 0,
                 adsProgress: {},
                 dailyTaskProgress: {},
+                adsgramTaskProgress: {}, // New tracking for the 5-ad task
                 miningAdsWatched: 0,
                 isMiningActive: false,
                 miningStartTime: 0,
@@ -2778,10 +2799,8 @@
             
             // ===== REPLACED DAILY TASK SETTINGS =====
             let dailyTaskSettings = {
-                adsTarget: 5,       // Total ads to watch
-                rewardCoins: 10,     // Reward after 5 ads
-                cooldownHours: 2,    // 2 Hours wait time
-                minWatchSeconds: 1   // Ad viewing duration
+                monetag: { target: 20, reward: 15 },
+                adsgram: { target: 5, reward: 10, cooldownHours: 2, minWatchSeconds: 1 }
             };
             
             let claimSettings = {};
@@ -3186,25 +3205,47 @@
                 elements.dtCoinBalance.textContent = state.score.toLocaleString();
                 elements.dtDiamondBalance.textContent = state.diamonds.toLocaleString();
                 
-                const taskData = state.dailyTaskProgress || { adsWatched: 0, lastCompletionTime: 0 };
+                const monetagData = state.dailyTaskProgress || { adsWatched: 0 };
+                const adsgramData = state.adsgramTaskProgress || { adsWatched: 0, lastCompletionTime: 0 };
                 
-                // Cooldown Check
-                const now = Date.now();
-                const msPassed = now - (taskData.lastCompletionTime || 0);
-                const msCooldown = dailyTaskSettings.cooldownHours * 60 * 60 * 1000;
-                const isCooldownActive = msPassed < msCooldown;
-
                 elements.dailyTaskListContainer.innerHTML = ""; 
 
-                const card = document.createElement("div");
-                card.className = "dt-card";
+                // --- CARD 1: Monetag Daily Task (20 Ads) ---
+                const cardMonetag = document.createElement("div");
+                cardMonetag.className = "dt-card";
+                cardMonetag.style.cssText = "flex-direction: column; padding: 20px; align-items: center; gap: 15px; background: linear-gradient(135deg, #2c3e50, #000); border: 1px solid #f39c12; margin-bottom: 20px;";
                 
-                card.style.flexDirection = "column";
-                card.style.padding = "20px";
-                card.style.alignItems = "center";
-                card.style.gap = "15px";
-                card.style.background = "linear-gradient(135deg, #2c3e50, #000)";
-                card.style.border = "1px solid #f39c12";
+                const mTarget = dailyTaskSettings.monetag.target;
+                const mDone = monetagData.adsWatched || 0;
+                const mPercent = Math.min((mDone / mTarget) * 100, 100);
+
+                cardMonetag.innerHTML = `
+                    <div style="font-size: 40px;">📺</div>
+                    <h3 style="margin:0; color:#f1c40f;">Daily Ad Challenge</h3>
+                    <p style="text-align:center; color:#ddd;">
+                        Watch <strong>${mTarget} Ads</strong> to get <br>
+                        <span style="font-size:18px; color:#2ecc71; font-weight:bold;">${dailyTaskSettings.monetag.reward} Coins</span>
+                    </p>
+                    <div style="width:100%; background:#444; height:20px; border-radius:10px; overflow:hidden; margin: 10px 0;">
+                        <div style="width:${mPercent}%; height:100%; background:linear-gradient(90deg, #f1c40f, #e67e22); transition: width 0.3s;"></div>
+                    </div>
+                    <p style="margin:0; font-weight:bold;">Progress: ${mDone} / ${mTarget}</p>
+                    <button id="start-monetag-ad-btn" class="action-button" style="margin-top:10px; width:100%; background:#3498db;">
+                        ${mDone === 0 ? "Start Watching" : "Watch Next Ad"} 
+                    </button>
+                `;
+                elements.dailyTaskListContainer.appendChild(cardMonetag);
+
+                // --- CARD 2: AdsGram Express Task (5 Ads) ---
+                const cardAdsgram = document.createElement("div");
+                cardAdsgram.className = "dt-card";
+                cardAdsgram.style.cssText = "flex-direction: column; padding: 20px; align-items: center; gap: 15px; background: linear-gradient(135deg, #4b0082, #000); border: 1px solid #9d4edd;";
+
+                // Check Cooldown
+                const now = Date.now();
+                const msPassed = now - (adsgramData.lastCompletionTime || 0);
+                const msCooldown = dailyTaskSettings.adsgram.cooldownHours * 60 * 60 * 1000;
+                const isCooldownActive = msPassed < msCooldown;
 
                 if (isCooldownActive) {
                     const timeLeft = msCooldown - msPassed;
@@ -3212,15 +3253,15 @@
                     const m = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
                     const s = Math.floor((timeLeft % (1000 * 60)) / 1000);
                     
-                    card.innerHTML = `
+                    cardAdsgram.innerHTML = `
                         <div style="font-size: 40px;">⏳</div>
-                        <h3 style="margin:0; color:#e74c3c;">Cooldown Active</h3>
-                        <p style="color:#aaa;">Please wait before watching more ads.</p>
+                        <h3 style="margin:0; color:#e74c3c;">Express Cooldown</h3>
+                        <p style="color:#aaa;">Wait before express mining again.</p>
                         <div style="font-size: 24px; font-weight:bold; color:#fff;">
                             ${h}h ${m}m ${s}s
                         </div>
                     `;
-                    
+                    // Start timer for cooldown update
                     if(!window.dailyTaskTimerInterval) {
                         window.dailyTaskTimerInterval = setInterval(() => {
                             if(!document.getElementById('daily-tasks-screen').classList.contains('hidden')) {
@@ -3231,90 +3272,101 @@
                             }
                         }, 1000);
                     }
-
                 } else {
-                    const adsDone = taskData.adsWatched || 0;
-                    const target = dailyTaskSettings.adsTarget;
-                    const progressPercent = (adsDone / target) * 100;
+                    const aTarget = dailyTaskSettings.adsgram.target;
+                    const aDone = adsgramData.adsWatched || 0;
+                    const aPercent = Math.min((aDone / aTarget) * 100, 100);
 
-                    card.innerHTML = `
-                        <div style="font-size: 40px;">📺</div>
-                        <h3 style="margin:0; color:#f1c40f;">Daily Ad Challenge</h3>
+                    cardAdsgram.innerHTML = `
+                        <div style="font-size: 40px;">⚡</div>
+                        <h3 style="margin:0; color:#9d4edd;">Express Mining</h3>
                         <p style="text-align:center; color:#ddd;">
-                            Watch <strong>${target} Ads</strong> to get <br>
-                            <span style="font-size:18px; color:#2ecc71; font-weight:bold;">${dailyTaskSettings.rewardCoins} Coins</span>
+                            Watch <strong>${aTarget} Ads</strong> to get <br>
+                            <span style="font-size:18px; color:#2ecc71; font-weight:bold;">${dailyTaskSettings.adsgram.reward} Coins</span>
                         </p>
-                        
                         <div style="width:100%; background:#444; height:20px; border-radius:10px; overflow:hidden; margin: 10px 0;">
-                            <div style="width:${progressPercent}%; height:100%; background:linear-gradient(90deg, #f1c40f, #e67e22); transition: width 0.3s;"></div>
+                            <div style="width:${aPercent}%; height:100%; background:linear-gradient(90deg, #9d4edd, #ff00ff); transition: width 0.3s;"></div>
                         </div>
-                        <p style="margin:0; font-weight:bold;">Progress: ${adsDone} / ${target}</p>
-
-                        <button id="start-daily-ad-btn" class="action-button" style="margin-top:10px; width:100%; background:#3498db;">
-                            ${adsDone === 0 ? "Start Watching" : "Watch Next Ad"} 
+                        <p style="margin:0; font-weight:bold;">Progress: ${aDone} / ${aTarget}</p>
+                        <button id="start-adsgram-ad-btn" class="action-button" style="margin-top:10px; width:100%; background:#8e44ad;">
+                            ${aDone === 0 ? "Start Express" : "Watch Next Ad"} 
                         </button>
                     `;
                 }
+                elements.dailyTaskListContainer.appendChild(cardAdsgram);
 
-                elements.dailyTaskListContainer.appendChild(card);
+                // --- Add Listeners ---
+                const btnMonetag = document.getElementById('start-monetag-ad-btn');
+                if(btnMonetag) btnMonetag.addEventListener('click', handleMonetagDailyWatch);
 
-                const btn = document.getElementById('start-daily-ad-btn');
-                if(btn) {
-                    btn.addEventListener('click', handleDailyAdWatch);
-                }
+                const btnAdsgram = document.getElementById('start-adsgram-ad-btn');
+                if(btnAdsgram) btnAdsgram.addEventListener('click', handleAdsgramDailyWatch);
             }
             
-            // ===== NEW HANDLER FOR SINGLE DAILY TASK =====
-            async function handleDailyAdWatch() {
-                const btn = document.getElementById('start-daily-ad-btn');
-                if(btn) btn.disabled = true;
+            // --- Handler for Monetag (20 Ads) ---
+            async function handleMonetagDailyWatch() {
+                const btn = document.getElementById('start-monetag-ad-btn');
+                if(btn) btn.disabled = true; btn.innerText = "Loading...";
 
-                // Using AdsGram Block int-20264 (Interstital format requires prefix) for Daily Tasks
-                showAdsgramAd("int-20264").then(() => {
-                     processAdSuccess();
+                showMonetagAd('9966888', 'show_9966888').then(() => {
+                    let taskData = state.dailyTaskProgress || { adsWatched: 0 };
+                    taskData.adsWatched = (taskData.adsWatched || 0) + 1;
+                    
+                    if (taskData.adsWatched >= dailyTaskSettings.monetag.target) {
+                        state.score += dailyTaskSettings.monetag.reward;
+                        playSound('coin-sound');
+                        taskData.adsWatched = 0; // Reset or keep it maxed until next day? Reset for now based on typical logic.
+                        alert(`🎉 Challenge Complete! You earned ${dailyTaskSettings.monetag.reward} Coins!`);
+                    } else {
+                        alert(`✅ Ad Watched! Progress: ${taskData.adsWatched}/${dailyTaskSettings.monetag.target}`);
+                    }
+                    
+                    state.dailyTaskProgress = taskData;
+                    saveGame({ score: state.score, dailyTaskProgress: state.dailyTaskProgress });
+                    updateDisplay();
+                    renderNewDailyTasksScreen();
                 }).catch(err => {
-                    console.error("Ad script promise error", err);
-                    btn.disabled = false;
+                    console.error(err);
+                    alert("Ad failed to load. Please try again.");
+                    if(btn) btn.disabled = false; btn.innerText = "Watch Next Ad";
                 });
             }
 
-            async function processAdSuccess() {
-                const btn = document.getElementById('start-daily-ad-btn');
-                let countdown = dailyTaskSettings.minWatchSeconds;
-                if(btn) btn.innerText = `Please wait ${countdown}s...`;
-                
-                const interval = setInterval(() => {
-                    countdown--;
-                    if(btn) btn.innerText = `Please wait ${countdown}s...`;
-                    
-                    if (countdown <= 0) {
-                        clearInterval(interval);
-                        
-                        let taskData = state.dailyTaskProgress || { adsWatched: 0, lastCompletionTime: 0 };
+            // --- Handler for AdsGram (5 Ads) ---
+            async function handleAdsgramDailyWatch() {
+                const btn = document.getElementById('start-adsgram-ad-btn');
+                if(btn) btn.disabled = true; btn.innerText = "Loading...";
+
+                showAdsgramAd("int-20264").then(() => {
+                     // Ad watched fully
+                     let btnRef = document.getElementById('start-adsgram-ad-btn');
+                     if(btnRef) btnRef.innerText = "Verifying...";
+                     
+                     setTimeout(() => {
+                        let taskData = state.adsgramTaskProgress || { adsWatched: 0, lastCompletionTime: 0 };
                         taskData.adsWatched = (taskData.adsWatched || 0) + 1;
 
-                        if (taskData.adsWatched >= dailyTaskSettings.adsTarget) {
-                            state.score += dailyTaskSettings.rewardCoins;
+                        if (taskData.adsWatched >= dailyTaskSettings.adsgram.target) {
+                            state.score += dailyTaskSettings.adsgram.reward;
                             playSound('coin-sound');
-                            
                             taskData.adsWatched = 0;
                             taskData.lastCompletionTime = Date.now();
-                            
-                            alert(`🎉 Congratulations! You watched ${dailyTaskSettings.adsTarget} ads and earned ${dailyTaskSettings.rewardCoins} Coins! Cooldown started.`);
+                            alert(`🎉 Express Task Complete! Earned ${dailyTaskSettings.adsgram.reward} Coins! Cooldown started.`);
                         } else {
-                            alert(`✅ Ad Watched! Progress: ${taskData.adsWatched}/${dailyTaskSettings.adsTarget}`);
+                            alert(`✅ Ad Watched! Progress: ${taskData.adsWatched}/${dailyTaskSettings.adsgram.target}`);
                         }
 
-                        state.dailyTaskProgress = taskData;
-                        saveGame({ 
-                            score: state.score, 
-                            dailyTaskProgress: state.dailyTaskProgress 
-                        });
-
+                        state.adsgramTaskProgress = taskData;
+                        saveGame({ score: state.score, adsgramTaskProgress: state.adsgramTaskProgress });
                         updateDisplay();
                         renderNewDailyTasksScreen();
-                    }
-                }, 1000);
+                     }, 1000);
+
+                }).catch(err => {
+                    console.error("AdsGram error", err);
+                    // alert("Ad was skipped or failed."); // Optional alert
+                    if(btn) btn.disabled = false; btn.innerText = "Watch Next Ad";
+                });
             }
 
             function startDailyTaskRefreshTimer() {
@@ -3956,7 +4008,8 @@
                             totalOnlineTime: 0,
                             diamonds: 0,
                             adsProgress: {},
-                            dailyTaskProgress: {},
+                            dailyTaskProgress: {}, // Preserved for Monetag Task
+                            adsgramTaskProgress: {}, // New for AdsGram
                             miningAdsWatched: 0,
                             isMiningActive: false,
                             miningStartTime: 0,
@@ -3989,6 +4042,7 @@
                     state.diamonds = data.diamonds || 0;
                     state.adsProgress = data.adsProgress || {};
                     state.dailyTaskProgress = data.dailyTaskProgress || {};
+                    state.adsgramTaskProgress = data.adsgramTaskProgress || {};
 
                     state.miningAdsWatched = data.miningAdsWatched || 0;
                     state.isMiningActive = data.isMiningActive || false;
