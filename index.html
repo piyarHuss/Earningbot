@@ -2,10 +2,9 @@
 <html lang="en">
 <head>
     <meta name="monetag" content="22d6e8efe3a929cb1e541a157eff8963">
-    <!-- Old Ad Script (Used for Daily Task) -->
-    <script src='//libtl.com/sdk.js' data-zone='9966888' data-sdk='show_9966888'></script>
-    <!-- NEW Rewarded Ad Script for Mining -->
-    <script src='//libtl.com/sdk.js' data-zone='9966767' data-sdk='show_9966767'></script>
+    
+    <!-- ===== AdsGram SDK ===== -->
+    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Tap-Tap Coin Game</title>
@@ -1900,26 +1899,23 @@
 
         let isAdCurrentlyShowing = false; 
 
-        function triggerTelegramAd() {
-            if (typeof show_9966888 !== 'function') {
-                console.log("Telegram ad function (show_9966888) abhi tak load nahi hua.");
-                return;
-            }
-            if (isAdCurrentlyShowing) {
-                console.log("Telegram Ad Roka Gaya: Koi aur ad pehle se chal raha hai.");
-                return;
-            }
-            const isPopupOpen = document.querySelector('.popup[style*="display: flex"], .ws-modal[style*="display: flex"]');
-            if (isPopupOpen) {
-                console.log("Telegram Ad Roka Gaya: Ek popup khula hai.");
-                return;
-            }
-            if(document.hidden){
-                console.log("Telegram Ad Roka Gaya: Page background me hai.");
-                return;
-            }
-            console.log("Telegram ad dikhaya ja raha hai...");
-            show_9966888();
+        // Helper function for AdsGram Ads
+        function showAdsgramAd(blockId) {
+            return new Promise((resolve, reject) => {
+                if (!window.Adsgram) {
+                    alert("AdsGram SDK not loaded properly. Please refresh.");
+                    reject("SDK missing");
+                    return;
+                }
+                const AdController = window.Adsgram.init({ blockId: blockId });
+                AdController.show().then((result) => {
+                    // result.done is true if watched to end
+                    resolve(result);
+                }).catch((result) => {
+                    // Error or skipped
+                    reject(result);
+                });
+            });
         }
         
         let automaticAdTimerInterval = null;
@@ -2779,10 +2775,10 @@
             
             // ===== REPLACED DAILY TASK SETTINGS =====
             let dailyTaskSettings = {
-                adsTarget: 20,       // Total ads to watch
-                rewardCoins: 15,     // Reward after 20 ads
-                cooldownHours: 8,    // 8 Hours wait time
-                minWatchSeconds: 15  // Ad viewing duration
+                adsTarget: 5,       // Total ads to watch
+                rewardCoins: 10,     // Reward after 5 ads
+                cooldownHours: 2,    // 2 Hours wait time
+                minWatchSeconds: 1   // Ad viewing duration
             };
             
             let claimSettings = {};
@@ -2862,22 +2858,22 @@
                 } else {
                     const adsWatched = state.miningAdsWatched || 0;
                     if (adsWatched < ADS_REQUIRED_FOR_MINING) {
-                        if (typeof show_9966767 !== 'function') {
-                            alert("Ad function is not ready yet. Please wait a moment.");
-                            return;
-                        }
-                        
                         button.disabled = true;
                         button.textContent = "Loading Ad...";
 
-                        show_9966767().then(() => {
-                            console.log('Rewarded interstitial ad for mining completed.');
+                        // Using AdsGram Block 20263 for Mining Button
+                        showAdsgramAd("20263").then(() => {
+                            console.log('AdsGram ad for mining completed.');
                             alert('Ad watched! Your progress has been updated.');
                             
                             state.miningAdsWatched++;
                             saveGame({ miningAdsWatched: state.miningAdsWatched });
                             
                             renderMiningButton(); 
+                        }).catch((err) => {
+                            console.error("Ad failed", err);
+                            button.disabled = false;
+                            button.textContent = `Watch Ad (${adsWatched}/${ADS_REQUIRED_FOR_MINING})`;
                         });
 
                     } else {
@@ -3270,17 +3266,13 @@
                 const btn = document.getElementById('start-daily-ad-btn');
                 if(btn) btn.disabled = true;
 
-                if (typeof show_9966888 === "function") {
-                    show_9966888().then(() => {
-                         processAdSuccess();
-                    }).catch(err => {
-                        console.log("Ad script promise error", err);
-                        processAdSuccess(); // Fallback
-                    });
-                } else {
-                    alert("Ad Script not loaded yet. Please wait or refresh.");
-                    if(btn) btn.disabled = false;
-                }
+                // Using AdsGram Block 20264 (int) for Daily Tasks
+                showAdsgramAd("20264").then(() => {
+                     processAdSuccess();
+                }).catch(err => {
+                    console.error("Ad script promise error", err);
+                    btn.disabled = false;
+                });
             }
 
             async function processAdSuccess() {
@@ -3305,7 +3297,7 @@
                             taskData.adsWatched = 0;
                             taskData.lastCompletionTime = Date.now();
                             
-                            alert(`🎉 Congratulations! You watched 20 ads and earned ${dailyTaskSettings.rewardCoins} Coins! Cooldown started.`);
+                            alert(`🎉 Congratulations! You watched ${dailyTaskSettings.adsTarget} ads and earned ${dailyTaskSettings.rewardCoins} Coins! Cooldown started.`);
                         } else {
                             alert(`✅ Ad Watched! Progress: ${taskData.adsWatched}/${dailyTaskSettings.adsTarget}`);
                         }
@@ -4437,8 +4429,5 @@
 
         });
     </script>
-
-    
-        
 </body>
 </html>
