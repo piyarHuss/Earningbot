@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Galaxy Miner - Final</title>
+    <title>Galaxy Miner - Anti Spam</title>
 
     <!-- ===== 1. TELEGRAM SDK ===== -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -242,6 +242,11 @@
         // SYSTEM VARIABLES
         let db, userId, userData = {};
         const ADSGRAM_BLOCK = "20263"; 
+        
+        // LOCAL SHORT COOLDOWNS (10s)
+        let localCooldowns = {
+            task1: 0, task2: 0, task3: 0, task4: 0, mining: 0
+        };
 
         // --- 3. INIT ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -265,15 +270,10 @@
                 db.ref(`Users/${userId}`).on('value', snap => {
                     userData = snap.val() || { score: 0, miningAdsWatched: 0, isMiningActive: false };
                     
-                    // If name/photo changed in Telegram, update Firebase
                     if (userData.Name !== realName || userData.Photo !== realPhoto) {
                         db.ref(`Users/${userId}`).update({ Name: realName, Photo: realPhoto });
                     }
-
-                    // Ensure local object has latest visuals
-                    userData.Name = realName;
-                    userData.Photo = realPhoto;
-
+                    userData.Name = realName; userData.Photo = realPhoto;
                     updateUI();
                 });
 
@@ -290,9 +290,7 @@
                     }
                 });
 
-                // AUTO ADS INIT
                 initAutoAds();
-
                 setInterval(updateMiningUI, 1000); 
                 setInterval(renderTasks, 1000);    
 
@@ -321,9 +319,7 @@
             document.getElementById('admin-rate').innerText = ADMIN_RATE;
             const sel = document.getElementById('w-method');
             sel.innerHTML = '<option value="">Select Method</option>';
-            ADMIN_METHODS.split(',').forEach(m => {
-                sel.innerHTML += `<option value="${m.trim()}">${m.trim()}</option>`;
-            });
+            ADMIN_METHODS.split(',').forEach(m => { sel.innerHTML += `<option value="${m.trim()}">${m.trim()}</option>`; });
             document.getElementById('reward-task1').innerText = "+" + (TASK_CONFIG.task1?.reward || 0);
             document.getElementById('reward-task2').innerText = "+" + (TASK_CONFIG.task2?.reward || 0);
             document.getElementById('reward-task3').innerText = "+" + (TASK_CONFIG.task3?.reward || 0);
@@ -331,10 +327,8 @@
         }
 
         function updateUI() {
-            // Update Profile Name & Image
             document.getElementById('player-name').innerText = userData.Name || "Player";
             if(userData.Photo) document.getElementById('user-avatar').src = userData.Photo;
-
             const s = (userData.score||0).toLocaleString();
             document.getElementById('player-balance').innerText = s;
             document.getElementById('wallet-big-balance').innerText = s;
@@ -343,23 +337,18 @@
             renderTasks();
         }
 
-        // --- 5. MONETAG FUNCTIONS & AUTO ADS ---
+        // --- 5. ADS & LOGIC ---
         function initAutoAds() {
-            // Uses script 9966767
             if (typeof show_9966767 === 'function') {
-                show_9966767({
-                    type: 'inApp',
-                    inAppSettings: { frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false }
-                });
-                console.log("Auto Ads Started");
+                show_9966767({ type: 'inApp', inAppSettings: { frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false } });
             }
         }
 
-        // --- 6. TASK LOGIC ---
         function renderTasks() {
             if(!userData) return;
             const tasks = userData.taskData || {};
             const now = Date.now();
+            
             const renderOne = (key, btnId, statusId, progId) => {
                 const conf = TASK_CONFIG[key] || {limit:10, cooldown:3600000};
                 const data = tasks[key] || { count: 0, lastDone: 0 };
@@ -367,6 +356,7 @@
                 const stat = document.getElementById(statusId);
                 const prog = document.getElementById(progId);
 
+                // 1. GLOBAL LIMIT COOLDOWN
                 if (data.count >= conf.limit) {
                     const timePassed = now - data.lastDone;
                     if (timePassed < conf.cooldown) {
@@ -378,11 +368,26 @@
                         return;
                     }
                 }
+                
+                // 2. SHORT COOLDOWN (10s)
+                if (localCooldowns[key] && now < localCooldowns[key]) {
+                    const wait = Math.ceil((localCooldowns[key] - now) / 1000);
+                    btn.innerText = `Wait ${wait}s`;
+                    btn.disabled = true;
+                    btn.style.background = "#555";
+                    // Update stats visuals but keep button locked
+                    const displayCount = (data.count >= conf.limit && (now - data.lastDone >= conf.cooldown)) ? 0 : data.count;
+                    stat.innerText = `${displayCount} / ${conf.limit}`;
+                    prog.style.width = `${(displayCount / conf.limit) * 100}%`; prog.style.background = "var(--secondary)";
+                    return;
+                }
+
                 const displayCount = (data.count >= conf.limit && (now - data.lastDone >= conf.cooldown)) ? 0 : data.count;
                 btn.innerText = "Watch Ad"; btn.disabled = false; btn.style.background = "";
                 stat.innerText = `${displayCount} / ${conf.limit}`;
                 prog.style.width = `${(displayCount / conf.limit) * 100}%`; prog.style.background = "var(--secondary)";
             };
+            
             renderOne('task1', 'btn-task1', 'status-task1', 'prog-task1');
             renderOne('task2', 'btn-task2', 'status-task2', 'prog-task2');
             renderOne('task3', 'btn-task3', 'status-task3', 'prog-task3');
@@ -400,32 +405,35 @@
 
             btn.innerText = "Loading..."; btn.disabled = true;
 
-            const grantReward = () => {
-                const newCount = currentCount + 1;
-                let updates = {};
-                updates[`Users/${userId}/score`] = firebase.database.ServerValue.increment(conf.reward);
-                if (newCount >= conf.limit) {
-                    updates[`Users/${userId}/taskData/${key}`] = { count: conf.limit, lastDone: firebase.database.ServerValue.TIMESTAMP };
+            const finish = (success) => {
+                if(success) {
+                    const newCount = currentCount + 1;
+                    let updates = {};
+                    updates[`Users/${userId}/score`] = firebase.database.ServerValue.increment(conf.reward);
+                    if (newCount >= conf.limit) {
+                        updates[`Users/${userId}/taskData/${key}`] = { count: conf.limit, lastDone: firebase.database.ServerValue.TIMESTAMP };
+                    } else {
+                        updates[`Users/${userId}/taskData/${key}`] = { count: newCount, lastDone: data.lastDone };
+                    }
+                    db.ref().update(updates).then(() => { alert(`Earned +${conf.reward} Coins!`); });
                 } else {
-                    updates[`Users/${userId}/taskData/${key}`] = { count: newCount, lastDone: data.lastDone };
+                    alert("Ad skipped or failed.");
                 }
-                db.ref().update(updates).then(() => { alert(`Earned +${conf.reward} Coins!`); });
-                btn.innerText = "Watch Ad"; btn.disabled = false;
+                // Trigger 10s cooldown
+                localCooldowns[key] = Date.now() + 10000;
             };
 
-            const handleError = (e) => { console.error(e); alert("Ad failed/skipped."); btn.innerText = "Watch Ad"; btn.disabled = false; };
-
             if (key === 'task1') {
-                if(window.Adsgram) window.Adsgram.init({ blockId: ADSGRAM_BLOCK }).show().then(watched => { if(watched) grantReward(); else handleError(); }).catch(handleError);
-                else grantReward();
+                if(window.Adsgram) window.Adsgram.init({ blockId: ADSGRAM_BLOCK }).show().then(finish).catch(() => finish(false));
+                else finish(true); // fallback
             } else if (key === 'task2') {
-                if(typeof show_9966888 === 'function') show_9966888().then(grantReward).catch(handleError);
+                if(typeof show_9966888 === 'function') show_9966888().then(()=>finish(true)).catch(()=>finish(false));
                 else { alert("Ad Script Not Loaded"); btn.disabled=false; }
             } else if (key === 'task3') {
-                if(typeof show_9966888 === 'function') show_9966888('pop').then(grantReward).catch(handleError);
+                if(typeof show_9966888 === 'function') show_9966888('pop').then(()=>finish(true)).catch(()=>finish(false));
                 else { alert("Ad Script Not Loaded"); btn.disabled=false; }
             } else if (key === 'task4') {
-                if(typeof show_9966767 === 'function') show_9966767().then(grantReward).catch(handleError);
+                if(typeof show_9966767 === 'function') show_9966767().then(()=>finish(true)).catch(()=>finish(false));
                 else { alert("Ad Script Not Loaded"); btn.disabled=false; }
             }
         }
@@ -438,6 +446,7 @@
                     btn.innerText = "LOADING..."; btn.disabled = true;
                     window.Adsgram.init({ blockId: ADSGRAM_BLOCK }).show().then((watched) => {
                         if(watched) db.ref(`Users/${userId}/miningAdsWatched`).set(firebase.database.ServerValue.increment(1));
+                        localCooldowns['mining'] = Date.now() + 10000; // 10s Cooldown for Mining Ad
                     }).catch(() => { btn.disabled = false; });
                 }
             } else if (btn.innerText.includes("START ENGINE")) {
@@ -463,16 +472,14 @@
             const isMining = userData.isMiningActive === true;
             const adsWatched = userData.miningAdsWatched || 0;
             const REQ = MINING_CONFIG.adsRequired;
-            const DUR = MINING_CONFIG.duration;
-
+            
             if (isMining) {
-                progressBox.style.display = 'none';
-                statusText.innerText = "Engine Running...";
-                const end = (userData.miningStartTime || 0) + DUR;
+                // ...existing mining logic...
+                const end = (userData.miningStartTime || 0) + MINING_CONFIG.duration;
                 const now = Date.now();
+                progressBox.style.display='none'; statusText.innerText = "Engine Running...";
                 if(now < end) {
-                    const l = end - now;
-                    const h = Math.floor(l/3600000); const m = Math.floor((l%3600000)/60000); const s = Math.floor((l%60000)/1000);
+                    const l = end - now; const h = Math.floor(l/3600000); const m = Math.floor((l%3600000)/60000); const s = Math.floor((l%60000)/1000);
                     timer.innerText = `${h}:${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
                     btn.innerHTML = `<i class="fas fa-cog fa-spin"></i> MINING...`; btn.disabled = true; btn.style.background = "#333";
                 } else {
@@ -480,6 +487,19 @@
                 }
             } else {
                 timer.innerText = "03:00:00";
+                
+                // CHECK MINING AD COOLDOWN
+                if(localCooldowns['mining'] && Date.now() < localCooldowns['mining']) {
+                    const wait = Math.ceil((localCooldowns['mining'] - Date.now()) / 1000);
+                    btn.innerHTML = `Wait ${wait}s`;
+                    btn.disabled = true;
+                    btn.style.background = "#555";
+                    progressBox.style.display = 'block';
+                    barFill.style.width = ((adsWatched / REQ) * 100) + "%";
+                    statusText.innerText = `Watch ${REQ - adsWatched} more ads`;
+                    return;
+                }
+
                 if (adsWatched < REQ) {
                     btn.innerHTML = `WATCH AD (${adsWatched}/${REQ})`; btn.disabled = false; btn.style.background = "";
                     progressBox.style.display = 'block';
