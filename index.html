@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Galaxy Miner - Anti Spam</title>
+    <title>Galaxy Miner - Slow Ads</title>
 
     <!-- ===== 1. TELEGRAM SDK ===== -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -101,10 +101,9 @@
 
     <div class="app-container">
         
-        <!-- HEADER (UPDATED FOR REAL PROFILE) -->
+        <!-- HEADER -->
         <div class="top-hud">
             <div class="profile-chip">
-                <!-- Image will be set by JS -->
                 <img id="user-avatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="profile-pic" alt="User">
                 <span id="player-name">Player</span>
             </div>
@@ -215,7 +214,6 @@
 
     <!-- ===== LOGIC ===== -->
     <script>
-        // --- 1. FIREBASE CONFIG ---
         const FIREBASE_CONFIG = {
             apiKey: "AIzaSyBJrCE4w_QfBqfF3g4O_RuCK4DbjmL9TRg",
             authDomain: "telegram-69052.firebaseapp.com",
@@ -226,29 +224,23 @@
             appId: "1:824247387361:web:f4e6c22abb4b503871a3a0"
         };
         
-        // --- 2. GLOBAL SETTINGS ---
         let TASK_CONFIG = {
             task1: { reward: 2, limit: 10, cooldown: 2 * 3600 * 1000 }, 
             task2: { reward: 5, limit: 10, cooldown: 1 * 3600 * 1000 }, 
             task3: { reward: 5, limit: 10, cooldown: 1 * 3600 * 1000 }, 
             task4: { reward: 10, limit: 5,  cooldown: 4 * 3600 * 1000 }  
         };
-
         let MINING_CONFIG = { reward: 10, adsRequired: 10, duration: 3 * 3600 * 1000 };
         let ADMIN_MIN_W = 1000;
         let ADMIN_RATE = 100;
         let ADMIN_METHODS = "UPI,PhonePe,Paytm";
         
-        // SYSTEM VARIABLES
         let db, userId, userData = {};
         const ADSGRAM_BLOCK = "20263"; 
         
-        // LOCAL SHORT COOLDOWNS (10s)
-        let localCooldowns = {
-            task1: 0, task2: 0, task3: 0, task4: 0, mining: 0
-        };
+        // 10s Cooldown Tracker
+        let localCooldowns = { task1: 0, task2: 0, task3: 0, task4: 0, mining: 0 };
 
-        // --- 3. INIT ---
         document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => { document.getElementById('loading-screen').style.display='none'; }, 5000);
             
@@ -257,19 +249,15 @@
                 db = firebase.database();
                 const tg = window.Telegram.WebApp; tg.expand();
                 
-                // USER IDENTIFICATION & PROFILE SYNC
                 const tgUser = tg.initDataUnsafe?.user;
                 userId = tgUser?.id.toString() || localStorage.getItem('gm_id') || 'dev_'+Date.now();
                 localStorage.setItem('gm_id', userId);
 
-                // Get Real Name & Photo or Default
                 const realName = tgUser?.first_name || "Astronaut";
                 const realPhoto = tgUser?.photo_url || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
 
-                // Load User Data & Sync Profile
                 db.ref(`Users/${userId}`).on('value', snap => {
                     userData = snap.val() || { score: 0, miningAdsWatched: 0, isMiningActive: false };
-                    
                     if (userData.Name !== realName || userData.Photo !== realPhoto) {
                         db.ref(`Users/${userId}`).update({ Name: realName, Photo: realPhoto });
                     }
@@ -277,7 +265,6 @@
                     updateUI();
                 });
 
-                // ** LOAD ADMIN SETTINGS **
                 db.ref('Settings').on('value', snap => {
                     if(snap.exists()) {
                         const s = snap.val();
@@ -296,7 +283,6 @@
 
             } catch(e) { console.error(e); }
 
-            // NAV & BUTTONS
             document.querySelectorAll('.nav-item').forEach(t => t.addEventListener('click', () => {
                 document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
                 t.classList.add('active');
@@ -313,7 +299,6 @@
             initGalaxy();
         });
 
-        // --- 4. ADMIN & UI ---
         function updateAdminUI() {
             document.getElementById('admin-min').innerText = ADMIN_MIN_W;
             document.getElementById('admin-rate').innerText = ADMIN_RATE;
@@ -337,10 +322,19 @@
             renderTasks();
         }
 
-        // --- 5. ADS & LOGIC ---
+        // --- SLOW AUTO ADS SETTINGS ---
         function initAutoAds() {
             if (typeof show_9966767 === 'function') {
-                show_9966767({ type: 'inApp', inAppSettings: { frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false } });
+                show_9966767({
+                    type: 'inApp',
+                    inAppSettings: {
+                        frequency: 2,    // Max 2 ads
+                        capping: 0.5,    // Every 30 mins (0.5 hours)
+                        interval: 60,    // 60 seconds gap
+                        timeout: 20      // Start after 20 seconds
+                    }
+                });
+                console.log("Auto Ads Started (Slow Mode)");
             }
         }
 
@@ -356,7 +350,7 @@
                 const stat = document.getElementById(statusId);
                 const prog = document.getElementById(progId);
 
-                // 1. GLOBAL LIMIT COOLDOWN
+                // Global Limit Check
                 if (data.count >= conf.limit) {
                     const timePassed = now - data.lastDone;
                     if (timePassed < conf.cooldown) {
@@ -369,13 +363,13 @@
                     }
                 }
                 
-                // 2. SHORT COOLDOWN (10s)
+                // 10s Button Cooldown Check
                 if (localCooldowns[key] && now < localCooldowns[key]) {
                     const wait = Math.ceil((localCooldowns[key] - now) / 1000);
                     btn.innerText = `Wait ${wait}s`;
                     btn.disabled = true;
                     btn.style.background = "#555";
-                    // Update stats visuals but keep button locked
+                    
                     const displayCount = (data.count >= conf.limit && (now - data.lastDone >= conf.cooldown)) ? 0 : data.count;
                     stat.innerText = `${displayCount} / ${conf.limit}`;
                     prog.style.width = `${(displayCount / conf.limit) * 100}%`; prog.style.background = "var(--secondary)";
@@ -419,13 +413,12 @@
                 } else {
                     alert("Ad skipped or failed.");
                 }
-                // Trigger 10s cooldown
-                localCooldowns[key] = Date.now() + 10000;
+                localCooldowns[key] = Date.now() + 10000; // 10s cooldown
             };
 
             if (key === 'task1') {
                 if(window.Adsgram) window.Adsgram.init({ blockId: ADSGRAM_BLOCK }).show().then(finish).catch(() => finish(false));
-                else finish(true); // fallback
+                else finish(true);
             } else if (key === 'task2') {
                 if(typeof show_9966888 === 'function') show_9966888().then(()=>finish(true)).catch(()=>finish(false));
                 else { alert("Ad Script Not Loaded"); btn.disabled=false; }
@@ -438,7 +431,6 @@
             }
         }
 
-        // --- 7. MINING ---
         function handleMiningBtn() {
             const btn = document.getElementById('mining-btn');
             if(btn.innerText.includes("WATCH AD")) {
@@ -446,7 +438,7 @@
                     btn.innerText = "LOADING..."; btn.disabled = true;
                     window.Adsgram.init({ blockId: ADSGRAM_BLOCK }).show().then((watched) => {
                         if(watched) db.ref(`Users/${userId}/miningAdsWatched`).set(firebase.database.ServerValue.increment(1));
-                        localCooldowns['mining'] = Date.now() + 10000; // 10s Cooldown for Mining Ad
+                        localCooldowns['mining'] = Date.now() + 10000; // 10s cooldown
                     }).catch(() => { btn.disabled = false; });
                 }
             } else if (btn.innerText.includes("START ENGINE")) {
@@ -474,7 +466,6 @@
             const REQ = MINING_CONFIG.adsRequired;
             
             if (isMining) {
-                // ...existing mining logic...
                 const end = (userData.miningStartTime || 0) + MINING_CONFIG.duration;
                 const now = Date.now();
                 progressBox.style.display='none'; statusText.innerText = "Engine Running...";
@@ -488,7 +479,7 @@
             } else {
                 timer.innerText = "03:00:00";
                 
-                // CHECK MINING AD COOLDOWN
+                // Check local mining cooldown
                 if(localCooldowns['mining'] && Date.now() < localCooldowns['mining']) {
                     const wait = Math.ceil((localCooldowns['mining'] - Date.now()) / 1000);
                     btn.innerHTML = `Wait ${wait}s`;
@@ -512,7 +503,6 @@
             }
         }
 
-        // --- 8. EXTRAS ---
         function initGalaxy() {
             const c = document.getElementById('galaxy-canvas'); const x = c.getContext('2d');
             c.width = window.innerWidth; c.height = window.innerHeight;
