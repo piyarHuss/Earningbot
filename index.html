@@ -1,17 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src='//libtl.com/sdk.js' data-zone='9966767' data-sdk='show_9966767'></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Galaxy Miner - Updated</title>
+    <title>Galaxy Miner - Monetag Integration</title>
 
     <!-- ===== 1. TELEGRAM SDK ===== -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-    <!-- ===== 2. ADSGRAM SDK ===== -->
+    <!-- ===== 2. ADSGRAM SDK (For Task 1) ===== -->
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 
-    <!-- ===== 3. FIREBASE SDK ===== -->
+    <!-- ===== 3. MONETAG SDK (REQUIRED) ===== -->
+    <!-- ⚠️ <script src='//libtl.com/sdk.js' data-zone='9966888' data-sdk='show_9966888'></script>
+    <!-- It usually looks like: <script src="//alwingulla.com/..." data-cfasync="false"></script> -->
+    <!-- Ensure the script supports the zone IDs: 9966888 and 9966767 -->
+    
+    <!-- ===== 4. FIREBASE SDK ===== -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -74,7 +80,7 @@
         .nav-item.active { color: var(--primary); }
         .nav-item i { font-size: 20px; }
 
-        /* --- ADDED FOR WITHDRAWAL POPUP & HISTORY --- */
+        /* MODALS */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; display: none; justify-content: center; align-items: center; }
         .modal-box { background: #1a1a1a; width: 90%; max-width: 350px; padding: 20px; border-radius: 15px; border: 1px solid var(--primary); position: relative; }
         .close-btn { position: absolute; top: 10px; right: 15px; color: #aaa; font-size: 24px; cursor: pointer; }
@@ -88,7 +94,7 @@
     <!-- LOADING -->
     <div id="loading-screen">
         <div class="loader"></div>
-        <div>CONNECTING...</div>
+        <div>LOADING GALAXY...</div>
     </div>
 
     <div class="app-container">
@@ -112,28 +118,44 @@
                 <div class="mining-progress" id="mining-progress-box">
                     <div class="mining-bar" id="mining-bar-fill"></div>
                 </div>
-                <div style="margin-top:5px; font-size:11px; color:#aaa;" id="mining-status-text">Watch 10 Ads to Start</div>
+                <div style="margin-top:5px; font-size:11px; color:#aaa;" id="mining-status-text">Watch Ads to Start</div>
             </div>
         </div>
 
         <!-- SCREEN: TASKS -->
         <div id="screen-tasks" class="screen">
-            <h2 style="text-align: center; margin-bottom: 20px;">Ad Tasks</h2>
-            <!-- 1. TASK 1 -->
+            <h2 style="text-align: center; margin-bottom: 20px;">Daily Missions</h2>
+            
+            <!-- 1. TASK 1 (ADSGRAM) -->
             <div class="task-card">
-                <div class="task-header"><div class="task-title"><i class="fas fa-bolt" style="color: yellow;"></i> Task 1</div><div class="task-reward">+2 Coins / Ad</div></div>
+                <div class="task-header"><div class="task-title"><i class="fas fa-bolt" style="color: yellow;"></i> Task 1 (Adsgram)</div><div class="task-reward" id="reward-task1">+2</div></div>
                 <div class="progress-bar"><div class="progress-fill" id="prog-task1"></div></div>
-                <div class="task-footer"><span id="status-task1">0 / 10 Watched</span><button class="btn-task" id="btn-task1">Watch</button></div>
+                <div class="task-footer"><span id="status-task1">0/10</span><button class="btn-task" id="btn-task1">Watch</button></div>
             </div>
-            <!-- 2. TASK 2 -->
+
+            <!-- 2. TASK 2 (MONETAG INTERSTITIAL) -->
             <div class="task-card">
-                <div class="task-header"><div class="task-title"><i class="fas fa-star" style="color: cyan;"></i> Task 2</div><div class="task-reward">+2 Coins / Ad</div></div>
+                <div class="task-header"><div class="task-title"><i class="fas fa-star" style="color: cyan;"></i> Task 2 (Monetag)</div><div class="task-reward" id="reward-task2">+2</div></div>
                 <div class="progress-bar"><div class="progress-fill" id="prog-task2"></div></div>
-                <div class="task-footer"><span id="status-task2">0 / 10 Watched</span><button class="btn-task" id="btn-task2">Watch</button></div>
+                <div class="task-footer"><span id="status-task2">0/10</span><button class="btn-task" id="btn-task2">Watch</button></div>
+            </div>
+
+            <!-- 3. TASK 3 (MONETAG POPUP) -->
+            <div class="task-card">
+                <div class="task-header"><div class="task-title"><i class="fas fa-fire" style="color: orange;"></i> Task 3 (Direct Pop)</div><div class="task-reward" id="reward-task3">+3</div></div>
+                <div class="progress-bar"><div class="progress-fill" id="prog-task3"></div></div>
+                <div class="task-footer"><span id="status-task3">0/10</span><button class="btn-task" id="btn-task3">Watch</button></div>
+            </div>
+
+            <!-- 4. TASK 4 (MONETAG 2ND INTERSTITIAL) -->
+            <div class="task-card">
+                <div class="task-header"><div class="task-title"><i class="fas fa-gem" style="color: violet;"></i> Task 4 (Special)</div><div class="task-reward" id="reward-task4">+4</div></div>
+                <div class="progress-bar"><div class="progress-fill" id="prog-task4"></div></div>
+                <div class="task-footer"><span id="status-task4">0/10</span><button class="btn-task" id="btn-task4">Watch</button></div>
             </div>
         </div>
 
-        <!-- SCREEN: WALLET (UPDATED) -->
+        <!-- SCREEN: WALLET -->
         <div id="screen-wallet" class="screen">
             <h2 style="text-align: center;">My Wallet</h2>
             <div style="background: linear-gradient(135deg, #1e3c72, #2a5298); padding: 25px; border-radius: 20px; text-align: center; border: 1px solid var(--secondary);">
@@ -142,7 +164,6 @@
                 <div style="color: var(--primary); font-size: 14px;">Value: ₹<span id="usd-val">0.00</span></div>
             </div>
             
-            <!-- ADMIN SETTINGS INFO -->
             <div style="text-align:center; font-size:11px; color:#888; margin-top:10px;">
                 Min Withdraw: <span id="admin-min">1000</span> Coins | Rate: <span id="admin-rate">100</span> = ₹1
             </div>
@@ -166,19 +187,13 @@
         <div class="modal-box">
             <span class="close-btn" onclick="closeModal('w-modal')">&times;</span>
             <h3 style="margin-top:0;">Request Withdrawal</h3>
-            
             <label style="font-size:12px; color:#aaa; display:block;">Select Method</label>
-            <select id="w-method" class="form-control">
-                <option value="">Loading Methods...</option>
-            </select>
-
+            <select id="w-method" class="form-control"><option value="">Loading...</option></select>
             <label style="font-size:12px; color:#aaa; display:block;">Amount (Coins)</label>
-            <input type="number" id="w-amount" class="form-control" placeholder="Min: 1000" oninput="calcVal()">
+            <input type="number" id="w-amount" class="form-control" placeholder="0" oninput="calcVal()">
             <div style="text-align:right; font-size:12px; color:lime;">You get: ₹<span id="w-get">0.00</span></div>
-
             <label style="font-size:12px; color:#aaa; display:block; margin-top:5px;">Phone / UPI ID</label>
-            <input type="text" id="w-detail" class="form-control" placeholder="e.g. 9876543210@ybl">
-
+            <input type="text" id="w-detail" class="form-control" placeholder="Details">
             <button class="btn-main" style="margin-top:10px;" onclick="submitRequest()">SUBMIT</button>
         </div>
     </div>
@@ -188,15 +203,13 @@
         <div class="modal-box" style="height: 60vh; display:flex; flex-direction:column;">
             <span class="close-btn" onclick="closeModal('h-modal')">&times;</span>
             <h3 style="margin-top:0;">History</h3>
-            <div id="h-list" style="overflow-y:auto; flex:1; text-align:left;">
-                Loading...
-            </div>
+            <div id="h-list" style="overflow-y:auto; flex:1; text-align:left;">Loading...</div>
         </div>
     </div>
 
     <!-- ===== LOGIC ===== -->
     <script>
-        // --- 1. CONFIGURATION ---
+        // --- 1. FIREBASE CONFIG ---
         const FIREBASE_CONFIG = {
             apiKey: "AIzaSyBJrCE4w_QfBqfF3g4O_RuCK4DbjmL9TRg",
             authDomain: "telegram-69052.firebaseapp.com",
@@ -207,35 +220,31 @@
             appId: "1:824247387361:web:f4e6c22abb4b503871a3a0"
         };
         
-        // ADS
-        const MINING_AD_BLOCK = "20263";      
-        const TASKS_AD_BLOCK  = "int-20264";  
+        // --- 2. GLOBAL SETTINGS (Controlled via Admin Panel) ---
+        // These are defaults. Admin Panel (DB: Settings/taskConfig) overrides these.
+        let TASK_CONFIG = {
+            task1: { reward: 2, limit: 10, cooldown: 2 * 3600 * 1000 }, // Adsgram
+            task2: { reward: 5, limit: 10, cooldown: 1 * 3600 * 1000 }, // Monetag 9966888
+            task3: { reward: 5, limit: 10, cooldown: 1 * 3600 * 1000 }, // Monetag Pop
+            task4: { reward: 10, limit: 5,  cooldown: 4 * 3600 * 1000 }  // Monetag 9966767
+        };
 
-        // GAME CONSTANTS
-        const MINING_ADS_REQUIRED = 10;       
-        const MINING_DURATION_MS = 3 * 60 * 60 * 1000; 
-        const MINING_REWARD = 10;             
-        const TASK_LIMIT = 10;                
-        const TASK_COOLDOWN_MS = 2 * 60 * 60 * 1000; 
+        let MINING_CONFIG = {
+            reward: 10,
+            adsRequired: 10,
+            duration: 3 * 3600 * 1000 // 3 hours
+        };
 
-        // ADMIN VARIABLES (Will load from DB)
+        // ADMIN VARIABLES
         let ADMIN_MIN_W = 1000;
-        let ADMIN_RATE = 100; // 100 Coins = 1 Rupee
+        let ADMIN_RATE = 100;
         let ADMIN_METHODS = "UPI,PhonePe,Paytm";
-
-        // --- 2. VARIABLES ---
+        
+        // SYSTEM VARIABLES
         let db, userId, userData = {};
+        const ADSGRAM_BLOCK = "20263"; // Adsgram ID
 
-        // --- 3. ADS FUNCTION ---
-        function playAdsGram(blockId) {
-            return new Promise((resolve) => {
-                if(window.Adsgram) {
-                    window.Adsgram.init({ blockId: blockId }).show().then(() => resolve(true)).catch(() => resolve(false));
-                } else resolve(true); // Fallback
-            });
-        }
-
-        // --- 4. APP INIT ---
+        // --- 3. INIT ---
         document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => { document.getElementById('loading-screen').style.display='none'; }, 5000);
             
@@ -246,15 +255,14 @@
                 userId = tg.initDataUnsafe?.user?.id.toString() || localStorage.getItem('gm_id') || 'dev_'+Date.now();
                 localStorage.setItem('gm_id', userId);
 
-                // Load User
+                // Load User Data
                 db.ref(`Users/${userId}`).on('value', snap => {
                     userData = snap.val() || { Name: "Player", score: 0, miningAdsWatched: 0, isMiningActive: false };
                     if(!snap.exists()) db.ref(`Users/${userId}`).set(userData);
                     updateUI();
-                    document.getElementById('loading-screen').style.display='none';
                 });
 
-                // ** LOAD ADMIN SETTINGS **
+                // ** LOAD ADMIN SETTINGS DYNAMICALLY **
                 db.ref('Settings').on('value', snap => {
                     if(snap.exists()) {
                         const s = snap.val();
@@ -262,23 +270,26 @@
                         if(s.coinRate) ADMIN_RATE = parseInt(s.coinRate);
                         if(s.methods) ADMIN_METHODS = s.methods;
                         
-                        // Update Wallet UI Text
-                        document.getElementById('admin-min').innerText = ADMIN_MIN_W;
-                        document.getElementById('admin-rate').innerText = ADMIN_RATE;
-                        
-                        // Populate Dropdown
-                        const sel = document.getElementById('w-method');
-                        sel.innerHTML = '<option value="">Select Method</option>';
-                        ADMIN_METHODS.split(',').forEach(m => {
-                            sel.innerHTML += `<option value="${m.trim()}">${m.trim()}</option>`;
-                        });
+                        // Overwrite Task Config if exists in DB
+                        if(s.taskConfig) {
+                            TASK_CONFIG = s.taskConfig; 
+                        }
+                        // Overwrite Mining Config
+                        if(s.miningConfig) {
+                            MINING_CONFIG = s.miningConfig;
+                        }
+
+                        updateAdminUI();
                     }
                 });
+
+                // AUTO ADS INIT
+                initAutoAds();
 
                 setInterval(updateMiningUI, 1000); 
                 setInterval(renderTasks, 1000);    
 
-            } catch(e) { alert(e); }
+            } catch(e) { console.error(e); }
 
             // NAV CLICK
             document.querySelectorAll('.nav-item').forEach(t => t.addEventListener('click', () => {
@@ -288,48 +299,208 @@
                 document.getElementById(t.dataset.target).classList.add('active');
             }));
 
-            // MINING BUTTON
-            document.getElementById('mining-btn').addEventListener('click', () => {
-                const btn = document.getElementById('mining-btn');
-                if(btn.innerText.includes("WATCH AD")) {
-                    btn.innerText = "LOADING AD..."; btn.disabled = true;
-                    playAdsGram(MINING_AD_BLOCK).then((watched) => {
-                        if(watched) db.ref(`Users/${userId}/miningAdsWatched`).set(firebase.database.ServerValue.increment(1));
-                        else alert("Ad skipped/failed.");
-                    });
-                } else if (btn.innerText.includes("START ENGINE")) {
-                    db.ref(`Users/${userId}`).update({ isMiningActive: true, miningStartTime: firebase.database.ServerValue.TIMESTAMP });
-                } else if (btn.innerText.includes("CLAIM")) {
-                    const u = {};
-                    u[`Users/${userId}/score`] = firebase.database.ServerValue.increment(MINING_REWARD);
-                    u[`Users/${userId}/isMiningActive`] = false;
-                    u[`Users/${userId}/miningStartTime`] = null;
-                    u[`Users/${userId}/miningAdsWatched`] = 0;
-                    db.ref().update(u);
-                    alert(`Claimed ${MINING_REWARD} Coins.`);
-                }
-            });
-
-            // TASKS CLICKS
-            document.getElementById('btn-task1').addEventListener('click', () => handleTask('task1', 2));
-            document.getElementById('btn-task2').addEventListener('click', () => handleTask('task2', 2));
+            // SETUP BUTTONS
+            document.getElementById('mining-btn').addEventListener('click', handleMiningBtn);
+            
+            // Task Buttons
+            document.getElementById('btn-task1').addEventListener('click', () => handleTaskLogic('task1'));
+            document.getElementById('btn-task2').addEventListener('click', () => handleTaskLogic('task2'));
+            document.getElementById('btn-task3').addEventListener('click', () => handleTaskLogic('task3'));
+            document.getElementById('btn-task4').addEventListener('click', () => handleTaskLogic('task4'));
 
             initGalaxy();
         });
 
-        // --- 5. LOGIC HANDLERS ---
+        // --- 4. ADMIN & UI ---
+        function updateAdminUI() {
+            document.getElementById('admin-min').innerText = ADMIN_MIN_W;
+            document.getElementById('admin-rate').innerText = ADMIN_RATE;
+            
+            const sel = document.getElementById('w-method');
+            sel.innerHTML = '<option value="">Select Method</option>';
+            ADMIN_METHODS.split(',').forEach(m => {
+                sel.innerHTML += `<option value="${m.trim()}">${m.trim()}</option>`;
+            });
+
+            // Update Task Rewards UI
+            document.getElementById('reward-task1').innerText = "+" + (TASK_CONFIG.task1?.reward || 0);
+            document.getElementById('reward-task2').innerText = "+" + (TASK_CONFIG.task2?.reward || 0);
+            document.getElementById('reward-task3').innerText = "+" + (TASK_CONFIG.task3?.reward || 0);
+            document.getElementById('reward-task4').innerText = "+" + (TASK_CONFIG.task4?.reward || 0);
+        }
+
         function updateUI() {
             document.getElementById('player-name').innerText = userData.Name || "Player";
             const s = (userData.score||0).toLocaleString();
             document.getElementById('player-balance').innerText = s;
             document.getElementById('wallet-big-balance').innerText = s;
-            
-            // Calc Rupees
-            const inr = ((userData.score || 0) / ADMIN_RATE).toFixed(2);
-            document.getElementById('usd-val').innerText = inr;
-            
+            document.getElementById('usd-val').innerText = ((userData.score || 0) / ADMIN_RATE).toFixed(2);
             updateMiningUI();
             renderTasks();
+        }
+
+        // --- 5. MONETAG FUNCTIONS & AUTO ADS ---
+        
+        // Auto Ads (In-App)
+        function initAutoAds() {
+            if (typeof show_9966767 === 'function') {
+                show_9966767({
+                    type: 'inApp',
+                    inAppSettings: {
+                        frequency: 2,
+                        capping: 0.1,
+                        interval: 30,
+                        timeout: 5,
+                        everyPage: false
+                    }
+                });
+                console.log("Auto Ads Started");
+            } else {
+                console.log("Monetag SDK not loaded yet.");
+            }
+        }
+
+        // --- 6. TASK LOGIC ---
+
+        function renderTasks() {
+            if(!userData) return;
+            const tasks = userData.taskData || {};
+            const now = Date.now();
+
+            // Helper to render logic
+            const renderOne = (key, btnId, statusId, progId) => {
+                const conf = TASK_CONFIG[key] || {limit:10, cooldown:3600000};
+                const data = tasks[key] || { count: 0, lastDone: 0 };
+                const btn = document.getElementById(btnId);
+                const stat = document.getElementById(statusId);
+                const prog = document.getElementById(progId);
+
+                // Check Cooldown
+                if (data.count >= conf.limit) {
+                    const timePassed = now - data.lastDone;
+                    if (timePassed < conf.cooldown) {
+                        const left = conf.cooldown - timePassed;
+                        const h = Math.floor(left/3600000); 
+                        const m = Math.floor((left%3600000)/60000); 
+                        const s = Math.floor((left%60000)/1000);
+                        btn.innerText = `${h}h ${m}m ${s}s`; 
+                        btn.disabled = true; 
+                        btn.style.background = "#333";
+                        stat.innerHTML = `<span class="cooldown-text">Limit Reached</span>`;
+                        prog.style.width = "100%"; 
+                        prog.style.background = "#ff4d4f";
+                        return;
+                    }
+                }
+
+                // Reset logic if cooldown over
+                const displayCount = (data.count >= conf.limit && (now - data.lastDone >= conf.cooldown)) ? 0 : data.count;
+                
+                btn.innerText = "Watch Ad"; 
+                btn.disabled = false; 
+                btn.style.background = "";
+                stat.innerText = `${displayCount} / ${conf.limit}`;
+                prog.style.width = `${(displayCount / conf.limit) * 100}%`;
+                prog.style.background = "var(--secondary)";
+            };
+
+            renderOne('task1', 'btn-task1', 'status-task1', 'prog-task1');
+            renderOne('task2', 'btn-task2', 'status-task2', 'prog-task2');
+            renderOne('task3', 'btn-task3', 'status-task3', 'prog-task3');
+            renderOne('task4', 'btn-task4', 'status-task4', 'prog-task4');
+        }
+
+        function handleTaskLogic(key) {
+            const conf = TASK_CONFIG[key];
+            const btn = document.getElementById('btn-' + key);
+            
+            // Check limits again locally
+            const tasks = userData.taskData || {};
+            const data = tasks[key] || { count: 0, lastDone: 0 };
+            if (data.count >= conf.limit && (Date.now() - data.lastDone < conf.cooldown)) return;
+
+            // Reset count if new cycle
+            let currentCount = data.count;
+            if (data.count >= conf.limit && (Date.now() - data.lastDone >= conf.cooldown)) currentCount = 0;
+
+            btn.innerText = "Loading..."; btn.disabled = true;
+
+            // --- REWARD FUNCTION ---
+            const grantReward = () => {
+                const newCount = currentCount + 1;
+                let updates = {};
+                updates[`Users/${userId}/score`] = firebase.database.ServerValue.increment(conf.reward);
+                
+                if (newCount >= conf.limit) {
+                    updates[`Users/${userId}/taskData/${key}`] = { count: conf.limit, lastDone: firebase.database.ServerValue.TIMESTAMP };
+                } else {
+                    updates[`Users/${userId}/taskData/${key}`] = { count: newCount, lastDone: data.lastDone }; // Keep old timestamp
+                }
+                
+                db.ref().update(updates).then(() => {
+                    alert(`Success! You earned +${conf.reward} Coins.`);
+                });
+                btn.innerText = "Watch Ad"; btn.disabled = false;
+            };
+
+            const handleError = (e) => {
+                console.error(e);
+                alert("Ad failed or closed too early.");
+                btn.innerText = "Watch Ad"; btn.disabled = false;
+            };
+
+            // --- AD SWITCHER ---
+            if (key === 'task1') {
+                // ADSGRAM
+                if(window.Adsgram) {
+                    window.Adsgram.init({ blockId: ADSGRAM_BLOCK }).show().then((watched) => {
+                        if(watched) grantReward(); else handleError();
+                    }).catch(handleError);
+                } else grantReward(); // Fallback if no SDK
+
+            } else if (key === 'task2') {
+                // MONETAG: show_9966888()
+                if(typeof show_9966888 === 'function') {
+                    show_9966888().then(grantReward).catch(handleError);
+                } else { alert("Monetag SDK missing!"); btn.disabled=false; }
+
+            } else if (key === 'task3') {
+                // MONETAG: show_9966888('pop')
+                if(typeof show_9966888 === 'function') {
+                    show_9966888('pop').then(grantReward).catch(handleError);
+                } else { alert("Monetag SDK missing!"); btn.disabled=false; }
+
+            } else if (key === 'task4') {
+                // MONETAG: show_9966767()
+                if(typeof show_9966767 === 'function') {
+                    show_9966767().then(grantReward).catch(handleError);
+                } else { alert("Monetag SDK missing!"); btn.disabled=false; }
+            }
+        }
+
+        // --- 7. MINING LOGIC ---
+        function handleMiningBtn() {
+            const btn = document.getElementById('mining-btn');
+            
+            if(btn.innerText.includes("WATCH AD")) {
+                // Use Adsgram for mining ads (or change to Monetag if preferred)
+                if(window.Adsgram) {
+                    btn.innerText = "LOADING..."; btn.disabled = true;
+                    window.Adsgram.init({ blockId: ADSGRAM_BLOCK }).show().then((watched) => {
+                        if(watched) db.ref(`Users/${userId}/miningAdsWatched`).set(firebase.database.ServerValue.increment(1));
+                    }).catch(() => { btn.disabled = false; });
+                }
+            } else if (btn.innerText.includes("START ENGINE")) {
+                db.ref(`Users/${userId}`).update({ isMiningActive: true, miningStartTime: firebase.database.ServerValue.TIMESTAMP });
+            } else if (btn.innerText.includes("CLAIM")) {
+                const u = {};
+                u[`Users/${userId}/score`] = firebase.database.ServerValue.increment(MINING_CONFIG.reward);
+                u[`Users/${userId}/isMiningActive`] = false;
+                u[`Users/${userId}/miningStartTime`] = null;
+                u[`Users/${userId}/miningAdsWatched`] = 0;
+                db.ref().update(u);
+                alert(`Claimed ${MINING_CONFIG.reward} Coins.`);
+            }
         }
 
         function updateMiningUI() {
@@ -341,11 +512,13 @@
 
             const isMining = userData.isMiningActive === true;
             const adsWatched = userData.miningAdsWatched || 0;
+            const REQ = MINING_CONFIG.adsRequired;
+            const DUR = MINING_CONFIG.duration;
 
             if (isMining) {
                 progressBox.style.display = 'none';
                 statusText.innerText = "Engine Running...";
-                const end = (userData.miningStartTime || 0) + MINING_DURATION_MS;
+                const end = (userData.miningStartTime || 0) + DUR;
                 const now = Date.now();
                 if(now < end) {
                     const l = end - now;
@@ -353,15 +526,15 @@
                     timer.innerText = `${h}:${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
                     btn.innerHTML = `<i class="fas fa-cog fa-spin"></i> MINING...`; btn.disabled = true; btn.style.background = "#333";
                 } else {
-                    timer.innerText = "00:00:00"; btn.innerHTML = `CLAIM ${MINING_REWARD} COINS`; btn.disabled = false; btn.style.background = "var(--secondary)"; btn.style.color = "#000";
+                    timer.innerText = "00:00:00"; btn.innerHTML = `CLAIM ${MINING_CONFIG.reward} COINS`; btn.disabled = false; btn.style.background = "var(--secondary)"; btn.style.color = "#000";
                 }
             } else {
                 timer.innerText = "03:00:00";
-                if (adsWatched < MINING_ADS_REQUIRED) {
-                    btn.innerHTML = `WATCH AD (${adsWatched}/${MINING_ADS_REQUIRED})`; btn.disabled = false; btn.style.background = "";
+                if (adsWatched < REQ) {
+                    btn.innerHTML = `WATCH AD (${adsWatched}/${REQ})`; btn.disabled = false; btn.style.background = "";
                     progressBox.style.display = 'block';
-                    barFill.style.width = ((adsWatched / MINING_ADS_REQUIRED) * 100) + "%";
-                    statusText.innerText = `Watch ${MINING_ADS_REQUIRED - adsWatched} more ads`;
+                    barFill.style.width = ((adsWatched / REQ) * 100) + "%";
+                    statusText.innerText = `Watch ${REQ - adsWatched} more ads`;
                 } else {
                     btn.innerHTML = `<i class="fas fa-play"></i> START ENGINE`; btn.disabled = false; btn.style.background = "#28a745"; btn.style.color = "#fff";
                     progressBox.style.display = 'none'; statusText.innerText = "Ready to Launch.";
@@ -369,56 +542,7 @@
             }
         }
 
-        // --- TASK LOGIC ---
-        function renderTasks() {
-            if(!userData) return;
-            const tasks = userData.taskData || {};
-            const now = Date.now();
-            const renderCard = (key, btnId, statusId, progId) => {
-                const data = tasks[key] || { count: 0, lastDone: 0 };
-                const btn = document.getElementById(btnId);
-                const stat = document.getElementById(statusId);
-                const prog = document.getElementById(progId);
-                if (data.count >= TASK_LIMIT) {
-                    const timePassed = now - data.lastDone;
-                    if (timePassed < TASK_COOLDOWN_MS) {
-                        const left = TASK_COOLDOWN_MS - timePassed;
-                        const h = Math.floor(left/3600000); const m = Math.floor((left%3600000)/60000); const s = Math.floor((left%60000)/1000);
-                        btn.innerText = `${h}h ${m}m ${s}s`; btn.disabled = true; btn.style.background = "#333";
-                        stat.innerHTML = `<span class="cooldown-text">Cooldown</span>`; prog.style.width = "100%"; prog.style.background = "#ff4d4f";
-                        return;
-                    }
-                }
-                const count = (data.count >= TASK_LIMIT && (now - data.lastDone >= TASK_COOLDOWN_MS)) ? 0 : data.count;
-                btn.innerText = "Watch"; btn.disabled = false; btn.style.background = "";
-                stat.innerText = `${count} / ${TASK_LIMIT} Watched`;
-                prog.style.width = `${(count / TASK_LIMIT) * 100}%`; prog.style.background = "var(--secondary)";
-            };
-            renderCard('task1', 'btn-task1', 'status-task1', 'prog-task1');
-            renderCard('task2', 'btn-task2', 'status-task2', 'prog-task2');
-        }
-
-        function handleTask(key, reward) {
-            const tasks = userData.taskData || {};
-            const data = tasks[key] || { count: 0, lastDone: 0 };
-            if (data.count >= TASK_LIMIT && (Date.now() - data.lastDone >= TASK_COOLDOWN_MS)) data.count = 0; 
-            const btnId = (key === 'task1') ? 'btn-task1' : 'btn-task2';
-            const btn = document.getElementById(btnId);
-            btn.innerText = "..."; btn.disabled = true;
-            playAdsGram(TASKS_AD_BLOCK).then((watched) => {
-                if(watched) {
-                    const newCount = data.count + 1;
-                    let updates = {};
-                    updates[`Users/${userId}/score`] = firebase.database.ServerValue.increment(reward);
-                    if (newCount >= TASK_LIMIT) updates[`Users/${userId}/taskData/${key}`] = { count: TASK_LIMIT, lastDone: firebase.database.ServerValue.TIMESTAMP };
-                    else updates[`Users/${userId}/taskData/${key}`] = { count: newCount, lastDone: data.lastDone };
-                    db.ref().update(updates);
-                } else alert("Ad failed.");
-                btn.innerText = "Watch"; btn.disabled = false;
-            });
-        }
-
-        // --- VISUALS ---
+        // --- 8. VISUALS & MODALS ---
         function initGalaxy() {
             const c = document.getElementById('galaxy-canvas'); const x = c.getContext('2d');
             c.width = window.innerWidth; c.height = window.innerHeight;
@@ -427,7 +551,6 @@
             l();
         }
 
-        // --- NEW: WITHDRAWAL & HISTORY ---
         function openWModal() { document.getElementById('w-modal').style.display='flex'; }
         function openHModal() { 
             document.getElementById('h-modal').style.display='flex'; 
@@ -449,32 +572,18 @@
             });
         }
         function closeModal(id) { document.getElementById(id).style.display='none'; }
-        
-        function calcVal() {
-            const amt = document.getElementById('w-amount').value;
-            document.getElementById('w-get').innerText = (amt / ADMIN_RATE).toFixed(2);
-        }
-
+        function calcVal() { document.getElementById('w-get').innerText = (document.getElementById('w-amount').value / ADMIN_RATE).toFixed(2); }
         function submitRequest() {
             const amt = parseInt(document.getElementById('w-amount').value);
             const met = document.getElementById('w-method').value;
             const det = document.getElementById('w-detail').value;
-
             if(!amt || !met || !det) return alert("Fill all fields.");
-            if(amt < ADMIN_MIN_W) return alert(`Minimum withdrawal: ${ADMIN_MIN_W} Coins`);
+            if(amt < ADMIN_MIN_W) return alert(`Minimum: ${ADMIN_MIN_W} Coins`);
             if(amt > userData.score) return alert("Insufficient Balance.");
-
-            const req = {
-                userId: userId, userName: userData.Name,
-                amount: amt, rupeeVal: (amt/ADMIN_RATE).toFixed(2),
-                method: met, details: det,
-                status: "Pending", date: new Date().toLocaleString()
-            };
-
+            const req = { userId: userId, userName: userData.Name, amount: amt, rupeeVal: (amt/ADMIN_RATE).toFixed(2), method: met, details: det, status: "Pending", date: new Date().toLocaleString() };
             db.ref('Withdrawals').push(req).then(() => {
                 db.ref(`Users/${userId}/score`).set(firebase.database.ServerValue.increment(-amt));
-                alert("Request Sent!");
-                closeModal('w-modal');
+                alert("Request Sent!"); closeModal('w-modal');
             });
         }
     </script>
