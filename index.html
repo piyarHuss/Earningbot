@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Galaxy Miner - Fast Ads</title>
+    <title>Galaxy Miner - Smart Ads</title>
 
     <!-- ===== 1. TELEGRAM SDK ===== -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -322,19 +322,19 @@
             renderTasks();
         }
 
-        // --- FAST AUTO ADS SETTINGS (UPDATED: 35 Seconds) ---
+        // --- UPDATED AUTO ADS SETTINGS (DELAYED START) ---
         function initAutoAds() {
             if (typeof show_9966767 === 'function') {
                 show_9966767({
                     type: 'inApp',
                     inAppSettings: {
-                        frequency: 100,  // Bohot saare ads allow kiye taaki band na ho
-                        capping: 1,      // Har 1 ghante me limit reset
-                        interval: 35,    // MAIN: Har 35 seconds me ad ayega
-                        timeout: 10      // App start hone ke 10 sec baad pehla ad
+                        frequency: 100,  // Max limit high taaki ad band na ho
+                        capping: 1,      // Hourly reset
+                        interval: 35,    // Gap: Har 35 seconds mein ad ayega
+                        timeout: 60      // START DELAY: App khulne ke 60 sec baad pehla ad ayega (Turant nahi)
                     }
                 });
-                console.log("Auto Ads Started (Fast Mode: 35s)");
+                console.log("Auto Ads Started (Starts after 60s, then every 35s)");
             }
         }
 
