@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Galaxy Miner - Jupiter Edition</title>
+    <title>Galaxy Miner - Ultimate Edition</title>
 
     <!-- ===== 1. TELEGRAM SDK ===== -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -25,10 +25,10 @@
 
     <style>
         :root {
-            --primary: #FFD700; --primary-glow: rgba(255, 215, 0, 0.5);
+            --primary: #FFD700; --primary-glow: rgba(255, 215, 0, 0.6);
             --secondary: #00e0ff; --bg-dark: #0b0f19;
-            --bg-panel: rgba(20, 25, 40, 0.95); --glass-border: rgba(255, 255, 255, 0.1);
-            --text-main: #ffffff; --text-muted: #a0a0a0;
+            --bg-panel: rgba(20, 25, 40, 0.95); --glass-border: rgba(255, 255, 255, 0.15);
+            --text-main: #ffffff;
             --font-main: 'Poppins', sans-serif;
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
@@ -47,68 +47,136 @@
 
         /* HUD */
         .top-hud { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; z-index: 10; }
-        .profile-chip { background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); padding: 5px 12px 5px 5px; border-radius: 50px; display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; max-width: 50%; }
+        .profile-chip { background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border); padding: 5px 12px 5px 5px; border-radius: 50px; display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; backdrop-filter: blur(5px); }
         .profile-pic { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--secondary); object-fit: cover; }
-        .balance-chip { background: rgba(0,0,0,0.6); border: 1px solid var(--primary); padding: 8px 16px; border-radius: 50px; display: flex; align-items: center; gap: 8px; box-shadow: 0 0 15px var(--primary-glow); }
-        .coin-svg { width: 24px; height: 24px; filter: drop-shadow(0 0 5px gold); }
-
-        /* MINING */
+        .balance-chip { background: rgba(0,0,0,0.6); border: 1px solid var(--primary); padding: 8px 16px; border-radius: 50px; display: flex; align-items: center; gap: 8px; box-shadow: 0 0 15px var(--primary-glow); backdrop-filter: blur(5px); }
+        
+        /* MINING & SPACE */
         #galaxy-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.6; }
-        .mining-hub { position: relative; z-index: 5; text-align: center; background: var(--bg-panel); padding: 30px; border-radius: 30px; border: 1px solid var(--glass-border); width: 90%; max-width: 350px; margin: auto; display: flex; flex-direction: column; align-items: center; }
-        .timer-display { font-size: 42px; font-weight: 700; margin: 10px 0; color: #fff; text-shadow: 0 0 20px rgba(255,255,255,0.2); }
-        .btn-main { background: linear-gradient(135deg, var(--primary), #e6b800); color: #000; border: none; width: 100%; padding: 16px; border-radius: 16px; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 5px 20px var(--primary-glow); display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .btn-main:disabled { background: #333; color: #777; box-shadow: none; cursor: default; }
-        .mining-progress { width: 100%; background: #333; height: 8px; border-radius: 4px; margin-top: 10px; overflow: hidden; display: none; }
-        .mining-bar { height: 100%; background: var(--secondary); width: 0%; transition: width 0.3s; }
+        
+        .mining-hub { 
+            position: relative; z-index: 5; text-align: center; width: 100%; 
+            display: flex; flex-direction: column; align-items: center; padding-top: 20px; 
+        }
 
-        /* JUPITER ANIMATION & STYLES */
+        .timer-display { font-size: 42px; font-weight: 700; margin: 5px 0; color: #fff; text-shadow: 0 0 15px rgba(255,215,0,0.5); }
+        
+        /* PLANET CONTAINER & ANIMATIONS */
+        .planet-container {
+            position: relative;
+            width: 280px; height: 280px;
+            display: flex; justify-content: center; align-items: center;
+            margin-bottom: 10px;
+            /* Container will handle Shake, Planet will handle Spin */
+        }
+
         #planet-jupiter {
-            width: 140px;
-            height: 140px;
-            object-fit: contain;
-            border-radius: 50%;
-            margin-bottom: 15px;
-            filter: drop-shadow(0 0 15px rgba(255, 150, 50, 0.4));
-            /* Default Slow Spin (Idle) */
-            animation: planetSpin 20s linear infinite;
+            width: 260px; height: 260px;
+            object-fit: contain; border-radius: 50%; z-index: 5; 
+            filter: drop-shadow(0 0 25px rgba(255, 140, 0, 0.4));
+            /* Spin Animation is ALWAYS active here */
+            animation: planetSpin 30s linear infinite; 
         }
 
-        /* Class for FAST spin (When Mining) */
-        .planet-fast {
-            animation: planetSpin 2s linear infinite !important;
-            filter: drop-shadow(0 0 30px rgba(255, 200, 50, 0.8)) !important;
+        /* SHAKE EFFECT (Applied to Container) */
+        .shake-effect {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
         }
 
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-4px, 0, 0); }
+            20%, 80% { transform: translate3d(6px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-8px, 0, 0); }
+            40%, 60% { transform: translate3d(8px, 0, 0); }
+        }
+
+        /* SPIN EFFECT (Applied to Image) */
         @keyframes planetSpin {
             from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+            to { transform: rotate(-360deg); } 
         }
 
+        /* Fast Spin Class */
+        .planet-fast { animation: planetSpin 3s linear infinite !important; filter: drop-shadow(0 0 50px rgba(255, 160, 50, 0.9)) !important; }
+
+        /* ASTEROID & EXPLOSION */
+        .asteroid {
+            position: absolute; width: 50px; height: 50px;
+            object-fit: contain; z-index: 6; pointer-events: none;
+        }
+        
+        .explosion {
+            position: absolute; width: 120px; height: 120px;
+            background: radial-gradient(circle, #fff700 10%, #ff4500 40%, transparent 70%);
+            border-radius: 50%;
+            z-index: 7;
+            transform: scale(0);
+            opacity: 1;
+            animation: explode 0.5s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes explode {
+            0% { transform: scale(0.5); opacity: 1; }
+            100% { transform: scale(2.5); opacity: 0; }
+        }
+
+        /* BUTTONS */
+        .btn-main { background: linear-gradient(135deg, var(--primary), #ffa500); color: #000; border: none; width: 85%; max-width:320px; padding: 18px; border-radius: 18px; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 0 20px var(--primary-glow); position: relative; z-index: 10; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-main:active { transform: scale(0.98); }
+        .mining-progress { width: 85%; max-width:320px; background: rgba(255,255,255,0.1); height: 6px; border-radius: 10px; margin-top: 15px; overflow: hidden; display: none; }
+        .mining-bar { height: 100%; background: var(--secondary); width: 0%; transition: width 0.3s; box-shadow: 0 0 10px var(--secondary); }
+
+        /* WALLET REDESIGN */
+        .wallet-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            padding: 30px 20px;
+            text-align: center;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+        .wallet-card::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(0,224,255,0.1) 0%, transparent 60%);
+            animation: rotateGlow 10s linear infinite; pointer-events: none;
+        }
+        @keyframes rotateGlow { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .wallet-balance { font-size: 48px; font-weight: 800; color: #fff; text-shadow: 0 0 20px rgba(255,255,255,0.3); margin: 10px 0; position: relative; z-index: 2; }
+        .wallet-label { color: #aaa; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; position: relative; z-index: 2; }
+        .wallet-value { color: var(--primary); font-size: 16px; font-weight: 600; background: rgba(0,0,0,0.4); padding: 5px 15px; border-radius: 20px; display: inline-block; border: 1px solid rgba(255,215,0,0.3); position: relative; z-index: 2; }
+
+        .btn-wallet { width: 100%; padding: 16px; border-radius: 15px; font-weight: 700; border: none; margin-bottom: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s; }
+        .btn-withdraw { background: linear-gradient(90deg, #00c6ff, #0072ff); color: white; box-shadow: 0 5px 15px rgba(0,198,255,0.4); }
+        .btn-history { background: rgba(255,255,255,0.1); color: #ccc; border: 1px solid rgba(255,255,255,0.1); }
+        .btn-history:hover { background: rgba(255,255,255,0.2); color: #fff; }
+
         /* TASKS */
-        .task-card { background: var(--bg-panel); border-radius: 16px; padding: 15px; margin-bottom: 15px; border: 1px solid var(--glass-border); display: flex; flex-direction: column; gap: 10px; }
-        .task-header { display: flex; justify-content: space-between; align-items: center; }
+        .task-card { background: rgba(30,35,50,0.8); backdrop-filter: blur(5px); border-radius: 16px; padding: 15px; margin-bottom: 15px; border: 1px solid var(--glass-border); }
+        .task-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .task-title { font-weight: 600; color: #fff; font-size: 14px; display: flex; align-items: center; gap: 8px; }
-        .task-reward { font-size: 12px; color: var(--primary); font-weight: bold; }
-        .progress-bar { width: 100%; height: 6px; background: #333; border-radius: 3px; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--secondary); width: 0%; transition: width 0.3s; }
-        .task-footer { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #aaa; }
-        .btn-task { background: var(--secondary); border: none; padding: 6px 16px; border-radius: 8px; color: #000; font-weight: 700; cursor: pointer; }
-        .btn-task:disabled { background: #444; color: #888; cursor: wait; }
-        .cooldown-text { color: #ff4d4f; font-weight: bold; }
+        .btn-task { background: var(--secondary); border: none; padding: 8px 18px; border-radius: 8px; color: #000; font-weight: 700; cursor: pointer; font-size: 12px; }
 
         /* NAV */
         .nav-bar { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(10, 15, 25, 0.95); border-top: 1px solid var(--glass-border); display: flex; justify-content: space-around; padding: 10px 0; padding-bottom: max(15px, env(safe-area-inset-bottom)); z-index: 50; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: var(--text-muted); font-size: 10px; cursor: pointer; flex: 1; }
-        .nav-item.active { color: var(--primary); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: #666; font-size: 10px; cursor: pointer; flex: 1; transition: 0.3s; }
+        .nav-item.active { color: var(--primary); text-shadow: 0 0 10px var(--primary-glow); transform: translateY(-2px); }
         .nav-item i { font-size: 20px; }
 
         /* MODALS */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; display: none; justify-content: center; align-items: center; }
-        .modal-box { background: #1a1a1a; width: 90%; max-width: 350px; padding: 20px; border-radius: 15px; border: 1px solid var(--primary); position: relative; }
-        .close-btn { position: absolute; top: 10px; right: 15px; color: #aaa; font-size: 24px; cursor: pointer; }
-        .form-control { width: 100%; padding: 10px; margin: 8px 0; background: #333; border: 1px solid #444; color: #fff; border-radius: 8px; }
-        .hist-item { background: #222; padding: 10px; border-radius: 8px; margin-bottom: 8px; font-size: 12px; display: flex; justify-content: space-between; align-items: center; border-left: 3px solid #555; }
-        .status-Pending { border-color: orange; } .status-Success { border-color: lime; } .status-Reject { border-color: red; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .modal-box { background: #151a25; width: 90%; max-width: 350px; padding: 25px; border-radius: 20px; border: 1px solid var(--secondary); position: relative; box-shadow: 0 0 30px rgba(0,224,255,0.2); }
+        .close-btn { position: absolute; top: 15px; right: 20px; color: #aaa; font-size: 24px; cursor: pointer; }
+        .form-control { width: 100%; padding: 14px; margin: 10px 0; background: #0b0f19; border: 1px solid #333; color: #fff; border-radius: 12px; font-size: 14px; outline: none; transition: 0.3s; }
+        .form-control:focus { border-color: var(--secondary); box-shadow: 0 0 10px rgba(0,224,255,0.2); }
+        .hist-item { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 10px; margin-bottom: 10px; font-size: 13px; display: flex; justify-content: space-between; align-items: center; border-left: 3px solid #555; }
+        .status-Pending { border-color: orange; color: orange; } .status-Success { border-color: lime; color: lime; } .status-Reject { border-color: red; color: red; }
     </style>
 </head>
 <body>
@@ -116,7 +184,7 @@
     <!-- LOADING -->
     <div id="loading-screen">
         <div class="loader"></div>
-        <div>CONNECTING...</div>
+        <div>CONNECTING TO SERVER...</div>
     </div>
 
     <div class="app-container">
@@ -125,77 +193,98 @@
         <div class="top-hud">
             <div class="profile-chip">
                 <img id="user-avatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="profile-pic" alt="User">
-                <span id="player-name">Player</span>
+                <span id="player-name">Astronaut</span>
             </div>
             <div class="balance-chip">
-                <svg class="coin-svg" viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#FFD700"/><text x="32" y="42" text-anchor="middle" font-size="30" fill="#5C4033" font-weight="bold">₵</text></svg>
-                <span id="player-balance" style="font-size: 18px; font-weight: 700; color: var(--primary);">0</span>
+                <i class="fas fa-coins" style="color: gold;"></i>
+                <span id="player-balance" style="font-size: 18px; font-weight: 700; color: #fff;">0</span>
             </div>
         </div>
 
         <!-- SCREEN: HOME (MINING) -->
         <div id="screen-home" class="screen active">
             <canvas id="galaxy-canvas"></canvas>
+            
             <div class="mining-hub">
-                <!-- JUPITER IMAGE ADDED HERE -->
-                <!-- Note: Make sure jupiter.png is in the same folder, or use a URL -->
-                <img id="planet-jupiter" src="jupiter.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3594/3594274.png'" alt="Jupiter Miner">
+                <div style="font-size: 12px; color: var(--secondary); margin-bottom: 10px; font-weight:bold; letter-spacing: 2px;">GALAXY MINER 3000</div>
                 
-                <div style="font-size: 12px; color: var(--secondary); margin-bottom: 5px;">GALAXY MINER 3000</div>
+                <!-- PLANET CONTAINER (Container shakes, Image spins) -->
+                <div class="planet-container" id="planet-zone">
+                    <img id="planet-jupiter" src="jupiter.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3594/3594274.png'" alt="Jupiter">
+                </div>
+
                 <div class="timer-display" id="mining-timer">00:00:00</div>
-                <button id="mining-btn" class="btn-main"><i class="fas fa-play"></i> START ENGINE</button>
+                <button id="mining-btn" class="btn-main"><i class="fas fa-power-off"></i> START ENGINE</button>
                 <div class="mining-progress" id="mining-progress-box">
                     <div class="mining-bar" id="mining-bar-fill"></div>
                 </div>
-                <div style="margin-top:5px; font-size:11px; color:#aaa;" id="mining-status-text">Watch Ads to Start</div>
+                <div style="margin-top:10px; font-size:12px; color:#aaa; font-weight:500;" id="mining-status-text">Watch Ads to Start</div>
             </div>
         </div>
 
         <!-- SCREEN: TASKS -->
         <div id="screen-tasks" class="screen">
-            <h2 style="text-align: center; margin-bottom: 20px;">Daily Missions</h2>
+            <h2 style="text-align: center; margin-bottom: 25px;">Mission Control</h2>
             
             <div class="task-card">
-                <div class="task-header"><div class="task-title"><i class="fas fa-bolt" style="color: yellow;"></i> Task 1 (Adsgram)</div><div class="task-reward" id="reward-task1">+2</div></div>
-                <div class="progress-bar"><div class="progress-fill" id="prog-task1"></div></div>
-                <div class="task-footer"><span id="status-task1">0/10</span><button class="btn-task" id="btn-task1">Watch</button></div>
+                <div class="task-header">
+                    <div class="task-title"><i class="fas fa-bolt" style="color: #FFD700;"></i> Special Task</div>
+                    <div class="task-reward" id="reward-task1">+2</div>
+                </div>
+                <div class="progress-bar" style="background:#222; height:4px; border-radius:2px; overflow:hidden; margin-bottom:8px;"><div class="progress-fill" id="prog-task1" style="width:0%; background:var(--secondary); height:100%;"></div></div>
+                <div style="display:flex; justify-content:space-between; font-size:12px; color:#888;">
+                    <span id="status-task1">0/10</span>
+                    <button class="btn-task" id="btn-task1">START</button>
+                </div>
             </div>
 
             <div class="task-card">
-                <div class="task-header"><div class="task-title"><i class="fas fa-star" style="color: cyan;"></i> Task 2 (Monetag)</div><div class="task-reward" id="reward-task2">+2</div></div>
-                <div class="progress-bar"><div class="progress-fill" id="prog-task2"></div></div>
-                <div class="task-footer"><span id="status-task2">0/10</span><button class="btn-task" id="btn-task2">Watch</button></div>
+                <div class="task-header"><div class="task-title"><i class="fas fa-star" style="color: cyan;"></i> Daily Drop</div><div class="task-reward" id="reward-task2">+2</div></div>
+                <div class="progress-bar" style="background:#222; height:4px; border-radius:2px; overflow:hidden; margin-bottom:8px;"><div class="progress-fill" id="prog-task2" style="width:0%; background:var(--secondary); height:100%;"></div></div>
+                <div style="display:flex; justify-content:space-between; font-size:12px; color:#888;">
+                    <span id="status-task2">0/10</span><button class="btn-task" id="btn-task2">START</button>
+                </div>
             </div>
 
             <div class="task-card">
-                <div class="task-header"><div class="task-title"><i class="fas fa-fire" style="color: orange;"></i> Task 3 (Direct Pop)</div><div class="task-reward" id="reward-task3">+3</div></div>
-                <div class="progress-bar"><div class="progress-fill" id="prog-task3"></div></div>
-                <div class="task-footer"><span id="status-task3">0/10</span><button class="btn-task" id="btn-task3">Watch</button></div>
+                <div class="task-header"><div class="task-title"><i class="fas fa-fire" style="color: orange;"></i> Rapid Fire</div><div class="task-reward" id="reward-task3">+3</div></div>
+                <div class="progress-bar" style="background:#222; height:4px; border-radius:2px; overflow:hidden; margin-bottom:8px;"><div class="progress-fill" id="prog-task3" style="width:0%; background:var(--secondary); height:100%;"></div></div>
+                <div style="display:flex; justify-content:space-between; font-size:12px; color:#888;">
+                    <span id="status-task3">0/10</span><button class="btn-task" id="btn-task3">START</button>
+                </div>
             </div>
 
             <div class="task-card">
-                <div class="task-header"><div class="task-title"><i class="fas fa-gem" style="color: violet;"></i> Task 4 (Special)</div><div class="task-reward" id="reward-task4">+4</div></div>
-                <div class="progress-bar"><div class="progress-fill" id="prog-task4"></div></div>
-                <div class="task-footer"><span id="status-task4">0/10</span><button class="btn-task" id="btn-task4">Watch</button></div>
+                <div class="task-header"><div class="task-title"><i class="fas fa-gem" style="color: violet;"></i> Treasure</div><div class="task-reward" id="reward-task4">+4</div></div>
+                <div class="progress-bar" style="background:#222; height:4px; border-radius:2px; overflow:hidden; margin-bottom:8px;"><div class="progress-fill" id="prog-task4" style="width:0%; background:var(--secondary); height:100%;"></div></div>
+                <div style="display:flex; justify-content:space-between; font-size:12px; color:#888;">
+                    <span id="status-task4">0/10</span><button class="btn-task" id="btn-task4">START</button>
+                </div>
             </div>
         </div>
 
-        <!-- SCREEN: WALLET -->
+        <!-- SCREEN: WALLET (REDESIGNED) -->
         <div id="screen-wallet" class="screen">
-            <h2 style="text-align: center;">My Wallet</h2>
-            <div style="background: linear-gradient(135deg, #1e3c72, #2a5298); padding: 25px; border-radius: 20px; text-align: center; border: 1px solid var(--secondary);">
-                <div style="color: #ccc; font-size: 14px;">Total Balance</div>
-                <div style="font-size: 40px; font-weight: bold; color: #fff;" id="wallet-big-balance">0</div>
-                <div style="color: var(--primary); font-size: 14px;">Value: ₹<span id="usd-val">0.00</span></div>
+            <h2 style="text-align: center; margin-bottom: 20px;">My Wallet</h2>
+            
+            <div class="wallet-card">
+                <div class="wallet-label">Total Balance</div>
+                <div class="wallet-balance" id="wallet-big-balance">0</div>
+                <div class="wallet-value">Value: ₹<span id="usd-val">0.00</span></div>
             </div>
             
-            <div style="text-align:center; font-size:11px; color:#888; margin-top:10px;">
-                Min Withdraw: <span id="admin-min">1000</span> Coins | Rate: <span id="admin-rate">100</span> = ₹1
-            </div>
+            <button class="btn-wallet btn-withdraw" onclick="openWModal()">
+                <i class="fas fa-university"></i> WITHDRAW FUNDS
+            </button>
+            
+            <button class="btn-wallet btn-history" onclick="openHModal()">
+                <i class="fas fa-history"></i> Transaction History
+            </button>
 
-            <br>
-            <button class="btn-main" onclick="openWModal()">WITHDRAW MONEY</button>
-            <button class="btn-main" style="margin-top:10px; background: #333; color:#fff;" onclick="openHModal()"><i class="fas fa-history"></i> History</button>
+            <div style="text-align:center; font-size:11px; color:#666; margin-top:20px; line-height: 1.6;">
+                Min Withdrawal: <span id="admin-min" style="color:#fff;">1000</span> Coins<br>
+                Exchange Rate: <span id="admin-rate" style="color:#fff;">100</span> Coins = ₹1
+            </div>
         </div>
 
         <!-- NAV BAR -->
@@ -211,15 +300,15 @@
     <div id="w-modal" class="modal-overlay">
         <div class="modal-box">
             <span class="close-btn" onclick="closeModal('w-modal')">&times;</span>
-            <h3 style="margin-top:0;">Request Withdrawal</h3>
+            <h3 style="margin-top:0; color:var(--secondary);">Withdraw Funds</h3>
             <label style="font-size:12px; color:#aaa; display:block;">Select Method</label>
             <select id="w-method" class="form-control"><option value="">Loading...</option></select>
             <label style="font-size:12px; color:#aaa; display:block;">Amount (Coins)</label>
             <input type="number" id="w-amount" class="form-control" placeholder="0" oninput="calcVal()">
-            <div style="text-align:right; font-size:12px; color:lime;">You get: ₹<span id="w-get">0.00</span></div>
-            <label style="font-size:12px; color:#aaa; display:block; margin-top:5px;">Phone / UPI ID</label>
-            <input type="text" id="w-detail" class="form-control" placeholder="Details">
-            <button class="btn-main" style="margin-top:10px;" onclick="submitRequest()">SUBMIT</button>
+            <div style="text-align:right; font-size:12px; color:lime; margin-bottom:10px;">You receive: ₹<span id="w-get">0.00</span></div>
+            <label style="font-size:12px; color:#aaa; display:block;">Account Details (UPI/Phone)</label>
+            <input type="text" id="w-detail" class="form-control" placeholder="Ex: 9876543210@upi">
+            <button class="btn-wallet btn-withdraw" style="margin-top:15px;" onclick="submitRequest()">CONFIRM WITHDRAWAL</button>
         </div>
     </div>
 
@@ -227,8 +316,8 @@
     <div id="h-modal" class="modal-overlay">
         <div class="modal-box" style="height: 60vh; display:flex; flex-direction:column;">
             <span class="close-btn" onclick="closeModal('h-modal')">&times;</span>
-            <h3 style="margin-top:0;">History</h3>
-            <div id="h-list" style="overflow-y:auto; flex:1; text-align:left;">Loading...</div>
+            <h3 style="margin-top:0; color:#fff;">History</h3>
+            <div id="h-list" style="overflow-y:auto; flex:1; text-align:left; padding-right:5px;">Loading...</div>
         </div>
     </div>
 
@@ -261,12 +350,13 @@
         let localCooldowns = { task1: 0, task2: 0, task3: 0, task4: 0, mining: 0 };
 
         document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => { document.getElementById('loading-screen').style.display='none'; }, 5000);
+            setTimeout(() => { document.getElementById('loading-screen').style.opacity = '0'; setTimeout(()=>{ document.getElementById('loading-screen').style.display='none'; },500); }, 3000);
             
             try {
                 firebase.initializeApp(FIREBASE_CONFIG);
                 db = firebase.database();
                 const tg = window.Telegram.WebApp; tg.expand();
+                tg.setHeaderColor('#0b0f19'); 
                 
                 const tgUser = tg.initDataUnsafe?.user;
                 userId = tgUser?.id.toString() || localStorage.getItem('gm_id') || 'dev_'+Date.now();
@@ -299,6 +389,9 @@
                 setInterval(updateMiningUI, 1000); 
                 setInterval(renderTasks, 1000);    
 
+                // Start Asteroid Spawner
+                setInterval(createAsteroid, 1500); // Slightly slower spawn for better performance
+
             } catch(e) { console.error(e); }
 
             document.querySelectorAll('.nav-item').forEach(t => t.addEventListener('click', () => {
@@ -317,6 +410,59 @@
             initGalaxy();
         });
 
+        // --- ASTEROID LOGIC ---
+        function createAsteroid() {
+            // Only create if we are on Home Screen
+            if(!document.getElementById('screen-home').classList.contains('active')) return;
+
+            const container = document.getElementById('planet-zone');
+            if(!container) return;
+
+            const asteroid = document.createElement('img');
+            asteroid.src = 'asteroid.png'; 
+            asteroid.classList.add('asteroid');
+            asteroid.onerror = function() { this.src='https://cdn-icons-png.flaticon.com/512/547/547432.png'; };
+
+            // Random Angle (0 to 360)
+            const angle = Math.random() * Math.PI * 2;
+            const distance = 350; 
+            
+            const startX = Math.cos(angle) * distance;
+            const startY = Math.sin(angle) * distance;
+
+            // Set initial style
+            asteroid.style.transform = `translate(${startX}px, ${startY}px) rotate(${Math.random()*360}deg)`;
+            asteroid.style.transition = `transform 1s linear`; // Fast hit
+
+            container.appendChild(asteroid);
+
+            // Trigger Animation to Center (0,0)
+            setTimeout(() => {
+                asteroid.style.transform = `translate(0px, 0px) rotate(${Math.random()*360}deg)`;
+            }, 50);
+
+            // IMPACT LOGIC (After 1s)
+            setTimeout(() => {
+                // 1. Remove Asteroid
+                asteroid.remove();
+                
+                // 2. Shake PLANET CONTAINER (Not the image itself, so spin continues)
+                // Use the container 'planet-zone' which is assigned to 'container' variable
+                container.classList.remove('shake-effect'); // Reset
+                void container.offsetWidth; // Trigger reflow
+                container.classList.add('shake-effect');
+
+                // 3. Create Explosion Fire
+                const explosion = document.createElement('div');
+                explosion.classList.add('explosion');
+                container.appendChild(explosion);
+                
+                // Remove explosion div after animation
+                setTimeout(() => { explosion.remove(); }, 600);
+
+            }, 1000);
+        }
+
         function updateAdminUI() {
             document.getElementById('admin-min').innerText = ADMIN_MIN_W;
             document.getElementById('admin-rate').innerText = ADMIN_RATE;
@@ -330,7 +476,7 @@
         }
 
         function updateUI() {
-            document.getElementById('player-name').innerText = userData.Name || "Player";
+            document.getElementById('player-name').innerText = userData.Name || "Astronaut";
             if(userData.Photo) document.getElementById('user-avatar').src = userData.Photo;
             const s = (userData.score||0).toLocaleString();
             document.getElementById('player-balance').innerText = s;
@@ -357,28 +503,28 @@
                     if (timePassed < conf.cooldown) {
                         const left = conf.cooldown - timePassed;
                         const h = Math.floor(left/3600000); const m = Math.floor((left%3600000)/60000); const s = Math.floor((left%60000)/1000);
-                        btn.innerText = `${h}h ${m}m ${s}s`; btn.disabled = true; btn.style.background = "#333";
-                        stat.innerHTML = `<span class="cooldown-text">Limit Reached</span>`;
-                        prog.style.width = "100%"; prog.style.background = "#ff4d4f";
+                        btn.innerText = `${h}h ${m}m ${s}s`; btn.disabled = true; btn.style.background = "#333"; btn.style.color="#777";
+                        stat.innerHTML = `<span class="cooldown-text">Done</span>`;
+                        prog.style.width = "100%"; prog.style.background = "#333";
                         return;
                     }
                 }
                 
                 if (localCooldowns[key] && now < localCooldowns[key]) {
                     const wait = Math.ceil((localCooldowns[key] - now) / 1000);
-                    btn.innerText = `Wait ${wait}s`;
+                    btn.innerText = `WAIT ${wait}s`;
                     btn.disabled = true;
-                    btn.style.background = "#555";
+                    btn.style.background = "#444";
                     
                     const displayCount = (data.count >= conf.limit && (now - data.lastDone >= conf.cooldown)) ? 0 : data.count;
-                    stat.innerText = `${displayCount} / ${conf.limit}`;
+                    stat.innerText = `${displayCount}/${conf.limit}`;
                     prog.style.width = `${(displayCount / conf.limit) * 100}%`; prog.style.background = "var(--secondary)";
                     return;
                 }
 
                 const displayCount = (data.count >= conf.limit && (now - data.lastDone >= conf.cooldown)) ? 0 : data.count;
-                btn.innerText = "Watch Ad"; btn.disabled = false; btn.style.background = "";
-                stat.innerText = `${displayCount} / ${conf.limit}`;
+                btn.innerText = "START"; btn.disabled = false; btn.style.background = ""; btn.style.color="#000";
+                stat.innerText = `${displayCount}/${conf.limit}`;
                 prog.style.width = `${(displayCount / conf.limit) * 100}%`; prog.style.background = "var(--secondary)";
             };
             
@@ -397,7 +543,7 @@
             if (data.count >= conf.limit && (Date.now() - data.lastDone < conf.cooldown)) return;
             let currentCount = (data.count >= conf.limit && (Date.now() - data.lastDone >= conf.cooldown)) ? 0 : data.count;
 
-            btn.innerText = "Loading..."; btn.disabled = true;
+            btn.innerText = "LOADING..."; btn.disabled = true;
 
             const finish = (success) => {
                 if(success) {
@@ -409,9 +555,9 @@
                     } else {
                         updates[`Users/${userId}/taskData/${key}`] = { count: newCount, lastDone: data.lastDone };
                     }
-                    db.ref().update(updates).then(() => { alert(`Earned +${conf.reward} Coins!`); });
+                    db.ref().update(updates).then(() => { alert(`Success! +${conf.reward} Coins`); });
                 } else {
-                    alert("Ad skipped or failed.");
+                    alert("Ad cancelled.");
                 }
                 localCooldowns[key] = Date.now() + 10000;
             };
@@ -460,7 +606,7 @@
             const progressBox = document.getElementById('mining-progress-box');
             const barFill = document.getElementById('mining-bar-fill');
             const statusText = document.getElementById('mining-status-text');
-            const planet = document.getElementById('planet-jupiter'); // GET PLANET
+            const planet = document.getElementById('planet-jupiter');
 
             const isMining = userData.isMiningActive === true;
             const adsWatched = userData.miningAdsWatched || 0;
@@ -469,45 +615,41 @@
             if (isMining) {
                 const end = (userData.miningStartTime || 0) + MINING_CONFIG.duration;
                 const now = Date.now();
-                progressBox.style.display='none'; statusText.innerText = "Engine Running...";
+                progressBox.style.display='none'; statusText.innerText = "MINING IN PROGRESS...";
                 
-                // === JUPITER FAST SPIN LOGIC ===
                 if(planet) planet.classList.add('planet-fast'); 
 
                 if(now < end) {
                     const l = end - now; const h = Math.floor(l/3600000); const m = Math.floor((l%3600000)/60000); const s = Math.floor((l%60000)/1000);
                     timer.innerText = `${h}:${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
-                    btn.innerHTML = `<i class="fas fa-cog fa-spin"></i> MINING...`; btn.disabled = true; btn.style.background = "#333";
+                    btn.innerHTML = `<i class="fas fa-cog fa-spin"></i> SYSTEM ACTIVE`; btn.disabled = true; btn.style.background = "#222"; btn.style.color="#fff";
                 } else {
-                    // Mining Done
-                    if(planet) planet.classList.remove('planet-fast'); // Slow Down
-                    timer.innerText = "00:00:00"; btn.innerHTML = `CLAIM ${MINING_CONFIG.reward} COINS`; btn.disabled = false; btn.style.background = "var(--secondary)"; btn.style.color = "#000";
+                    if(planet) planet.classList.remove('planet-fast'); 
+                    timer.innerText = "00:00:00"; btn.innerHTML = `CLAIM ${MINING_CONFIG.reward} COINS`; btn.disabled = false; btn.style.background = "var(--primary)"; btn.style.color = "#000";
                 }
             } else {
-                // Not Mining (Idle)
-                if(planet) planet.classList.remove('planet-fast'); // Ensure Slow
-
+                if(planet) planet.classList.remove('planet-fast');
                 timer.innerText = "03:00:00";
                 
                 if(localCooldowns['mining'] && Date.now() < localCooldowns['mining']) {
                     const wait = Math.ceil((localCooldowns['mining'] - Date.now()) / 1000);
-                    btn.innerHTML = `Wait ${wait}s`;
+                    btn.innerHTML = `WAIT ${wait}s`;
                     btn.disabled = true;
-                    btn.style.background = "#555";
+                    btn.style.background = "#333";
                     progressBox.style.display = 'block';
                     barFill.style.width = ((adsWatched / REQ) * 100) + "%";
-                    statusText.innerText = `Watch ${REQ - adsWatched} more ads`;
+                    statusText.innerText = `Watch ${REQ - adsWatched} more ads to enable`;
                     return;
                 }
 
                 if (adsWatched < REQ) {
-                    btn.innerHTML = `WATCH AD (${adsWatched}/${REQ})`; btn.disabled = false; btn.style.background = "";
+                    btn.innerHTML = `WATCH AD (${adsWatched}/${REQ})`; btn.disabled = false; btn.style.background = "var(--secondary)"; btn.style.color="#000";
                     progressBox.style.display = 'block';
                     barFill.style.width = ((adsWatched / REQ) * 100) + "%";
-                    statusText.innerText = `Watch ${REQ - adsWatched} more ads`;
+                    statusText.innerText = `Watch ${REQ - adsWatched} more ads to enable`;
                 } else {
-                    btn.innerHTML = `<i class="fas fa-play"></i> START ENGINE`; btn.disabled = false; btn.style.background = "#28a745"; btn.style.color = "#fff";
-                    progressBox.style.display = 'none'; statusText.innerText = "Ready to Launch.";
+                    btn.innerHTML = `<i class="fas fa-power-off"></i> START ENGINE`; btn.disabled = false; btn.style.background = "#28a745"; btn.style.color = "#fff";
+                    progressBox.style.display = 'none'; statusText.innerText = "System Ready.";
                 }
             }
         }
@@ -515,20 +657,20 @@
         function initGalaxy() {
             const c = document.getElementById('galaxy-canvas'); const x = c.getContext('2d');
             c.width = window.innerWidth; c.height = window.innerHeight;
-            let s = []; for(let i=0;i<100;i++)s.push({x:Math.random()*c.width,y:Math.random()*c.height});
-            function l(){x.clearRect(0,0,c.width,c.height);x.fillStyle='#fff';s.forEach(p=>{p.y+=0.5;if(p.y>c.height)p.y=0;x.beginPath();x.arc(p.x,p.y,Math.random()*2,0,7);x.fill()});requestAnimationFrame(l)}
+            let s = []; for(let i=0;i<80;i++)s.push({x:Math.random()*c.width,y:Math.random()*c.height, r:Math.random()*1.5});
+            function l(){x.clearRect(0,0,c.width,c.height);x.fillStyle='rgba(255,255,255,0.6)';s.forEach(p=>{p.y+=0.2;if(p.y>c.height)p.y=0;x.beginPath();x.arc(p.x,p.y,p.r,0,7);x.fill()});requestAnimationFrame(l)}
             l();
         }
         function openWModal() { document.getElementById('w-modal').style.display='flex'; }
         function openHModal() { 
             document.getElementById('h-modal').style.display='flex'; 
-            const list = document.getElementById('h-list'); list.innerHTML = "Loading...";
+            const list = document.getElementById('h-list'); list.innerHTML = "<div style='text-align:center; margin-top:20px; color:#666;'><i class='fas fa-circle-notch fa-spin'></i> Loading...</div>";
             db.ref('Withdrawals').orderByChild('userId').equalTo(userId).once('value', snap => {
                 list.innerHTML = "";
-                if(!snap.exists()) { list.innerHTML="<p style='color:#777; text-align:center;'>No history.</p>"; return; }
+                if(!snap.exists()) { list.innerHTML="<p style='color:#777; text-align:center; margin-top:20px;'>No history found.</p>"; return; }
                 const data = []; snap.forEach(c => data.push(c.val()));
                 data.reverse().forEach(w => {
-                    list.innerHTML += `<div class="hist-item status-${w.status}"><div><b>₹${w.rupeeVal}</b><br><small style='color:#777'>${w.date}</small></div><div style='text-align:right'>${w.method}<br><span style='color:${w.status==='Success'?'lime':(w.status==='Reject'?'red':'orange')}'>${w.status}</span></div></div>`;
+                    list.innerHTML += `<div class="hist-item"><div><b style='color:#fff; font-size:14px;'>₹${w.rupeeVal}</b><br><small style='color:#888'>${w.date}</small></div><div style='text-align:right; font-size:11px; color:#aaa;'>${w.method}<br><span class='status-${w.status}'>${w.status}</span></div></div>`;
                 });
             });
         }
@@ -538,13 +680,22 @@
             const amt = parseInt(document.getElementById('w-amount').value);
             const met = document.getElementById('w-method').value;
             const det = document.getElementById('w-detail').value;
-            if(!amt || !met || !det) return alert("Fill all fields.");
-            if(amt < ADMIN_MIN_W) return alert(`Minimum: ${ADMIN_MIN_W} Coins`);
-            if(amt > userData.score) return alert("Insufficient Balance.");
+            if(!amt || !met || !det) return alert("Please fill all details.");
+            if(amt < ADMIN_MIN_W) return alert(`Minimum withdrawal is ${ADMIN_MIN_W} Coins`);
+            if(amt > userData.score) return alert("Insufficient Balance!");
+            
+            // Disable button
+            const btn = document.querySelector('.btn-withdraw');
+            const oldText = btn.innerHTML;
+            btn.innerHTML = "Processing..."; btn.disabled = true;
+
             const req = { userId: userId, userName: userData.Name, amount: amt, rupeeVal: (amt/ADMIN_RATE).toFixed(2), method: met, details: det, status: "Pending", date: new Date().toLocaleString() };
             db.ref('Withdrawals').push(req).then(() => {
                 db.ref(`Users/${userId}/score`).set(firebase.database.ServerValue.increment(-amt));
-                alert("Request Sent!"); closeModal('w-modal');
+                alert("Withdrawal Requested Successfully!"); 
+                closeModal('w-modal');
+                document.getElementById('w-amount').value = "";
+                btn.innerHTML = oldText; btn.disabled = false;
             });
         }
     </script>
