@@ -3,19 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Galaxy Miner - No Auto Ads</title>
+    <title>Galaxy Miner - Jupiter Edition</title>
 
     <!-- ===== 1. TELEGRAM SDK ===== -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-    <!-- ===== 2. ADSGRAM SDK (Task 1) ===== -->
+    <!-- ===== 2. ADSGRAM SDK ===== -->
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 
-    <!-- ===== 3. MONETAG SDKs (Task 2, 3 & 4 Only) ===== -->
-    <!-- Script for Zone 9966767 (Task 4) -->
+    <!-- ===== 3. MONETAG SDKs ===== -->
     <script src='//libtl.com/sdk.js' data-zone='9966767' data-sdk='show_9966767'></script>
-    
-    <!-- Script for Zone 9966888 (Task 2 & 3) -->
     <script src='//libtl.com/sdk.js' data-zone='9966888' data-sdk='show_9966888'></script>
 
     <!-- ===== 4. FIREBASE SDK ===== -->
@@ -57,12 +54,35 @@
 
         /* MINING */
         #galaxy-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.6; }
-        .mining-hub { position: relative; z-index: 5; text-align: center; background: var(--bg-panel); padding: 30px; border-radius: 30px; border: 1px solid var(--glass-border); width: 90%; max-width: 350px; margin: auto; }
+        .mining-hub { position: relative; z-index: 5; text-align: center; background: var(--bg-panel); padding: 30px; border-radius: 30px; border: 1px solid var(--glass-border); width: 90%; max-width: 350px; margin: auto; display: flex; flex-direction: column; align-items: center; }
         .timer-display { font-size: 42px; font-weight: 700; margin: 10px 0; color: #fff; text-shadow: 0 0 20px rgba(255,255,255,0.2); }
         .btn-main { background: linear-gradient(135deg, var(--primary), #e6b800); color: #000; border: none; width: 100%; padding: 16px; border-radius: 16px; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 5px 20px var(--primary-glow); display: flex; align-items: center; justify-content: center; gap: 10px; }
         .btn-main:disabled { background: #333; color: #777; box-shadow: none; cursor: default; }
         .mining-progress { width: 100%; background: #333; height: 8px; border-radius: 4px; margin-top: 10px; overflow: hidden; display: none; }
         .mining-bar { height: 100%; background: var(--secondary); width: 0%; transition: width 0.3s; }
+
+        /* JUPITER ANIMATION & STYLES */
+        #planet-jupiter {
+            width: 140px;
+            height: 140px;
+            object-fit: contain;
+            border-radius: 50%;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 0 15px rgba(255, 150, 50, 0.4));
+            /* Default Slow Spin (Idle) */
+            animation: planetSpin 20s linear infinite;
+        }
+
+        /* Class for FAST spin (When Mining) */
+        .planet-fast {
+            animation: planetSpin 2s linear infinite !important;
+            filter: drop-shadow(0 0 30px rgba(255, 200, 50, 0.8)) !important;
+        }
+
+        @keyframes planetSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
 
         /* TASKS */
         .task-card { background: var(--bg-panel); border-radius: 16px; padding: 15px; margin-bottom: 15px; border: 1px solid var(--glass-border); display: flex; flex-direction: column; gap: 10px; }
@@ -117,6 +137,10 @@
         <div id="screen-home" class="screen active">
             <canvas id="galaxy-canvas"></canvas>
             <div class="mining-hub">
+                <!-- JUPITER IMAGE ADDED HERE -->
+                <!-- Note: Make sure jupiter.png is in the same folder, or use a URL -->
+                <img id="planet-jupiter" src="jupiter.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3594/3594274.png'" alt="Jupiter Miner">
+                
                 <div style="font-size: 12px; color: var(--secondary); margin-bottom: 5px;">GALAXY MINER 3000</div>
                 <div class="timer-display" id="mining-timer">00:00:00</div>
                 <button id="mining-btn" class="btn-main"><i class="fas fa-play"></i> START ENGINE</button>
@@ -131,28 +155,24 @@
         <div id="screen-tasks" class="screen">
             <h2 style="text-align: center; margin-bottom: 20px;">Daily Missions</h2>
             
-            <!-- 1. TASK 1 (ADSGRAM) -->
             <div class="task-card">
                 <div class="task-header"><div class="task-title"><i class="fas fa-bolt" style="color: yellow;"></i> Task 1 (Adsgram)</div><div class="task-reward" id="reward-task1">+2</div></div>
                 <div class="progress-bar"><div class="progress-fill" id="prog-task1"></div></div>
                 <div class="task-footer"><span id="status-task1">0/10</span><button class="btn-task" id="btn-task1">Watch</button></div>
             </div>
 
-            <!-- 2. TASK 2 (MONETAG INTERSTITIAL) -->
             <div class="task-card">
                 <div class="task-header"><div class="task-title"><i class="fas fa-star" style="color: cyan;"></i> Task 2 (Monetag)</div><div class="task-reward" id="reward-task2">+2</div></div>
                 <div class="progress-bar"><div class="progress-fill" id="prog-task2"></div></div>
                 <div class="task-footer"><span id="status-task2">0/10</span><button class="btn-task" id="btn-task2">Watch</button></div>
             </div>
 
-            <!-- 3. TASK 3 (MONETAG POPUP) -->
             <div class="task-card">
                 <div class="task-header"><div class="task-title"><i class="fas fa-fire" style="color: orange;"></i> Task 3 (Direct Pop)</div><div class="task-reward" id="reward-task3">+3</div></div>
                 <div class="progress-bar"><div class="progress-fill" id="prog-task3"></div></div>
                 <div class="task-footer"><span id="status-task3">0/10</span><button class="btn-task" id="btn-task3">Watch</button></div>
             </div>
 
-            <!-- 4. TASK 4 (MONETAG 2ND INTERSTITIAL) -->
             <div class="task-card">
                 <div class="task-header"><div class="task-title"><i class="fas fa-gem" style="color: violet;"></i> Task 4 (Special)</div><div class="task-reward" id="reward-task4">+4</div></div>
                 <div class="progress-bar"><div class="progress-fill" id="prog-task4"></div></div>
@@ -238,7 +258,6 @@
         let db, userId, userData = {};
         const ADSGRAM_BLOCK = "20263"; 
         
-        // 10s Cooldown Tracker
         let localCooldowns = { task1: 0, task2: 0, task3: 0, task4: 0, mining: 0 };
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -277,7 +296,6 @@
                     }
                 });
 
-                // NO AUTO ADS INITIALIZATION HERE (Removed)
                 setInterval(updateMiningUI, 1000); 
                 setInterval(renderTasks, 1000);    
 
@@ -322,9 +340,6 @@
             renderTasks();
         }
 
-        // --- AUTO ADS FUNCTION REMOVED ---
-        // (Is jagah pe pehle initAutoAds code tha, jo ab hata diya gaya hai)
-
         function renderTasks() {
             if(!userData) return;
             const tasks = userData.taskData || {};
@@ -337,7 +352,6 @@
                 const stat = document.getElementById(statusId);
                 const prog = document.getElementById(progId);
 
-                // Global Limit Check
                 if (data.count >= conf.limit) {
                     const timePassed = now - data.lastDone;
                     if (timePassed < conf.cooldown) {
@@ -350,7 +364,6 @@
                     }
                 }
                 
-                // 10s Button Cooldown Check
                 if (localCooldowns[key] && now < localCooldowns[key]) {
                     const wait = Math.ceil((localCooldowns[key] - now) / 1000);
                     btn.innerText = `Wait ${wait}s`;
@@ -400,7 +413,7 @@
                 } else {
                     alert("Ad skipped or failed.");
                 }
-                localCooldowns[key] = Date.now() + 10000; // 10s cooldown
+                localCooldowns[key] = Date.now() + 10000;
             };
 
             if (key === 'task1') {
@@ -425,7 +438,7 @@
                     btn.innerText = "LOADING..."; btn.disabled = true;
                     window.Adsgram.init({ blockId: ADSGRAM_BLOCK }).show().then((watched) => {
                         if(watched) db.ref(`Users/${userId}/miningAdsWatched`).set(firebase.database.ServerValue.increment(1));
-                        localCooldowns['mining'] = Date.now() + 10000; // 10s cooldown
+                        localCooldowns['mining'] = Date.now() + 10000;
                     }).catch(() => { btn.disabled = false; });
                 }
             } else if (btn.innerText.includes("START ENGINE")) {
@@ -447,6 +460,7 @@
             const progressBox = document.getElementById('mining-progress-box');
             const barFill = document.getElementById('mining-bar-fill');
             const statusText = document.getElementById('mining-status-text');
+            const planet = document.getElementById('planet-jupiter'); // GET PLANET
 
             const isMining = userData.isMiningActive === true;
             const adsWatched = userData.miningAdsWatched || 0;
@@ -456,17 +470,25 @@
                 const end = (userData.miningStartTime || 0) + MINING_CONFIG.duration;
                 const now = Date.now();
                 progressBox.style.display='none'; statusText.innerText = "Engine Running...";
+                
+                // === JUPITER FAST SPIN LOGIC ===
+                if(planet) planet.classList.add('planet-fast'); 
+
                 if(now < end) {
                     const l = end - now; const h = Math.floor(l/3600000); const m = Math.floor((l%3600000)/60000); const s = Math.floor((l%60000)/1000);
                     timer.innerText = `${h}:${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
                     btn.innerHTML = `<i class="fas fa-cog fa-spin"></i> MINING...`; btn.disabled = true; btn.style.background = "#333";
                 } else {
+                    // Mining Done
+                    if(planet) planet.classList.remove('planet-fast'); // Slow Down
                     timer.innerText = "00:00:00"; btn.innerHTML = `CLAIM ${MINING_CONFIG.reward} COINS`; btn.disabled = false; btn.style.background = "var(--secondary)"; btn.style.color = "#000";
                 }
             } else {
+                // Not Mining (Idle)
+                if(planet) planet.classList.remove('planet-fast'); // Ensure Slow
+
                 timer.innerText = "03:00:00";
                 
-                // Check local mining cooldown
                 if(localCooldowns['mining'] && Date.now() < localCooldowns['mining']) {
                     const wait = Math.ceil((localCooldowns['mining'] - Date.now()) / 1000);
                     btn.innerHTML = `Wait ${wait}s`;
