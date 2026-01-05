@@ -31,7 +31,6 @@
             --text-main: #ffffff;
             --font-main: 'Poppins', sans-serif;
             --box-color: #2a2a40;
-            --box-active: #ff00ff;
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
         body, html { height: 100%; margin: 0; padding: 0; overflow: hidden; background-color: var(--bg-dark); color: var(--text-main); font-family: var(--font-main); }
@@ -63,38 +62,50 @@
 
         .timer-display { font-size: 42px; font-weight: 700; margin: 5px 0; color: #fff; text-shadow: 0 0 15px rgba(255,215,0,0.5); }
         
+        /* PLANET CONTAINER & ANIMATIONS */
         .planet-container {
-            position: relative; width: 260px; height: 260px;
-            display: flex; justify-content: center; align-items: center; margin-bottom: 10px;
+            position: relative;
+            width: 280px; height: 280px;
+            display: flex; justify-content: center; align-items: center;
+            margin-bottom: 10px;
         }
 
         #planet-jupiter {
-            width: 240px; height: 240px; object-fit: contain; border-radius: 50%; z-index: 5; 
+            width: 260px; height: 260px;
+            object-fit: contain; border-radius: 50%; z-index: 5; 
             filter: drop-shadow(0 0 25px rgba(255, 140, 0, 0.4));
             animation: planetSpin 30s linear infinite; 
         }
+
         .shake-effect { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
         @keyframes shake { 10%, 90% { transform: translate3d(-4px, 0, 0); } 20%, 80% { transform: translate3d(6px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-8px, 0, 0); } 40%, 60% { transform: translate3d(8px, 0, 0); } }
         @keyframes planetSpin { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
         .planet-fast { animation: planetSpin 3s linear infinite !important; filter: drop-shadow(0 0 50px rgba(255, 160, 50, 0.9)) !important; }
 
-        /* STONE BUTTON (LOOT BOX) */
-        .stone-trigger-container {
-            margin-top: 20px;
-            position: relative;
-            z-index: 20;
-            display: flex;
-            justify-content: center;
-        }
-        .stone-btn {
-            background: transparent; border: none; cursor: pointer;
-            transition: transform 0.2s;
-            filter: drop-shadow(0 0 10px #888);
-            display: flex; flex-direction: column; align-items: center;
-        }
+        /* ASTEROID & EXPLOSION */
+        .asteroid { position: absolute; width: 50px; height: 50px; object-fit: contain; z-index: 6; pointer-events: none; }
+        .explosion { position: absolute; width: 120px; height: 120px; background: radial-gradient(circle, #fff700 10%, #ff4500 40%, transparent 70%); border-radius: 50%; z-index: 7; transform: scale(0); opacity: 1; animation: explode 0.5s ease-out forwards; pointer-events: none; }
+        @keyframes explode { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(2.5); opacity: 0; } }
+
+        /* STONE BUTTON (LOOT BOX) - NEW ADDITION */
+        .stone-trigger-container { margin-top: 20px; position: relative; z-index: 20; display: flex; justify-content: center; }
+        .stone-btn { background: transparent; border: none; cursor: pointer; transition: transform 0.2s; filter: drop-shadow(0 0 10px #888); display: flex; flex-direction: column; align-items: center; }
         .stone-btn img { width: 80px; height: 80px; object-fit: contain; animation: floatStone 3s ease-in-out infinite; }
         .stone-btn:active { transform: scale(0.9); }
         @keyframes floatStone { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        /* STONE GRID STYLES */
+        .stone-grid-container { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 20px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 15px; }
+        .stone-box { aspect-ratio: 1; background: var(--box-color); border: 1px solid #444; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold; color: #555; position: relative; box-shadow: inset 0 0 10px #000; }
+        /* Image inside box */
+        .stone-box img { width: 75%; height: 75%; object-fit: contain; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6)); }
+        .stone-box.highlight { background: #fff; box-shadow: 0 0 15px #fff; border-color: #fff; z-index: 5; }
+        .stone-box.opened { background: linear-gradient(135deg, #444, #222); color: var(--primary); border-color: var(--primary); box-shadow: 0 0 5px var(--primary); }
+        .stone-box.opened img { display: none; }
+        .stone-box.opened span { display: block; font-size: 20px; }
+        .stone-progress-text { text-align: center; color: var(--secondary); margin-bottom: 5px; font-size: 13px; font-weight: 600; }
+        .stone-status-bar { height: 8px; background: #333; border-radius: 4px; overflow: hidden; margin-bottom: 15px; width: 100%; }
+        .stone-status-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #ff00ff, #00ffff); transition: width 0.3s; }
 
         /* BUTTONS */
         .btn-main { background: linear-gradient(135deg, var(--primary), #ffa500); color: #000; border: none; width: 85%; max-width:320px; padding: 18px; border-radius: 18px; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 0 20px var(--primary-glow); position: relative; z-index: 10; text-transform: uppercase; letter-spacing: 1px; }
@@ -102,7 +113,7 @@
         .mining-progress { width: 85%; max-width:320px; background: rgba(255,255,255,0.1); height: 6px; border-radius: 10px; margin-top: 15px; overflow: hidden; display: none; }
         .mining-bar { height: 100%; background: var(--secondary); width: 0%; transition: width 0.3s; box-shadow: 0 0 10px var(--secondary); }
 
-        /* WALLET & TASKS */
+        /* WALLET REDESIGN */
         .wallet-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 25px; padding: 30px 20px; text-align: center; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: relative; overflow: hidden; }
         .wallet-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(0,224,255,0.1) 0%, transparent 60%); animation: rotateGlow 10s linear infinite; pointer-events: none; }
         @keyframes rotateGlow { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -112,62 +123,13 @@
         .btn-wallet { width: 100%; padding: 16px; border-radius: 15px; font-weight: 700; border: none; margin-bottom: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s; }
         .btn-withdraw { background: linear-gradient(90deg, #00c6ff, #0072ff); color: white; box-shadow: 0 5px 15px rgba(0,198,255,0.4); }
         .btn-history { background: rgba(255,255,255,0.1); color: #ccc; border: 1px solid rgba(255,255,255,0.1); }
-        
+        .btn-history:hover { background: rgba(255,255,255,0.2); color: #fff; }
+
+        /* TASKS */
         .task-card { background: rgba(30,35,50,0.8); backdrop-filter: blur(5px); border-radius: 16px; padding: 15px; margin-bottom: 15px; border: 1px solid var(--glass-border); }
         .task-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .task-title { font-weight: 600; color: #fff; font-size: 14px; display: flex; align-items: center; gap: 8px; }
         .btn-task { background: var(--secondary); border: none; padding: 8px 18px; border-radius: 8px; color: #000; font-weight: 700; cursor: pointer; font-size: 12px; }
-
-        /* STONE LOOT BOX GRID */
-        .stone-grid-container {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
-            margin-bottom: 20px;
-            padding: 10px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 15px;
-        }
-        .stone-box {
-            aspect-ratio: 1;
-            background: var(--box-color);
-            border: 1px solid #444;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            font-weight: bold;
-            color: #555;
-            position: relative;
-            box-shadow: inset 0 0 10px #000;
-        }
-        /* IMAGE INSIDE BOX */
-        .stone-box img {
-            width: 75%;
-            height: 75%;
-            object-fit: contain;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6));
-        }
-
-        .stone-box.highlight {
-            background: #fff;
-            box-shadow: 0 0 15px #fff;
-            border-color: #fff;
-            z-index: 5;
-        }
-        .stone-box.opened {
-            background: linear-gradient(135deg, #444, #222);
-            color: var(--primary);
-            border-color: var(--primary);
-            box-shadow: 0 0 5px var(--primary);
-        }
-        .stone-box.opened img { display: none; } /* Hide image when opened */
-        .stone-box.opened span { display: block; font-size: 20px; }
-
-        .stone-progress-text { text-align: center; color: var(--secondary); margin-bottom: 5px; font-size: 13px; font-weight: 600; }
-        .stone-status-bar { height: 8px; background: #333; border-radius: 4px; overflow: hidden; margin-bottom: 15px; width: 100%; }
-        .stone-status-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #ff00ff, #00ffff); transition: width 0.3s; }
 
         /* NAV */
         .nav-bar { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(10, 15, 25, 0.95); border-top: 1px solid var(--glass-border); display: flex; justify-content: space-around; padding: 10px 0; padding-bottom: max(15px, env(safe-area-inset-bottom)); z-index: 50; }
@@ -214,7 +176,7 @@
             <div class="mining-hub">
                 <div style="font-size: 12px; color: var(--secondary); margin-bottom: 10px; font-weight:bold; letter-spacing: 2px;">GALAXY MINER 3000</div>
                 
-                <!-- PLANET CONTAINER -->
+                <!-- PLANET CONTAINER (Container shakes, Image spins) -->
                 <div class="planet-container" id="planet-zone">
                     <img id="planet-jupiter" src="jupiter.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3594/3594274.png'" alt="Jupiter">
                 </div>
@@ -236,27 +198,65 @@
             </div>
         </div>
 
-        <!-- SCREEN: TASKS -->
+        <!-- SCREEN: TASKS (RESTORED TO ORIGINAL) -->
         <div id="screen-tasks" class="screen">
             <h2 style="text-align: center; margin-bottom: 25px;">Mission Control</h2>
-            <!-- Tasks rendered by JS -->
-            <div id="task-list-container"></div>
+            
+            <div class="task-card">
+                <div class="task-header">
+                    <div class="task-title"><i class="fas fa-bolt" style="color: #FFD700;"></i> Special Task</div>
+                    <div class="task-reward" id="reward-task1">+2</div>
+                </div>
+                <div class="progress-bar" style="background:#222; height:4px; border-radius:2px; overflow:hidden; margin-bottom:8px;"><div class="progress-fill" id="prog-task1" style="width:0%; background:var(--secondary); height:100%;"></div></div>
+                <div style="display:flex; justify-content:space-between; font-size:12px; color:#888;">
+                    <span id="status-task1">0/10</span>
+                    <button class="btn-task" id="btn-task1">START</button>
+                </div>
+            </div>
+
+            <div class="task-card">
+                <div class="task-header"><div class="task-title"><i class="fas fa-star" style="color: cyan;"></i> Daily Drop</div><div class="task-reward" id="reward-task2">+2</div></div>
+                <div class="progress-bar" style="background:#222; height:4px; border-radius:2px; overflow:hidden; margin-bottom:8px;"><div class="progress-fill" id="prog-task2" style="width:0%; background:var(--secondary); height:100%;"></div></div>
+                <div style="display:flex; justify-content:space-between; font-size:12px; color:#888;">
+                    <span id="status-task2">0/10</span><button class="btn-task" id="btn-task2">START</button>
+                </div>
+            </div>
+
+            <div class="task-card">
+                <div class="task-header"><div class="task-title"><i class="fas fa-fire" style="color: orange;"></i> Rapid Fire</div><div class="task-reward" id="reward-task3">+3</div></div>
+                <div class="progress-bar" style="background:#222; height:4px; border-radius:2px; overflow:hidden; margin-bottom:8px;"><div class="progress-fill" id="prog-task3" style="width:0%; background:var(--secondary); height:100%;"></div></div>
+                <div style="display:flex; justify-content:space-between; font-size:12px; color:#888;">
+                    <span id="status-task3">0/10</span><button class="btn-task" id="btn-task3">START</button>
+                </div>
+            </div>
+
+            <div class="task-card">
+                <div class="task-header"><div class="task-title"><i class="fas fa-gem" style="color: violet;"></i> Treasure</div><div class="task-reward" id="reward-task4">+4</div></div>
+                <div class="progress-bar" style="background:#222; height:4px; border-radius:2px; overflow:hidden; margin-bottom:8px;"><div class="progress-fill" id="prog-task4" style="width:0%; background:var(--secondary); height:100%;"></div></div>
+                <div style="display:flex; justify-content:space-between; font-size:12px; color:#888;">
+                    <span id="status-task4">0/10</span><button class="btn-task" id="btn-task4">START</button>
+                </div>
+            </div>
         </div>
 
-        <!-- SCREEN: WALLET -->
+        <!-- SCREEN: WALLET (REDESIGNED) -->
         <div id="screen-wallet" class="screen">
             <h2 style="text-align: center; margin-bottom: 20px;">My Wallet</h2>
+            
             <div class="wallet-card">
                 <div class="wallet-label">Total Balance</div>
                 <div class="wallet-balance" id="wallet-big-balance">0</div>
                 <div class="wallet-value">Value: ₹<span id="usd-val">0.00</span></div>
             </div>
+            
             <button class="btn-wallet btn-withdraw" onclick="openWModal()">
                 <i class="fas fa-university"></i> WITHDRAW FUNDS
             </button>
+            
             <button class="btn-wallet btn-history" onclick="openHModal()">
                 <i class="fas fa-history"></i> Transaction History
             </button>
+
             <div style="text-align:center; font-size:11px; color:#666; margin-top:20px; line-height: 1.6;">
                 Min Withdrawal: <span id="admin-min" style="color:#fff;">1000</span> Coins<br>
                 Exchange Rate: <span id="admin-rate" style="color:#fff;">100</span> Coins = ₹1
@@ -297,11 +297,14 @@
         <div class="modal-box">
             <span class="close-btn" onclick="closeModal('w-modal')">&times;</span>
             <h3 style="margin-top:0; color:var(--secondary);">Withdraw Funds</h3>
+            <label style="font-size:12px; color:#aaa; display:block;">Select Method</label>
             <select id="w-method" class="form-control"><option value="">Loading...</option></select>
-            <input type="number" id="w-amount" class="form-control" placeholder="Amount (Coins)" oninput="calcVal()">
+            <label style="font-size:12px; color:#aaa; display:block;">Amount (Coins)</label>
+            <input type="number" id="w-amount" class="form-control" placeholder="0" oninput="calcVal()">
             <div style="text-align:right; font-size:12px; color:lime; margin-bottom:10px;">You receive: ₹<span id="w-get">0.00</span></div>
-            <input type="text" id="w-detail" class="form-control" placeholder="UPI/Phone">
-            <button class="btn-wallet btn-withdraw" style="margin-top:15px;" onclick="submitRequest()">CONFIRM</button>
+            <label style="font-size:12px; color:#aaa; display:block;">Account Details (UPI/Phone)</label>
+            <input type="text" id="w-detail" class="form-control" placeholder="Ex: 9876543210@upi">
+            <button class="btn-wallet btn-withdraw" style="margin-top:15px;" onclick="submitRequest()">CONFIRM WITHDRAWAL</button>
         </div>
     </div>
 
@@ -310,7 +313,7 @@
         <div class="modal-box" style="height: 60vh; display:flex; flex-direction:column;">
             <span class="close-btn" onclick="closeModal('h-modal')">&times;</span>
             <h3 style="margin-top:0; color:#fff;">History</h3>
-            <div id="h-list" style="overflow-y:auto; flex:1;">Loading...</div>
+            <div id="h-list" style="overflow-y:auto; flex:1; text-align:left; padding-right:5px;">Loading...</div>
         </div>
     </div>
 
@@ -327,30 +330,26 @@
         };
         
         let TASK_CONFIG = {
-            task1: { reward: 2, limit: 10, cooldown: 2 * 3600 * 1000, name: "Special Task" }, 
-            task2: { reward: 5, limit: 10, cooldown: 1 * 3600 * 1000, name: "Daily Drop" }, 
-            task3: { reward: 5, limit: 10, cooldown: 1 * 3600 * 1000, name: "Rapid Fire" }, 
-            task4: { reward: 10, limit: 5,  cooldown: 4 * 3600 * 1000, name: "Treasure" }  
+            task1: { reward: 2, limit: 10, cooldown: 2 * 3600 * 1000 }, 
+            task2: { reward: 5, limit: 10, cooldown: 1 * 3600 * 1000 }, 
+            task3: { reward: 5, limit: 10, cooldown: 1 * 3600 * 1000 }, 
+            task4: { reward: 10, limit: 5,  cooldown: 4 * 3600 * 1000 }  
         };
         let MINING_CONFIG = { reward: 10, adsRequired: 10, duration: 3 * 3600 * 1000 };
+        let ADMIN_MIN_W = 1000;
+        let ADMIN_RATE = 100;
+        let ADMIN_METHODS = "UPI,PhonePe,Paytm";
         
-        // --- STONE LOOT BOX CONFIG ---
+        // --- NEW STONE LOOT BOX CONFIG ---
         const STONE_ADS_BLOCK = "int-20264"; 
-        const ADSGRAM_MINING_BLOCK = "20263"; 
         const STONE_REQ_ADS = 5;
         const STONE_COOLDOWN_MS = 2 * 3600 * 1000; // 2 Hours
-        
-        const STONE_REWARDS_POOL = [
-            10, 10, 
-            7, 7, 7,
-            5, 5, 5, 5, 5,
-            3, 3, 3, 3, 3,
-            2, 2, 2, 2, 2
-        ];
+        const STONE_REWARDS_POOL = [10, 10, 7, 7, 7, 5, 5, 5, 5, 5, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2];
 
         let db, userId, userData = {};
+        const ADSGRAM_BLOCK = "20263"; 
+        
         let localCooldowns = { task1: 0, task2: 0, task3: 0, task4: 0, mining: 0 };
-        let ADMIN_MIN_W = 1000, ADMIN_RATE = 100, ADMIN_METHODS = "UPI,PhonePe,Paytm";
 
         document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => { document.getElementById('loading-screen').style.opacity = '0'; setTimeout(()=>{ document.getElementById('loading-screen').style.display='none'; },500); }, 3000);
@@ -383,16 +382,19 @@
                         if(s.minWithdraw) ADMIN_MIN_W = parseInt(s.minWithdraw);
                         if(s.coinRate) ADMIN_RATE = parseInt(s.coinRate);
                         if(s.methods) ADMIN_METHODS = s.methods;
+                        if(s.taskConfig) TASK_CONFIG = s.taskConfig; 
+                        if(s.miningConfig) MINING_CONFIG = s.miningConfig;
                         updateAdminUI();
                     }
                 });
 
                 setInterval(updateMiningUI, 1000); 
-                setInterval(renderTasks, 1000);
-                setInterval(updateStoneUI, 1000); 
-                setInterval(createAsteroid, 1500); 
-                initGalaxy();
-                generateStoneGrid(); // Draw grid
+                setInterval(renderTasks, 1000);    
+                setInterval(updateStoneUI, 1000); // Check Stone Timer
+                setInterval(createAsteroid, 1500); // Asteroids
+
+                // Initialize Grid
+                generateStoneGrid();
 
             } catch(e) { console.error(e); }
 
@@ -404,8 +406,17 @@
             }));
 
             document.getElementById('mining-btn').addEventListener('click', handleMiningBtn);
+            
+            // TASK BUTTONS (RESTORED)
+            document.getElementById('btn-task1').addEventListener('click', () => handleTaskLogic('task1'));
+            document.getElementById('btn-task2').addEventListener('click', () => handleTaskLogic('task2'));
+            document.getElementById('btn-task3').addEventListener('click', () => handleTaskLogic('task3'));
+            document.getElementById('btn-task4').addEventListener('click', () => handleTaskLogic('task4'));
+
+            // STONE BUTTON
             document.getElementById('stone-action-btn').addEventListener('click', handleStoneAction);
-            renderStaticTasks();
+
+            initGalaxy();
         });
 
         // --- STONE LOOT BOX LOGIC ---
@@ -416,7 +427,7 @@
                 const box = document.createElement('div');
                 box.className = 'stone-box';
                 box.id = `sbox-${i}`;
-                // HERE IS THE CHANGE: Using Image instead of Icon
+                // Using Image as requested
                 box.innerHTML = `<img src="stone.png" alt="Box" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2663/2663114.png'">`;
                 grid.appendChild(box);
             }
@@ -493,7 +504,7 @@
             const btn = document.getElementById('stone-action-btn');
             btn.disabled = true; btn.innerText = "SPINNING...";
             
-            // Reset grid images before spin
+            // Reset grid images
             document.querySelectorAll('.stone-box').forEach(b => {
                 b.className = 'stone-box';
                 b.innerHTML = `<img src="stone.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2663/2663114.png'">`;
@@ -523,19 +534,15 @@
             const box = document.getElementById(`sbox-${index}`);
             box.classList.add('opened');
             box.classList.remove('highlight');
-            // Show Amount instead of image
             box.innerHTML = `<span>+${amount}</span>`;
             
             setTimeout(() => {
                 alert(`CONGRATULATIONS! You found ${amount} Coins!`);
-                
                 const updates = {};
                 updates[`Users/${userId}/score`] = firebase.database.ServerValue.increment(amount);
                 updates[`Users/${userId}/stoneAds`] = 0;
                 updates[`Users/${userId}/stoneLastOpen`] = firebase.database.ServerValue.TIMESTAMP;
-                
                 db.ref().update(updates);
-                
                 document.getElementById('stone-action-btn').disabled = false;
                 updateStoneUI(); 
             }, 500);
@@ -548,34 +555,23 @@
             if(!container) return;
             const asteroid = document.createElement('img');
             asteroid.src = 'asteroid.png'; 
-            asteroid.style.position='absolute'; asteroid.style.width='40px'; asteroid.style.zIndex='6';
+            asteroid.classList.add('asteroid');
             asteroid.onerror = function() { this.src='https://cdn-icons-png.flaticon.com/512/547/547432.png'; };
             const angle = Math.random() * Math.PI * 2;
-            const distance = 300; 
-            const startX = Math.cos(angle) * distance; const startY = Math.sin(angle) * distance;
-            asteroid.style.transform = `translate(${startX}px, ${startY}px)`;
-            asteroid.style.transition = `transform 1s linear`; 
+            const distance = 350; 
+            const startX = Math.cos(angle) * distance;
+            const startY = Math.sin(angle) * distance;
+            asteroid.style.transform = `translate(${startX}px, ${startY}px) rotate(${Math.random()*360}deg)`;
+            asteroid.style.transition = `transform 1s linear`;
             container.appendChild(asteroid);
-            setTimeout(() => { asteroid.style.transform = `translate(0px, 0px)`; }, 50);
+            setTimeout(() => { asteroid.style.transform = `translate(0px, 0px) rotate(${Math.random()*360}deg)`; }, 50);
             setTimeout(() => {
                 asteroid.remove();
                 container.classList.remove('shake-effect'); void container.offsetWidth; container.classList.add('shake-effect');
+                const explosion = document.createElement('div');
+                explosion.classList.add('explosion'); container.appendChild(explosion);
+                setTimeout(() => { explosion.remove(); }, 600);
             }, 1000);
-        }
-
-        // --- STANDARD LOGIC ---
-        function renderStaticTasks() {
-            const c = document.getElementById('task-list-container');
-            c.innerHTML = '';
-            Object.keys(TASK_CONFIG).forEach(key => {
-                const t = TASK_CONFIG[key];
-                c.innerHTML += `
-                <div class="task-card">
-                    <div class="task-header"><div class="task-title"><i class="fas fa-star" style="color:cyan;"></i> ${t.name}</div><div class="task-reward" id="reward-${key}">+${t.reward}</div></div>
-                    <div style="background:#222;height:4px;border-radius:2px;overflow:hidden;margin-bottom:8px;"><div id="prog-${key}" style="width:0%;background:var(--secondary);height:100%;"></div></div>
-                    <div style="display:flex;justify-content:space-between;font-size:12px;color:#888;"><span id="status-${key}">0/${t.limit}</span><button class="btn-task" id="btn-${key}" onclick="handleTaskLogic('${key}')">START</button></div>
-                </div>`;
-            });
         }
 
         function updateAdminUI() {
@@ -584,6 +580,10 @@
             const sel = document.getElementById('w-method');
             sel.innerHTML = '<option value="">Select Method</option>';
             ADMIN_METHODS.split(',').forEach(m => { sel.innerHTML += `<option value="${m.trim()}">${m.trim()}</option>`; });
+            document.getElementById('reward-task1').innerText = "+" + (TASK_CONFIG.task1?.reward || 0);
+            document.getElementById('reward-task2').innerText = "+" + (TASK_CONFIG.task2?.reward || 0);
+            document.getElementById('reward-task3').innerText = "+" + (TASK_CONFIG.task3?.reward || 0);
+            document.getElementById('reward-task4').innerText = "+" + (TASK_CONFIG.task4?.reward || 0);
         }
 
         function updateUI() {
@@ -597,52 +597,69 @@
             renderTasks();
         }
 
+        // RESTORED ORIGINAL TASK RENDER FUNCTION
         function renderTasks() {
             if(!userData) return;
             const tasks = userData.taskData || {};
             const now = Date.now();
             
-            Object.keys(TASK_CONFIG).forEach(key => {
-                const conf = TASK_CONFIG[key];
+            const renderOne = (key, btnId, statusId, progId) => {
+                const conf = TASK_CONFIG[key] || {limit:10, cooldown:3600000};
                 const data = tasks[key] || { count: 0, lastDone: 0 };
-                const btn = document.getElementById(`btn-${key}`);
-                const stat = document.getElementById(`status-${key}`);
-                const prog = document.getElementById(`prog-${key}`);
+                const btn = document.getElementById(btnId);
+                const stat = document.getElementById(statusId);
+                const prog = document.getElementById(progId);
 
                 if (data.count >= conf.limit) {
                     const timePassed = now - data.lastDone;
                     if (timePassed < conf.cooldown) {
                         const left = conf.cooldown - timePassed;
-                        const h = Math.floor(left/3600000); const m = Math.floor((left%3600000)/60000);
-                        btn.innerText = `${h}h ${m}m`; btn.disabled = true; btn.style.background = "#333";
-                        stat.innerText = "Done"; prog.style.width = "100%";
+                        const h = Math.floor(left/3600000); const m = Math.floor((left%3600000)/60000); const s = Math.floor((left%60000)/1000);
+                        btn.innerText = `${h}h ${m}m ${s}s`; btn.disabled = true; btn.style.background = "#333"; btn.style.color="#777";
+                        stat.innerHTML = `<span class="cooldown-text">Done</span>`;
+                        prog.style.width = "100%"; prog.style.background = "#333";
                         return;
                     }
                 }
                 
                 if (localCooldowns[key] && now < localCooldowns[key]) {
                     const wait = Math.ceil((localCooldowns[key] - now) / 1000);
-                    btn.innerText = `WAIT ${wait}s`; btn.disabled = true;
-                } else {
+                    btn.innerText = `WAIT ${wait}s`;
+                    btn.disabled = true;
+                    btn.style.background = "#444";
+                    
                     const displayCount = (data.count >= conf.limit && (now - data.lastDone >= conf.cooldown)) ? 0 : data.count;
-                    btn.innerText = "START"; btn.disabled = false; btn.style.background = "";
                     stat.innerText = `${displayCount}/${conf.limit}`;
-                    prog.style.width = `${(displayCount / conf.limit) * 100}%`;
+                    prog.style.width = `${(displayCount / conf.limit) * 100}%`; prog.style.background = "var(--secondary)";
+                    return;
                 }
-            });
+
+                const displayCount = (data.count >= conf.limit && (now - data.lastDone >= conf.cooldown)) ? 0 : data.count;
+                btn.innerText = "START"; btn.disabled = false; btn.style.background = ""; btn.style.color="#000";
+                stat.innerText = `${displayCount}/${conf.limit}`;
+                prog.style.width = `${(displayCount / conf.limit) * 100}%`; prog.style.background = "var(--secondary)";
+            };
+            
+            renderOne('task1', 'btn-task1', 'status-task1', 'prog-task1');
+            renderOne('task2', 'btn-task2', 'status-task2', 'prog-task2');
+            renderOne('task3', 'btn-task3', 'status-task3', 'prog-task3');
+            renderOne('task4', 'btn-task4', 'status-task4', 'prog-task4');
         }
 
+        // RESTORED ORIGINAL TASK LOGIC (Specific Ad Networks per task)
         function handleTaskLogic(key) {
             const conf = TASK_CONFIG[key];
-            const btn = document.getElementById(`btn-${key}`);
+            const btn = document.getElementById('btn-' + key);
+            const tasks = userData.taskData || {};
+            const data = tasks[key] || { count: 0, lastDone: 0 };
+            
+            if (data.count >= conf.limit && (Date.now() - data.lastDone < conf.cooldown)) return;
+            let currentCount = (data.count >= conf.limit && (Date.now() - data.lastDone >= conf.cooldown)) ? 0 : data.count;
+
             btn.innerText = "LOADING..."; btn.disabled = true;
 
             const finish = (success) => {
                 if(success) {
-                    const tasks = userData.taskData || {};
-                    const data = tasks[key] || { count: 0, lastDone: 0 };
-                    const currentCount = (data.count >= conf.limit && (Date.now() - data.lastDone >= conf.cooldown)) ? 0 : data.count;
-                    
                     const newCount = currentCount + 1;
                     let updates = {};
                     updates[`Users/${userId}/score`] = firebase.database.ServerValue.increment(conf.reward);
@@ -652,15 +669,25 @@
                         updates[`Users/${userId}/taskData/${key}`] = { count: newCount, lastDone: data.lastDone };
                     }
                     db.ref().update(updates).then(() => { alert(`Success! +${conf.reward} Coins`); });
+                } else {
+                    alert("Ad cancelled.");
                 }
                 localCooldowns[key] = Date.now() + 10000;
             };
 
-            if(key === 'task1' && window.Adsgram) {
-                window.Adsgram.init({ blockId: ADSGRAM_MINING_BLOCK }).show().then(()=>finish(true)).catch(()=>finish(false));
-            } else if (typeof show_9966888 === 'function') {
-                show_9966888().then(()=>finish(true)).catch(()=>finish(false));
-            } else { finish(true); } 
+            if (key === 'task1') {
+                if(window.Adsgram) window.Adsgram.init({ blockId: ADSGRAM_BLOCK }).show().then(finish).catch(() => finish(false));
+                else finish(true);
+            } else if (key === 'task2') {
+                if(typeof show_9966888 === 'function') show_9966888().then(()=>finish(true)).catch(()=>finish(false));
+                else { alert("Ad Script Not Loaded"); btn.disabled=false; }
+            } else if (key === 'task3') {
+                if(typeof show_9966888 === 'function') show_9966888('pop').then(()=>finish(true)).catch(()=>finish(false));
+                else { alert("Ad Script Not Loaded"); btn.disabled=false; }
+            } else if (key === 'task4') {
+                if(typeof show_9966767 === 'function') show_9966767().then(()=>finish(true)).catch(()=>finish(false));
+                else { alert("Ad Script Not Loaded"); btn.disabled=false; }
+            }
         }
 
         function handleMiningBtn() {
@@ -668,9 +695,9 @@
             if(btn.innerText.includes("WATCH AD")) {
                 if(window.Adsgram) {
                     btn.innerText = "LOADING..."; btn.disabled = true;
-                    window.Adsgram.init({ blockId: ADSGRAM_MINING_BLOCK }).show().then((watched) => {
+                    window.Adsgram.init({ blockId: ADSGRAM_BLOCK }).show().then((watched) => {
                         if(watched) db.ref(`Users/${userId}/miningAdsWatched`).set(firebase.database.ServerValue.increment(1));
-                        localCooldowns['mining'] = Date.now() + 5000;
+                        localCooldowns['mining'] = Date.now() + 10000;
                     }).catch(() => { btn.disabled = false; });
                 }
             } else if (btn.innerText.includes("START ENGINE")) {
@@ -678,15 +705,22 @@
             } else if (btn.innerText.includes("CLAIM")) {
                 const u = {};
                 u[`Users/${userId}/score`] = firebase.database.ServerValue.increment(MINING_CONFIG.reward);
-                u[`Users/${userId}/isMiningActive`] = false; u[`Users/${userId}/miningStartTime`] = null; u[`Users/${userId}/miningAdsWatched`] = 0;
+                u[`Users/${userId}/isMiningActive`] = false;
+                u[`Users/${userId}/miningStartTime`] = null;
+                u[`Users/${userId}/miningAdsWatched`] = 0;
                 db.ref().update(u);
+                alert(`Claimed ${MINING_CONFIG.reward} Coins.`);
             }
         }
 
         function updateMiningUI() {
             const btn = document.getElementById('mining-btn');
             const timer = document.getElementById('mining-timer');
+            const progressBox = document.getElementById('mining-progress-box');
+            const barFill = document.getElementById('mining-bar-fill');
+            const statusText = document.getElementById('mining-status-text');
             const planet = document.getElementById('planet-jupiter');
+
             const isMining = userData.isMiningActive === true;
             const adsWatched = userData.miningAdsWatched || 0;
             const REQ = MINING_CONFIG.adsRequired;
@@ -694,28 +728,41 @@
             if (isMining) {
                 const end = (userData.miningStartTime || 0) + MINING_CONFIG.duration;
                 const now = Date.now();
+                progressBox.style.display='none'; statusText.innerText = "MINING IN PROGRESS...";
+                
                 if(planet) planet.classList.add('planet-fast'); 
+
                 if(now < end) {
                     const l = end - now; const h = Math.floor(l/3600000); const m = Math.floor((l%3600000)/60000); const s = Math.floor((l%60000)/1000);
                     timer.innerText = `${h}:${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
-                    btn.innerHTML = `<i class="fas fa-cog fa-spin"></i> MINING...`; btn.disabled = true;
+                    btn.innerHTML = `<i class="fas fa-cog fa-spin"></i> SYSTEM ACTIVE`; btn.disabled = true; btn.style.background = "#222"; btn.style.color="#fff";
                 } else {
                     if(planet) planet.classList.remove('planet-fast'); 
-                    timer.innerText = "00:00:00"; btn.innerHTML = `CLAIM ${MINING_CONFIG.reward} COINS`; btn.disabled = false; btn.style.background = "var(--primary)";
+                    timer.innerText = "00:00:00"; btn.innerHTML = `CLAIM ${MINING_CONFIG.reward} COINS`; btn.disabled = false; btn.style.background = "var(--primary)"; btn.style.color = "#000";
                 }
             } else {
                 if(planet) planet.classList.remove('planet-fast');
                 timer.innerText = "03:00:00";
+                
                 if(localCooldowns['mining'] && Date.now() < localCooldowns['mining']) {
-                    btn.innerHTML = `WAIT...`; btn.disabled = true; return;
+                    const wait = Math.ceil((localCooldowns['mining'] - Date.now()) / 1000);
+                    btn.innerHTML = `WAIT ${wait}s`;
+                    btn.disabled = true;
+                    btn.style.background = "#333";
+                    progressBox.style.display = 'block';
+                    barFill.style.width = ((adsWatched / REQ) * 100) + "%";
+                    statusText.innerText = `Watch ${REQ - adsWatched} more ads to enable`;
+                    return;
                 }
+
                 if (adsWatched < REQ) {
-                    btn.innerHTML = `WATCH AD (${adsWatched}/${REQ})`; btn.disabled = false; btn.style.background = "var(--secondary)";
-                    document.getElementById('mining-bar-fill').style.width = ((adsWatched / REQ) * 100) + "%";
-                    document.getElementById('mining-progress-box').style.display='block';
+                    btn.innerHTML = `WATCH AD (${adsWatched}/${REQ})`; btn.disabled = false; btn.style.background = "var(--secondary)"; btn.style.color="#000";
+                    progressBox.style.display = 'block';
+                    barFill.style.width = ((adsWatched / REQ) * 100) + "%";
+                    statusText.innerText = `Watch ${REQ - adsWatched} more ads to enable`;
                 } else {
-                    btn.innerHTML = `<i class="fas fa-power-off"></i> START ENGINE`; btn.disabled = false; btn.style.background = "#28a745";
-                    document.getElementById('mining-progress-box').style.display='none';
+                    btn.innerHTML = `<i class="fas fa-power-off"></i> START ENGINE`; btn.disabled = false; btn.style.background = "#28a745"; btn.style.color = "#fff";
+                    progressBox.style.display = 'none'; statusText.innerText = "System Ready.";
                 }
             }
         }
@@ -730,13 +777,13 @@
         function openWModal() { document.getElementById('w-modal').style.display='flex'; }
         function openHModal() { 
             document.getElementById('h-modal').style.display='flex'; 
-            const list = document.getElementById('h-list'); list.innerHTML = "<div style='text-align:center; margin-top:20px; color:#666;'>Loading...</div>";
+            const list = document.getElementById('h-list'); list.innerHTML = "<div style='text-align:center; margin-top:20px; color:#666;'><i class='fas fa-circle-notch fa-spin'></i> Loading...</div>";
             db.ref('Withdrawals').orderByChild('userId').equalTo(userId).once('value', snap => {
                 list.innerHTML = "";
-                if(!snap.exists()) { list.innerHTML="<p style='color:#777; text-align:center;'>No history.</p>"; return; }
+                if(!snap.exists()) { list.innerHTML="<p style='color:#777; text-align:center; margin-top:20px;'>No history found.</p>"; return; }
                 const data = []; snap.forEach(c => data.push(c.val()));
                 data.reverse().forEach(w => {
-                    list.innerHTML += `<div class="hist-item"><div><b style='color:#fff;'>₹${w.rupeeVal}</b><br><small style='color:#888'>${w.date}</small></div><div style='text-align:right;'>${w.method}<br><span class='status-${w.status}'>${w.status}</span></div></div>`;
+                    list.innerHTML += `<div class="hist-item"><div><b style='color:#fff; font-size:14px;'>₹${w.rupeeVal}</b><br><small style='color:#888'>${w.date}</small></div><div style='text-align:right; font-size:11px; color:#aaa;'>${w.method}<br><span class='status-${w.status}'>${w.status}</span></div></div>`;
                 });
             });
         }
@@ -746,14 +793,22 @@
             const amt = parseInt(document.getElementById('w-amount').value);
             const met = document.getElementById('w-method').value;
             const det = document.getElementById('w-detail').value;
-            if(!amt || !met || !det) return alert("Fill all details.");
-            if(amt < ADMIN_MIN_W) return alert(`Min withdrawal ${ADMIN_MIN_W} Coins`);
+            if(!amt || !met || !det) return alert("Please fill all details.");
+            if(amt < ADMIN_MIN_W) return alert(`Minimum withdrawal is ${ADMIN_MIN_W} Coins`);
             if(amt > userData.score) return alert("Insufficient Balance!");
             
+            // Disable button
+            const btn = document.querySelector('.btn-withdraw');
+            const oldText = btn.innerHTML;
+            btn.innerHTML = "Processing..."; btn.disabled = true;
+
             const req = { userId: userId, userName: userData.Name, amount: amt, rupeeVal: (amt/ADMIN_RATE).toFixed(2), method: met, details: det, status: "Pending", date: new Date().toLocaleString() };
             db.ref('Withdrawals').push(req).then(() => {
                 db.ref(`Users/${userId}/score`).set(firebase.database.ServerValue.increment(-amt));
-                alert("Withdrawal Requested!"); closeModal('w-modal');
+                alert("Withdrawal Requested Successfully!"); 
+                closeModal('w-modal');
+                document.getElementById('w-amount').value = "";
+                btn.innerHTML = oldText; btn.disabled = false;
             });
         }
     </script>
