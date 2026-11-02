@@ -627,12 +627,12 @@ svg{width:100%;height:100%;display:block}
 
   </div>
 
-  <!-- Dedicated task row: keeps the game board clear. -->
-  <div id="task-dock" class="task-dock">
+  <!-- Adsgram task dock: hidden until Adsgram renders a real available task. -->
+  <div id="task-dock" class="task-dock" aria-live="polite">
     <div id="task-ad-overlay" class="task-ad-overlay off">
       <div class="task-ad-header">
         <span class="task-ad-tag">⚡ SPECIAL MISSION</span>
-        <span class="task-ad-sub">Complete task &amp; stay 6s for +100 Coins!</span>
+        <span class="task-ad-sub">Complete the Adsgram task and stay 6 seconds</span>
       </div>
       <adsgram-task id="adsgram-task-comp" data-block-id="task-57510" class="adsgram-task-box"></adsgram-task>
       <div id="task-countdown-box" class="task-countdown-box" style="display:none;">
@@ -707,7 +707,7 @@ const ADS_CONFIG = {
   PLAY_BLOCK: "int-20264",      // Arena Play button tap ad
   WIN_BLOCK: "20263",          // Game Win ad
   CLAIM_BLOCK: "int-20264",    // Free coins claim ad
-  TASK_BLOCK: "task-57510"     // In-game 1-minute recurring task ad
+  TASK_BLOCK: "task-57510"     // Adsgram task widget; shown only when a task is available
 };
 
 // Safe Adsgram Show Promise Wrapper for Fullscreen Ads
@@ -762,7 +762,8 @@ function getMegaTonUID(){
   }catch(e){}
 
   try{
-    const p = new URLSearchParams(window.location.search).get('uid');
+    const params = new URLSearchParams(window.location.search);
+    const p = params.get('uid') || params.get('startapp');
     if(p && String(p).trim()){
       const v = String(p).trim();
       localStorage.setItem('megaton_uid', v);
@@ -822,38 +823,41 @@ function updateMegaTonBadges(){
   });
 }
 
-async function dispatchMegaTonReward(levelCleared, scoreReached){
-  const level = Number(levelCleared) || 100;
-  const score = Number(scoreReached) || 0;
+/* ================== MEGATON PLAY COIN-COLLECT CALLBACK BRIDGE ================== */
+let megatonRewardInProgress = false;
+const localClaimedTargets = new Set();
+let pendingMegaTonCoinTotal = 0;
 
-  const p1 = {
-    type: "LEVEL_COMPLETE",
-    gameId: MEGATON_CONFIG.taskId,
-    level: Number(level),
-    target: Number(level),
-    score: Number(score)
-  };
-  const p2 = {
+function sendMegaTonCoinCallback(totalCoinsCollected){
+  const total = Math.max(0, Math.floor(Number(totalCoinsCollected) || 0));
+  const payload = {
     type: "TASK_REWARD",
     gameId: MEGATON_CONFIG.taskId,
-    target: Number(level),
-    level: Number(level),
-    score: Number(score)
+    rewardType: "COINS_COLLECTED",
+    target: total,
+    level: total,
+    score: total,
+    totalCoinsCollected: total
   };
-
   try{
-    if(window.parent && window.parent !== window){
-      window.parent.postMessage(p1, "*");
-      window.parent.postMessage(p2, "*");
-    }
+    if(window.parent && window.parent !== window) window.parent.postMessage(payload, "*");
   }catch(e){}
-
   try{
-    if(window.opener){
-      window.opener.postMessage(p1, "*");
-      window.opener.postMessage(p2, "*");
-    }
+    if(window.opener) window.opener.postMessage(payload, "*");
   }catch(e){}
+}
+
+async function checkAndSendMegaTonCoinRewards(totalCoinsCollected){
+  const total = Math.max(0, Math.floor(Number(totalCoinsCollected) || 0));
+  if(!total) return;
+
+  // Parent/MegaTon Play callback is a coin-total callback, never a level-complete callback.
+  sendMegaTonCoinCallback(total);
+
+  if(megatonRewardInProgress){
+    pendingMegaTonCoinTotal = Math.max(pendingMegaTonCoinTotal, total);
+    return;
+  }
 
   const uid = getMegaTonUID();
   const banner = $('#megaton-win-banner');
@@ -862,102 +866,136 @@ async function dispatchMegaTonReward(levelCleared, scoreReached){
   if(!uid){
     if(banner && status){
       banner.className = 'megaton-win-banner guest-mode';
-      status.textContent = '⚠️ Playing as Guest (Open via MegaTon Play to earn TON)';
+      status.textContent = '⚠️ Guest mode: open this game through MegaTon Play to earn TON';
     }
-    showMegaTonToast('⚠️ Playing as Guest: Open via MegaTon Play to earn TON!');
     return;
   }
 
+  megatonRewardInProgress = true;
   if(banner && status){
     banner.className = 'megaton-win-banner';
-    status.textContent = 'Syncing TON reward with MegaTon Play...';
+    status.textContent = 'Checking collected-coin milestones with MegaTon Play...';
   }
 
   try{
-    let rewTon = 0.05;
-    try{
-      const adminUrl = `${MEGATON_CONFIG.firebaseUrl}/adminTasks/${MEGATON_CONFIG.taskId}.json`;
-      const adminRes = await fetch(adminUrl);
-      if(adminRes.ok){
-        const adminData = await adminRes.json();
-        if(adminData){
-          const val = parseFloat(adminData.reward ?? adminData.ton ?? adminData.amount);
-          if(Number.isFinite(val) && val > 0) rewTon = val;
-        }
-      }
-    }catch(err){}
+    const safeUid = encodeURIComponent(String(uid));
+    const taskId = MEGATON_CONFIG.taskId;
+    const adminUrl = `${MEGATON_CONFIG.firebaseUrl}/adminTasks/${encodeURIComponent(taskId)}.json`;
+    const userUrl = `${MEGATON_CONFIG.firebaseUrl}/users/${safeUid}/state.json`;
 
-    const userUrl = `${MEGATON_CONFIG.firebaseUrl}/users/${uid}/state.json`;
-    const userRes = await fetch(userUrl);
-    if(!userRes.ok) throw new Error(`HTTP ${userRes.status}`);
-    const userState = (await userRes.json()) || {};
+    const [adminRes, userRes] = await Promise.all([fetch(adminUrl), fetch(userUrl)]);
+    if(!adminRes.ok) throw new Error(`Task rules HTTP ${adminRes.status}`);
+    if(!userRes.ok) throw new Error(`User state HTTP ${userRes.status}`);
 
-    const gameTasks = userState.gameTasks || {};
-    const taskInfo = gameTasks[MEGATON_CONFIG.taskId];
-    const isCompleted = taskInfo && (taskInfo.completed === true || (taskInfo.level != null && Number(taskInfo.level) >= level));
+    const taskData = (await adminRes.json()) || {};
+    const stateData = (await userRes.json()) || {};
+    const rawLevels = taskData.levels;
+    const levels = Array.isArray(rawLevels)
+      ? rawLevels
+      : (rawLevels && typeof rawLevels === 'object' ? Object.values(rawLevels) : []);
 
-    if(isCompleted){
-      if(banner && status){
-        banner.className = 'megaton-win-banner';
-        status.innerHTML = `Milestone already completed! <span style="color:#facc15">(+${rewTon} TON previously earned)</span>`;
-      }
-      showMegaTonToast(`🎉 Victory! Milestone previously claimed (+${rewTon} TON)`);
+    if(!levels.length){
+      if(banner && status) status.textContent = 'No coin milestones are configured for this MegaTon task yet.';
       return;
     }
 
-    const points = rewTon >= 0.5 ? rewTon : Math.round(rewTon * 10000) / 10;
-    const currentBalance = Number(userState.b) || 0;
-    const newBalance = Math.round((currentBalance + points) * 100) / 100;
+    const gameTasks = stateData.gameTasks && typeof stateData.gameTasks === 'object'
+      ? stateData.gameTasks : {};
+    const oldTaskState = gameTasks[taskId] && typeof gameTasks[taskId] === 'object'
+      ? gameTasks[taskId] : {};
+    const claimedTargets = oldTaskState.claimedTargets && typeof oldTaskState.claimedTargets === 'object'
+      ? { ...oldTaskState.claimedTargets } : {};
 
-    const updatedGameTasks = {
-      ...gameTasks,
-      [MEGATON_CONFIG.taskId]: {
-        completed: true,
-        level: Number(level),
-        score: Number(score),
+    const eligible = levels.map(item => {
+      const target = Number(item && (item.lvl ?? item.target));
+      const rewTon = Number(item && item.reward || 0);
+      return { target, rewTon };
+    }).filter(item =>
+      Number.isFinite(item.target) && item.target > 0 &&
+      Number.isFinite(item.rewTon) && item.rewTon > 0 &&
+      total >= item.target
+    ).sort((x,y)=>x.target-y.target);
+
+    let newBalance = Number(stateData.b) || 0;
+    const hist = Array.isArray(stateData.hist) ? [...stateData.hist] : [];
+    const newlyClaimed = [];
+
+    for(const milestone of eligible){
+      const target = milestone.target;
+      const claimKey = `${uid}:${taskId}:${target}`;
+      if(localClaimedTargets.has(claimKey) || claimedTargets[String(target)] === true) continue;
+
+      // Keep the prompt's MegaTon points conversion exactly.
+      const rewTon = milestone.rewTon;
+      const points = rewTon >= 0.5 ? rewTon : Math.round(rewTon * 10000) / 10;
+      newBalance += points;
+
+      claimedTargets[String(target)] = true;
+      newlyClaimed.push({ target, rewTon, points, claimKey });
+
+      hist.unshift({
+        s: `${MEGATON_CONFIG.gameTitle} (${target} Coins)`,
+        a: `+${rewTon} TON`,
+        k: "t",
         ts: Date.now()
-      }
-    };
+      });
+    }
 
-    const hist = Array.isArray(userState.hist) ? [...userState.hist] : [];
-    hist.unshift({
-      s: `${MEGATON_CONFIG.gameTitle} (Level ${level})`,
-      a: `+${rewTon} TON`,
-      k: "t",
-      ts: Date.now()
-    });
-    if(hist.length > 30) hist.length = 30;
+    if(!newlyClaimed.length){
+      if(banner && status) status.textContent = `Coin total synced: ${total}. No new TON milestone to claim.`;
+      return;
+    }
 
     const patchData = {
-      b: newBalance,
-      gameTasks: updatedGameTasks,
-      hist: hist
+      b: Math.round(newBalance * 100) / 100,
+      gameTasks: {
+        ...gameTasks,
+        [taskId]: {
+          ...oldTaskState,
+          claimedTargets,
+          totalCoinsCollected: Math.max(Number(oldTaskState.totalCoinsCollected) || 0, total),
+          lastCoinSyncAt: Date.now()
+        }
+      },
+      hist: hist.slice(0, 30)
     };
 
-    await fetch(userUrl, {
+    const patchRes = await fetch(userUrl, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(patchData)
     });
+    if(!patchRes.ok) throw new Error(`Reward PATCH HTTP ${patchRes.status}`);
 
+    newlyClaimed.forEach(item => localClaimedTargets.add(item.claimKey));
+
+    const summary = newlyClaimed.map(item =>
+      `🎉 ${item.target} Coins Collected! +${item.rewTon} TON Credited in MegaTon Play!`
+    );
     if(banner && status){
       banner.className = 'megaton-win-banner';
-      status.innerHTML = `🎉 <b style="color:#4ade80">+${rewTon} TON</b> Credited to MegaTon Balance!`;
+      status.textContent = `🎁 +${newlyClaimed.reduce((sum,item)=>sum+item.rewTon,0)} TON credited for collected-coin milestones!`;
     }
-    showMegaTonToast(`🎉 Match Victory! +${rewTon} TON Credited in MegaTon Play!`);
+    summary.forEach((message, index)=>setTimeout(()=>showMegaTonToast(message, 5200), index * 350));
 
-  }catch(syncError){
-    if(banner && status){
-      banner.className = 'megaton-win-banner';
-      status.innerHTML = `🎉 Victory Dispatched to MegaTon Play via Callback!`;
+  }catch(error){
+    console.error('[MegaTon coin callback]', error);
+    if(banner && status) status.textContent = 'MegaTon coin reward sync failed. Please retry after connection is restored.';
+  }finally{
+    megatonRewardInProgress = false;
+    if(pendingMegaTonCoinTotal > total){
+      const nextTotal = pendingMegaTonCoinTotal;
+      pendingMegaTonCoinTotal = 0;
+      setTimeout(()=>checkAndSendMegaTonCoinRewards(nextTotal), 0);
+    }else{
+      pendingMegaTonCoinTotal = 0;
     }
-    showMegaTonToast(`🎉 Match Cleared! Reward dispatched to MegaTon Play!`);
   }
 }
 
 /* ================== GLOBAL STATE & PERSISTENCE ================== */
 const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s),wait=ms=>new Promise(r=>setTimeout(r,ms));
-let coins=800,best=0,username='Guest'+Math.floor(100000+Math.random()*900000);
+let coins=800,best=0,totalCoinsCollected=0,username='Guest'+Math.floor(100000+Math.random()*900000);
 const BONUS_COOLDOWN_MS = 2 * 60 * 60 * 1000;
 let lastBonusTime = 0;
 let bonusTimerInterval = null;
@@ -967,16 +1005,27 @@ const KEY='slr_v3';
 try{
   const d=JSON.parse(localStorage.getItem(KEY)||'{}');
   if(d.c!=null && Number.isFinite(Number(d.c)))coins=Math.max(0,Number(d.c));
+  if(d.tc!=null && Number.isFinite(Number(d.tc)))totalCoinsCollected=Math.max(0,Math.floor(Number(d.tc)));
   if(d.b!=null)best=Math.max(best,d.b);
   if(d.u)username=d.u;
   if(d.lb!=null && Number.isFinite(Number(d.lb)))lastBonusTime=Number(d.lb);
 }catch(e){}
 
 const store=()=>{
-  const s=JSON.stringify({c:coins,b:best,u:username,lb:lastBonusTime});
+  const s=JSON.stringify({c:coins,tc:totalCoinsCollected,b:best,u:username,lb:lastBonusTime});
   try{localStorage.setItem(KEY,s)}catch(e){}
   try{document.cookie=KEY+'='+encodeURIComponent(s)+';max-age=315360000;path=/;SameSite=Lax'}catch(e){}
 };
+
+function creditGameCoins(amount, source){
+  const value = Math.max(0, Math.floor(Number(amount) || 0));
+  if(!value) return;
+  coins += value;
+  totalCoinsCollected += value;
+  store();
+  updateHUD();
+  checkAndSendMegaTonCoinRewards(totalCoinsCollected);
+}
 
 function updateHUD(){
   $('#coins').textContent=coins;
@@ -1586,9 +1635,7 @@ $('#btn-claim-coins').onclick = async ()=>{
   await showAdsgramAd(ADS_CONFIG.CLAIM_BLOCK);
 
   lastBonusTime = Date.now();
-  coins += 500;
-  store();
-  updateHUD();
+  creditGameCoins(500, 'free bonus');
   SFX.coinCascade();
   updateBonusModal();
   setTimeout(()=>{
@@ -1604,97 +1651,145 @@ $('#btn-win-lobby').onclick = ()=>{
   showScreen('scr-lobby');
 };
 
-/* ================== ADSGRAM TASK SYSTEM (task-57510) ================== */
+/* ================== ADSGRAM TASK AVAILABILITY + VERIFIED REWARD ================== */
 const TASK_REQUIRED_MS = 6000;
 let inGameTaskTimer = null;
 let taskCountdownTimer = null;
+let taskAvailabilityTimer = null;
+let taskAvailabilityObserver = null;
 let isTaskActive = false;
 let hasTaskBeenClicked = false;
-let taskRewardGranted = false;
 let hasAdsgramRewardEvent = false;
+let taskRewardGranted = false;
 let taskRemainingMs = TASK_REQUIRED_MS;
-let taskLastResumeAt = 0;
-let taskStartAt = 0;
+let taskStartedAt = 0;
+let taskPausedAt = 0;
 
 function setTaskDockVisible(visible){
   const dock = $('#task-dock');
+  const overlay = $('#task-ad-overlay');
   if(dock) dock.classList.toggle('active', !!visible);
+  if(overlay) overlay.classList.toggle('off', !visible);
 }
 
 function setDiceTaskLock(locked){
-  const diceButton = $('#df');
-  if(!diceButton) return;
-  diceButton.classList.toggle('task-locked', !!locked);
-  diceButton.setAttribute('aria-disabled', locked ? 'true' : 'false');
-  diceButton.title = locked ? 'Complete the task to unlock the dice' : 'Roll dice';
+  const dice = $('#df');
+  if(!dice) return;
+  dice.classList.toggle('task-locked', !!locked);
+  dice.setAttribute('aria-disabled', locked ? 'true' : 'false');
+  dice.title = locked ? 'Complete the available Adsgram task first' : 'Roll dice';
 }
 
-function updateTaskCountdownUI(){
-  const secVal = $('#task-sec-val');
-  if(secVal) secVal.textContent = String(Math.ceil(taskRemainingMs / 1000));
+function getAdsgramTaskRoot(){
+  const el = $('#adsgram-task-comp');
+  return el ? (el.shadowRoot || el) : null;
 }
 
-function pauseTaskCountdown(){
-  if(taskLastResumeAt){
-    taskRemainingMs = Math.max(0, taskRemainingMs - (Date.now() - taskLastResumeAt));
-    taskLastResumeAt = 0;
+function adsgramHasRealAvailableTask(){
+  const el = $('#adsgram-task-comp');
+  const root = getAdsgramTaskRoot();
+  if(!el || !root) return false;
+
+  const explicitAvailable = el.getAttribute('data-available');
+  if(explicitAvailable === 'false') return false;
+  if(explicitAvailable === 'true') return true;
+
+  // Adsgram can render a skeleton while no campaign/task is available.
+  // Do not expose that empty placeholder as an available task.
+  const text = String(root.innerText || root.textContent || '')
+    .replace(/\s+/g, ' ').trim().toLowerCase();
+  const titleNodes = root.querySelectorAll('h1,h2,h3,p,[class*="title"],[class*="description"],[class*="task-name"]');
+  let hasTitle = false;
+  for(const node of titleNodes){
+    const value = String(node.innerText || node.textContent || '').replace(/\s+/g,' ').trim();
+    if(value.length >= 5 && !/^(go|open|start|loading|please wait)$/i.test(value)){
+      hasTitle = true;
+      break;
+    }
   }
+  const hasRealImage = Array.from(root.querySelectorAll('img')).some(img =>
+    img.complete && img.naturalWidth > 8 && img.naturalHeight > 8
+  );
+  const hasTaskId = !!(el.getAttribute('data-task-id') || el.dataset.taskId);
+  const onlyPlaceholderText = !text || text === 'go' || text === 'loading' || text === 'please wait';
+  return !onlyPlaceholderText && (hasTitle || (hasRealImage && text.length > 8) || hasTaskId);
+}
+
+function updateAdsgramTaskAvailability(){
+  const available = adsgramHasRealAvailableTask();
+  if(!live || !$('#scr-game').classList.contains('active') || isTaskActive) {
+    if(!isTaskActive) setTaskDockVisible(false);
+    return;
+  }
+  if(available){
+    setTaskDockVisible(true);
+    setDiceTaskLock(false);
+  }else{
+    setTaskDockVisible(false);
+    setDiceTaskLock(false);
+  }
+}
+
+function pauseAdsgramTaskTimer(){
+  if(!taskStartedAt) return;
+  taskRemainingMs = Math.max(0, taskRemainingMs - (Date.now() - taskStartedAt));
+  taskStartedAt = 0;
+  taskPausedAt = Date.now();
   if(taskCountdownTimer){
     clearInterval(taskCountdownTimer);
     taskCountdownTimer = null;
   }
-  updateTaskCountdownUI();
+  const sec = $('#task-sec-val');
+  if(sec) sec.textContent = String(Math.ceil(taskRemainingMs / 1000));
 }
 
-function finishNativeTask(){
-  if(!isTaskActive || !hasTaskBeenClicked || taskRewardGranted || !hasAdsgramRewardEvent || taskRemainingMs > 0) return;
+function finishAdsgramTaskIfReady(){
+  if(!isTaskActive || !hasTaskBeenClicked || !hasAdsgramRewardEvent ||
+     taskRemainingMs > 0 || taskRewardGranted) return;
+
   taskRewardGranted = true;
   if(taskCountdownTimer){
     clearInterval(taskCountdownTimer);
     taskCountdownTimer = null;
   }
 
-  coins += 100;
-  updateHUD();
-  store();
+  creditGameCoins(100, 'Adsgram task');
   SFX.coinCascade();
-  showMegaTonToast('🎉 Task Completed! +100 Coins Added');
+  showMegaTonToast('🎉 Adsgram Task Verified! +100 Coins Added');
 
-  const overlay = $('#task-ad-overlay');
-  if(overlay) overlay.classList.add('off');
-  setTaskDockVisible(false);
   isTaskActive = false;
   hasTaskBeenClicked = false;
-  taskRewardGranted = false;
   hasAdsgramRewardEvent = false;
+  taskRewardGranted = false;
   taskRemainingMs = TASK_REQUIRED_MS;
-  taskLastResumeAt = 0;
-  taskStartAt = 0;
+  taskStartedAt = 0;
+  taskPausedAt = 0;
+  setTaskDockVisible(false);
   setDiceTaskLock(false);
+  updateAdsgramTaskAvailability();
 }
 
-function resumeTaskCountdown(){
-  if(!isTaskActive || !hasTaskBeenClicked || taskRewardGranted || taskLastResumeAt || document.hidden) return;
-  taskLastResumeAt = Date.now();
-  taskStartAt = Date.now() - (TASK_REQUIRED_MS - taskRemainingMs);
-
-  if(taskCountdownTimer) clearInterval(taskCountdownTimer);
+function runAdsgramTaskTimer(){
+  if(!isTaskActive || !hasTaskBeenClicked || taskStartedAt || document.hidden) return;
+  taskStartedAt = Date.now();
+  taskPausedAt = 0;
   taskCountdownTimer = setInterval(()=>{
     if(document.hidden){
-      pauseTaskCountdown();
+      pauseAdsgramTaskTimer();
       return;
     }
-    taskRemainingMs = Math.max(0, TASK_REQUIRED_MS - (Date.now() - taskStartAt));
-    updateTaskCountdownUI();
+    taskRemainingMs = Math.max(0, taskRemainingMs - 100);
+    const sec = $('#task-sec-val');
+    if(sec) sec.textContent = String(Math.ceil(taskRemainingMs / 1000));
     if(taskRemainingMs <= 0){
       clearInterval(taskCountdownTimer);
       taskCountdownTimer = null;
-      taskLastResumeAt = 0;
+      taskStartedAt = 0;
       if(hasAdsgramRewardEvent){
-        finishNativeTask();
+        finishAdsgramTaskIfReady();
       }else{
         const box = $('#task-countdown-box');
-        if(box) box.textContent = '⏳ Waiting for Adsgram task verification...';
+        if(box) box.textContent = '⏳ Waiting for Adsgram reward verification...';
       }
     }
   }, 100);
@@ -1702,80 +1797,72 @@ function resumeTaskCountdown(){
 
 function startInGameTaskLoop(){
   stopInGameTaskLoop();
-  inGameTaskTimer = setInterval(()=>{
-    if(live && !isTaskActive && $('#scr-game').classList.contains('active')){
-      showNativeTaskBanner();
-    }
-  }, 60 * 1000);
+  // Scan Adsgram's widget state; never display a timer-driven empty card.
+  updateAdsgramTaskAvailability();
+  taskAvailabilityTimer = setInterval(updateAdsgramTaskAvailability, 2500);
+
+  const el = $('#adsgram-task-comp');
+  const root = getAdsgramTaskRoot();
+  if(root && window.MutationObserver){
+    taskAvailabilityObserver = new MutationObserver(updateAdsgramTaskAvailability);
+    taskAvailabilityObserver.observe(root, {childList:true,subtree:true,attributes:true,characterData:true});
+  }
 }
 
 function stopInGameTaskLoop(){
-  if(inGameTaskTimer){
-    clearInterval(inGameTaskTimer);
-    inGameTaskTimer = null;
-  }
-  if(taskCountdownTimer){
-    clearInterval(taskCountdownTimer);
-    taskCountdownTimer = null;
-  }
-  const overlay = $('#task-ad-overlay');
-  if(overlay) overlay.classList.add('off');
-  setTaskDockVisible(false);
+  if(inGameTaskTimer){ clearInterval(inGameTaskTimer); inGameTaskTimer = null; }
+  if(taskCountdownTimer){ clearInterval(taskCountdownTimer); taskCountdownTimer = null; }
+  if(taskAvailabilityTimer){ clearInterval(taskAvailabilityTimer); taskAvailabilityTimer = null; }
+  if(taskAvailabilityObserver){ taskAvailabilityObserver.disconnect(); taskAvailabilityObserver = null; }
+
   isTaskActive = false;
   hasTaskBeenClicked = false;
-  taskRewardGranted = false;
-  taskRemainingMs = TASK_REQUIRED_MS;
-  taskLastResumeAt = 0;
-  taskStartAt = 0;
-  setDiceTaskLock(false);
-}
-
-function showNativeTaskBanner(){
-  isTaskActive = true;
-  hasTaskBeenClicked = false;
-  taskRewardGranted = false;
   hasAdsgramRewardEvent = false;
+  taskRewardGranted = false;
   taskRemainingMs = TASK_REQUIRED_MS;
-  taskLastResumeAt = 0;
-  taskStartAt = 0;
-
-  const overlay = $('#task-ad-overlay');
-  const countBox = $('#task-countdown-box');
-  if(countBox) countBox.style.display = 'none';
-  if(overlay) overlay.classList.remove('off');
-  setTaskDockVisible(true);
-  setDiceTaskLock(true);
+  taskStartedAt = 0;
+  taskPausedAt = 0;
+  setTaskDockVisible(false);
+  setDiceTaskLock(false);
 }
 
 const taskComp = $('#adsgram-task-comp');
 if(taskComp){
   taskComp.addEventListener('click', ()=>{
-    if(!isTaskActive || hasTaskBeenClicked || taskRewardGranted) return;
+    if(!live || !adsgramHasRealAvailableTask() || isTaskActive || taskRewardGranted) return;
+    isTaskActive = true;
     hasTaskBeenClicked = true;
+    hasAdsgramRewardEvent = false;
     taskRemainingMs = TASK_REQUIRED_MS;
-    taskLastResumeAt = 0;
-    taskStartAt = 0;
 
     const countBox = $('#task-countdown-box');
     if(countBox) countBox.style.display = 'block';
-    updateTaskCountdownUI();
-    resumeTaskCountdown();
+    const sec = $('#task-sec-val');
+    if(sec) sec.textContent = '6';
+
+    setTaskDockVisible(true);
+    setDiceTaskLock(true);
+    runAdsgramTaskTimer();
   });
 
-  taskComp.addEventListener('reward', (e)=>{
-    console.log('[Adsgram Task Reward Received]', e.detail);
+  // Adsgram's reward event is required; a click or elapsed timer alone never pays.
+  taskComp.addEventListener('reward', ()=>{
     if(!isTaskActive || !hasTaskBeenClicked || taskRewardGranted) return;
     hasAdsgramRewardEvent = true;
-    if(taskRemainingMs <= 0) finishNativeTask();
+    finishAdsgramTaskIfReady();
+  });
+
+  taskComp.addEventListener('error', ()=>{
+    if(!isTaskActive) updateAdsgramTaskAvailability();
   });
 }
 
 document.addEventListener('visibilitychange', ()=>{
   if(!isTaskActive || !hasTaskBeenClicked || taskRewardGranted) return;
   if(document.hidden){
-    pauseTaskCountdown();
+    pauseAdsgramTaskTimer();
   }else{
-    resumeTaskCountdown();
+    runAdsgramTaskTimer();
   }
 });
 
@@ -2151,7 +2238,7 @@ function react(i,c){const e=$('#p'+i);if(!e)return;e.classList.remove('happy','s
 function flash(c){const f=$('#fl');f.className='';void f.offsetWidth;f.className=c}
 function shake(){cv.classList.remove('sh');void cv.offsetWidth;cv.classList.add('sh')}
 function addCoins(n,gx,gy){
-  coins+=n;updateHUD();store();
+  creditGameCoins(n, 'ladder coin reward');
   const c=$('#cp');c.classList.remove('bump');void c.offsetWidth;c.classList.add('bump');
   if(gx!=null)burst(gx,gy,'#f5c542',16);
   SFX.coinCascade();
@@ -2211,13 +2298,11 @@ function win(p){
     const sc=Math.max(100,1000-p.t*10);
     if(sc>best)best=sc;
     const rewardGain = activeRoom.reward;
-    coins += rewardGain;
-    updateHUD();store();
+    creditGameCoins(rewardGain, 'match coin reward');
     $('#wi').innerHTML=IC.cup;$('#wi').style.color='#facc15';$('#wi').style.filter='';
     $('#ws').textContent=sc;$('#wc').textContent='+'+rewardGain;$('#wb').textContent=best;
     
-    // MegaTon Play Reward Bridge
-    dispatchMegaTonReward(100, sc);
+    // Coin milestones were checked by creditGameCoins() when the match coins were awarded.
 
     // WIN AD TRIGGER: 20263
     setTimeout(()=>{
@@ -2242,7 +2327,7 @@ function startOnlineGame(opponentName){
   P=[0,1].map(i=>({pos:0,t:0,x:stp(i)[0],y:stp(i)[1],z:0,ox:0,oy:0,mv:0}));
   cur=0;busy=0;live=1;$('#win').classList.add('off');
   panel();
-  startInGameTaskLoop(); // 1-minute recurring task loop start
+  startInGameTaskLoop(); // show only when Adsgram has a real available task
 }
 
 $('#again').onclick=()=>{
