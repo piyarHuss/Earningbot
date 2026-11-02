@@ -632,12 +632,9 @@ svg{width:100%;height:100%;display:block}
     <div id="task-ad-overlay" class="task-ad-overlay off">
       <div class="task-ad-header">
         <span class="task-ad-tag">⚡ SPECIAL MISSION</span>
-        <span class="task-ad-sub">Complete the Adsgram task and stay 6 seconds</span>
+        <span class="task-ad-sub">Complete the task and stay 5 seconds</span>
       </div>
       <adsgram-task id="adsgram-task-comp" data-block-id="task-57510" class="adsgram-task-box"></adsgram-task>
-      <div id="task-countdown-box" class="task-countdown-box" style="display:none;">
-        ⏳ Stay in task: <span id="task-sec-val">6</span>s remaining...
-      </div>
     </div>
   </div>
 
@@ -1651,19 +1648,18 @@ $('#btn-win-lobby').onclick = ()=>{
   showScreen('scr-lobby');
 };
 
-/* ================== ADSGRAM TASK AVAILABILITY + VERIFIED REWARD ================== */
-const TASK_REQUIRED_MS = 6000;
-let inGameTaskTimer = null;
-let taskCountdownTimer = null;
+/* ================== ADSGRAM TASK (MIN 5s AWAY + AUTO REPEAT) ================== */
+const TASK_MIN_AWAY_MS = 5000;
 let taskAvailabilityTimer = null;
-let taskAvailabilityObserver = null;
-let isTaskActive = false;
-let hasTaskBeenClicked = false;
-let hasAdsgramRewardEvent = false;
-let taskRewardGranted = false;
-let taskRemainingMs = TASK_REQUIRED_MS;
-let taskStartedAt = 0;
-let taskPausedAt = 0;
+let taskObserver = null;
+let taskBlocking = false;   // real task dikh raha hai -> dice lock
+let isTaskActive = false;   // user ne task par tap kar diya
+let taskClickAt = 0;
+let taskAwayStart = 0;
+let taskBestAway = 0;
+let taskReturned = false;
+let taskGranted = false;
+let taskLastReset = 0;
 
 function setTaskDockVisible(visible){
   const dock = $('#task-dock');
@@ -1673,198 +1669,191 @@ function setTaskDockVisible(visible){
 }
 
 function setDiceTaskLock(locked){
+  taskBlocking = !!locked;
   const dice = $('#df');
   if(!dice) return;
-  dice.classList.toggle('task-locked', !!locked);
-  dice.setAttribute('aria-disabled', locked ? 'true' : 'false');
-  dice.title = locked ? 'Complete the available Adsgram task first' : 'Roll dice';
+  dice.classList.toggle('task-locked', taskBlocking);
+  dice.setAttribute('aria-disabled', taskBlocking ? 'true' : 'false');
+  dice.title = taskBlocking ? 'Pehle task complete karo' : 'Roll dice';
 }
 
+function getTaskEl(){ return $('#adsgram-task-comp'); }
 function getAdsgramTaskRoot(){
-  const el = $('#adsgram-task-comp');
+  const el = getTaskEl();
   return el ? (el.shadowRoot || el) : null;
 }
 
+// Sirf visible text padho (style/script ka text ignore)
+function taskRootText(){
+  const r = getAdsgramTaskRoot();
+  if(!r) return '';
+  let s = '';
+  try{
+    const w = document.createTreeWalker(r, NodeFilter.SHOW_TEXT, {
+      acceptNode: n => /^(style|script)$/i.test((n.parentNode && n.parentNode.nodeName) || '')
+        ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT
+    });
+    while(w.nextNode()) s += ' ' + w.currentNode.nodeValue;
+  }catch(e){}
+  return s.replace(/\s+/g, ' ').trim().toLowerCase();
+}
+
+function adsgramShowsDone(){
+  return /\b(done|completed|claimed)\b/.test(taskRootText());
+}
+
 function adsgramHasRealAvailableTask(){
-  const el = $('#adsgram-task-comp');
-  const root = getAdsgramTaskRoot();
+  const el = getTaskEl(), root = getAdsgramTaskRoot();
   if(!el || !root) return false;
-
-  const explicitAvailable = el.getAttribute('data-available');
-  if(explicitAvailable === 'false') return false;
-  if(explicitAvailable === 'true') return true;
-
-  // Adsgram can render a skeleton while no campaign/task is available.
-  // Do not expose that empty placeholder as an available task.
-  const text = String(root.innerText || root.textContent || '')
-    .replace(/\s+/g, ' ').trim().toLowerCase();
-  const titleNodes = root.querySelectorAll('h1,h2,h3,p,[class*="title"],[class*="description"],[class*="task-name"]');
-  let hasTitle = false;
-  for(const node of titleNodes){
-    const value = String(node.innerText || node.textContent || '').replace(/\s+/g,' ').trim();
-    if(value.length >= 5 && !/^(go|open|start|loading|please wait)$/i.test(value)){
-      hasTitle = true;
-      break;
-    }
-  }
-  const hasRealImage = Array.from(root.querySelectorAll('img')).some(img =>
-    img.complete && img.naturalWidth > 8 && img.naturalHeight > 8
-  );
-  const hasTaskId = !!(el.getAttribute('data-task-id') || el.dataset.taskId);
-  const onlyPlaceholderText = !text || text === 'go' || text === 'loading' || text === 'please wait';
-  return !onlyPlaceholderText && (hasTitle || (hasRealImage && text.length > 8) || hasTaskId);
+  if(el.getAttribute('data-available') === 'false') return false;
+  const text = taskRootText();
+  if(!text || /^(go|loading|please wait)$/.test(text)) return false;
+  if(!isTaskActive && adsgramShowsDone()) return false;   // purana "done" = available nahi
+  return text.length >= 5;
 }
 
-function updateAdsgramTaskAvailability(){
-  const available = adsgramHasRealAvailableTask();
-  if(!live || !$('#scr-game').classList.contains('active') || isTaskActive) {
-    if(!isTaskActive) setTaskDockVisible(false);
-    return;
-  }
-  if(available){
-    setTaskDockVisible(true);
-    setDiceTaskLock(false);
-  }else{
-    setTaskDockVisible(false);
-    setDiceTaskLock(false);
-  }
-}
-
-function pauseAdsgramTaskTimer(){
-  if(!taskStartedAt) return;
-  taskRemainingMs = Math.max(0, taskRemainingMs - (Date.now() - taskStartedAt));
-  taskStartedAt = 0;
-  taskPausedAt = Date.now();
-  if(taskCountdownTimer){
-    clearInterval(taskCountdownTimer);
-    taskCountdownTimer = null;
-  }
-  const sec = $('#task-sec-val');
-  if(sec) sec.textContent = String(Math.ceil(taskRemainingMs / 1000));
-}
-
-function finishAdsgramTaskIfReady(){
-  if(!isTaskActive || !hasTaskBeenClicked || !hasAdsgramRewardEvent ||
-     taskRemainingMs > 0 || taskRewardGranted) return;
-
-  taskRewardGranted = true;
-  if(taskCountdownTimer){
-    clearInterval(taskCountdownTimer);
-    taskCountdownTimer = null;
-  }
-
-  creditGameCoins(100, 'Adsgram task');
-  SFX.coinCascade();
-  showMegaTonToast('🎉 Adsgram Task Verified! +100 Coins Added');
-
+/* ---- Task state ---- */
+function resetTaskState(){
   isTaskActive = false;
-  hasTaskBeenClicked = false;
-  hasAdsgramRewardEvent = false;
-  taskRewardGranted = false;
-  taskRemainingMs = TASK_REQUIRED_MS;
-  taskStartedAt = 0;
-  taskPausedAt = 0;
+  taskClickAt = 0;
+  taskAwayStart = 0;
+  taskBestAway = 0;
+  taskReturned = false;
+  taskGranted = false;
+}
+
+// Naya adsgram-task element banao -> agla task load hota hai
+function resetTaskElement(){
+  resetTaskState();
+  taskLastReset = Date.now();
   setTaskDockVisible(false);
   setDiceTaskLock(false);
-  updateAdsgramTaskAvailability();
+  const old = getTaskEl();
+  if(!old || !old.parentNode) return;
+  const nw = document.createElement('adsgram-task');
+  nw.id = 'adsgram-task-comp';
+  nw.className = 'adsgram-task-box';
+  nw.setAttribute('data-block-id', ADS_CONFIG.TASK_BLOCK);
+  old.parentNode.replaceChild(nw, old);
+  bindTaskEvents(nw);
+  attachTaskObserver();
+  setTimeout(updateAdsgramTaskAvailability, 1500);
 }
 
-function runAdsgramTaskTimer(){
-  if(!isTaskActive || !hasTaskBeenClicked || taskStartedAt || document.hidden) return;
-  taskStartedAt = Date.now();
-  taskPausedAt = 0;
-  taskCountdownTimer = setInterval(()=>{
-    if(document.hidden){
-      pauseAdsgramTaskTimer();
-      return;
-    }
-    taskRemainingMs = Math.max(0, taskRemainingMs - 100);
-    const sec = $('#task-sec-val');
-    if(sec) sec.textContent = String(Math.ceil(taskRemainingMs / 1000));
-    if(taskRemainingMs <= 0){
-      clearInterval(taskCountdownTimer);
-      taskCountdownTimer = null;
-      taskStartedAt = 0;
-      if(hasAdsgramRewardEvent){
-        finishAdsgramTaskIfReady();
-      }else{
-        const box = $('#task-countdown-box');
-        if(box) box.textContent = '⏳ Waiting for Adsgram reward verification...';
-      }
-    }
-  }, 100);
+function taskIsValid(){
+  if(taskAwayStart) return false;                 // abhi bhi bahar hai
+  if(taskReturned) return true;                   // 5s+ bahar rahke wapas aaya
+  // Fallback: koi away-event aaya hi nahi to click se 5s guzarna chahiye
+  return !taskBestAway && (Date.now() - taskClickAt >= TASK_MIN_AWAY_MS);
+}
+
+function completeTask(){
+  if(taskGranted) return;
+  taskGranted = true;
+  creditGameCoins(100, 'Adsgram task');
+  SFX.coinCascade();
+  showMegaTonToast('🎉 Task complete! +100 Coins');
+  resetTaskElement();       // task hatega, naya available hua to wapas aayega
+}
+
+function failTask(){
+  SFX.click();
+  showMegaTonToast('⚠️ Oops! Very fast, try again');
+  resetTaskElement();       // reward nahi, task complete nahi, fresh task
+}
+
+function onTaskReward(){
+  if(!isTaskActive || taskGranted || taskAwayStart) return;
+  if(taskIsValid()) completeTask(); else failTask();
+}
+
+/* ---- Away / Back tracking (user task link khol ke bahar gaya?) ---- */
+function taskAway(){
+  if(isTaskActive && !taskAwayStart) taskAwayStart = Date.now();
+}
+function taskBack(){
+  if(!isTaskActive || !taskAwayStart) return;
+  const d = Date.now() - taskAwayStart;
+  taskAwayStart = 0;
+  taskBestAway = Math.max(taskBestAway, d);
+  if(d < TASK_MIN_AWAY_MS) failTask();   // 5 sec se pehle wapas aaya
+  else taskReturned = true;
+}
+document.addEventListener('visibilitychange', ()=>{ document.hidden ? taskAway() : taskBack(); });
+try{
+  if(window.Telegram && Telegram.WebApp && Telegram.WebApp.onEvent){
+    Telegram.WebApp.onEvent('deactivated', taskAway);
+    Telegram.WebApp.onEvent('activated', taskBack);
+  }
+}catch(e){}
+
+/* ---- Adsgram element events ---- */
+function bindTaskEvents(el){
+  if(!el) return;
+  el.addEventListener('click', ()=>{
+    if(!live || !taskBlocking || isTaskActive) return;
+    if(!adsgramHasRealAvailableTask()) return;
+    isTaskActive = true;
+    taskClickAt = Date.now();
+    taskAwayStart = 0;
+    taskBestAway = 0;
+    taskReturned = false;
+    taskGranted = false;
+  });
+  el.addEventListener('reward', onTaskReward);
+  ['onBannerNotFound','onError','error'].forEach(ev=>{
+    el.addEventListener(ev, ()=>{ if(!isTaskActive) updateAdsgramTaskAvailability(); });
+  });
+}
+
+/* ---- Availability loop ---- */
+function updateAdsgramTaskAvailability(){
+  const gameOn = live && $('#scr-game').classList.contains('active');
+  if(!gameOn){
+    setTaskDockVisible(false);
+    setDiceTaskLock(false);
+    return;
+  }
+  if(isTaskActive){
+    // Reward event miss ho gaya ho to "done" dekh ke check karo
+    if(adsgramShowsDone()) onTaskReward();
+    return;
+  }
+  if(adsgramShowsDone()){
+    setTaskDockVisible(false);
+    setDiceTaskLock(false);
+    if(Date.now() - taskLastReset > 4000) resetTaskElement();  // agla task mangao
+    return;
+  }
+  const available = adsgramHasRealAvailableTask();
+  setTaskDockVisible(available);
+  setDiceTaskLock(available);   // task dikhe to dice lock, pehle task karna padega
+}
+
+function attachTaskObserver(){
+  if(taskObserver){ taskObserver.disconnect(); taskObserver = null; }
+  const root = getAdsgramTaskRoot();
+  if(root && window.MutationObserver){
+    taskObserver = new MutationObserver(updateAdsgramTaskAvailability);
+    taskObserver.observe(root, {childList:true, subtree:true, attributes:true, characterData:true});
+  }
 }
 
 function startInGameTaskLoop(){
   stopInGameTaskLoop();
-  // Scan Adsgram's widget state; never display a timer-driven empty card.
+  bindTaskEvents(getTaskEl());
+  attachTaskObserver();
   updateAdsgramTaskAvailability();
-  taskAvailabilityTimer = setInterval(updateAdsgramTaskAvailability, 2500);
-
-  const el = $('#adsgram-task-comp');
-  const root = getAdsgramTaskRoot();
-  if(root && window.MutationObserver){
-    taskAvailabilityObserver = new MutationObserver(updateAdsgramTaskAvailability);
-    taskAvailabilityObserver.observe(root, {childList:true,subtree:true,attributes:true,characterData:true});
-  }
+  taskAvailabilityTimer = setInterval(updateAdsgramTaskAvailability, 1500);
 }
 
 function stopInGameTaskLoop(){
-  if(inGameTaskTimer){ clearInterval(inGameTaskTimer); inGameTaskTimer = null; }
-  if(taskCountdownTimer){ clearInterval(taskCountdownTimer); taskCountdownTimer = null; }
   if(taskAvailabilityTimer){ clearInterval(taskAvailabilityTimer); taskAvailabilityTimer = null; }
-  if(taskAvailabilityObserver){ taskAvailabilityObserver.disconnect(); taskAvailabilityObserver = null; }
-
-  isTaskActive = false;
-  hasTaskBeenClicked = false;
-  hasAdsgramRewardEvent = false;
-  taskRewardGranted = false;
-  taskRemainingMs = TASK_REQUIRED_MS;
-  taskStartedAt = 0;
-  taskPausedAt = 0;
+  if(taskObserver){ taskObserver.disconnect(); taskObserver = null; }
+  resetTaskState();
   setTaskDockVisible(false);
   setDiceTaskLock(false);
 }
-
-const taskComp = $('#adsgram-task-comp');
-if(taskComp){
-  taskComp.addEventListener('click', ()=>{
-    if(!live || !adsgramHasRealAvailableTask() || isTaskActive || taskRewardGranted) return;
-    isTaskActive = true;
-    hasTaskBeenClicked = true;
-    hasAdsgramRewardEvent = false;
-    taskRemainingMs = TASK_REQUIRED_MS;
-
-    const countBox = $('#task-countdown-box');
-    if(countBox) countBox.style.display = 'block';
-    const sec = $('#task-sec-val');
-    if(sec) sec.textContent = '6';
-
-    setTaskDockVisible(true);
-    setDiceTaskLock(true);
-    runAdsgramTaskTimer();
-  });
-
-  // Adsgram's reward event is required; a click or elapsed timer alone never pays.
-  taskComp.addEventListener('reward', ()=>{
-    if(!isTaskActive || !hasTaskBeenClicked || taskRewardGranted) return;
-    hasAdsgramRewardEvent = true;
-    finishAdsgramTaskIfReady();
-  });
-
-  taskComp.addEventListener('error', ()=>{
-    if(!isTaskActive) updateAdsgramTaskAvailability();
-  });
-}
-
-document.addEventListener('visibilitychange', ()=>{
-  if(!isTaskActive || !hasTaskBeenClicked || taskRewardGranted) return;
-  if(document.hidden){
-    pauseAdsgramTaskTimer();
-  }else{
-    runAdsgramTaskTimer();
-  }
-});
 
 /* ================== CINEMATIC VS MATCHMAKING & SOUNDS ================== */
 const vsCv = $('#vs-coin-canvas'), vsCx = vsCv.getContext('2d');
@@ -2253,7 +2242,7 @@ async function dice(){
 }
 
 async function turn(){
-  if(busy||!live||isTaskActive)return;busy=1;panel();const p=P[cur],v=await dice();p.t++;await wait(250);p.mv=1;
+  if(busy||!live||(cur===0&&taskBlocking))return;busy=1;panel();const p=P[cur],v=await dice();p.t++;await wait(250);p.mv=1;
   let t=p.pos+v;const mine=cur===0;
   if(t>100){
     const d=$('#df');d.classList.remove('no');void d.offsetWidth;d.classList.add('no');
@@ -2335,7 +2324,15 @@ $('#again').onclick=()=>{
   $('#win').classList.add('off');
   selectRoom(curRoomIdx);
 };
-$('#df').onclick=()=>{if(live&&!busy&&cur===0&&!isTaskActive)turn()};
+$('#df').onclick=()=>{
+  if(!live||busy||cur!==0) return;
+  if(taskBlocking){
+    const d=$('#df'); d.classList.remove('no'); void d.offsetWidth; d.classList.add('no');
+    showMegaTonToast('Pehle neeche wala task complete karo');
+    return;
+  }
+  turn();
+};
 $('#mt').onclick=()=>{
   mute=!mute;
   $('#mt').innerHTML=IC[mute?'off':'on'];
