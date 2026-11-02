@@ -898,10 +898,22 @@ async function checkAndSendMegaTonCoinRewards(totalCoinsCollected){
 
     const gameTasks = stateData.gameTasks && typeof stateData.gameTasks === 'object'
       ? stateData.gameTasks : {};
-    const oldTaskState = gameTasks[taskId] && typeof gameTasks[taskId] === 'object'
-      ? gameTasks[taskId] : {};
-    const claimedTargets = oldTaskState.claimedTargets && typeof oldTaskState.claimedTargets === 'object'
-      ? { ...oldTaskState.claimedTargets } : {};
+    const oldTaskState = gameTasks[taskId];
+
+    // MegaTon app format: gameTasks[taskId] = [300, 1500, ...] (claimed target numbers)
+    let claimedList = [];
+    if(Array.isArray(oldTaskState)){
+      claimedList = oldTaskState.map(Number);
+    }else if(oldTaskState && typeof oldTaskState === 'object'){
+      if(oldTaskState.claimedTargets && typeof oldTaskState.claimedTargets === 'object'){
+        // purana galat format (claimedTargets object) -> array me convert
+        claimedList = Object.keys(oldTaskState.claimedTargets)
+          .filter(k => oldTaskState.claimedTargets[k] === true).map(Number);
+      }else{
+        claimedList = Object.values(oldTaskState).map(Number);
+      }
+    }
+    claimedList = claimedList.filter(n => Number.isFinite(n) && n > 0);
 
     const eligible = levels.map(item => {
       const target = Number(item && (item.lvl ?? item.target));
@@ -920,14 +932,14 @@ async function checkAndSendMegaTonCoinRewards(totalCoinsCollected){
     for(const milestone of eligible){
       const target = milestone.target;
       const claimKey = `${uid}:${taskId}:${target}`;
-      if(localClaimedTargets.has(claimKey) || claimedTargets[String(target)] === true) continue;
+      if(localClaimedTargets.has(claimKey) || claimedList.includes(target)) continue;
 
       // Keep the prompt's MegaTon points conversion exactly.
       const rewTon = milestone.rewTon;
       const points = rewTon >= 0.5 ? rewTon : Math.round(rewTon * 10000) / 10;
       newBalance += points;
 
-      claimedTargets[String(target)] = true;
+      claimedList.push(target);
       newlyClaimed.push({ target, rewTon, points, claimKey });
 
       hist.unshift({
@@ -943,19 +955,14 @@ async function checkAndSendMegaTonCoinRewards(totalCoinsCollected){
       return;
     }
 
+    claimedList.sort((x,y)=>x-y);
+
+    // Multi-path PATCH: sirf is task ka array + balance + hist badlega, baaki tasks safe rahenge.
     const patchData = {
       b: Math.round(newBalance * 100) / 100,
-      gameTasks: {
-        ...gameTasks,
-        [taskId]: {
-          ...oldTaskState,
-          claimedTargets,
-          totalCoinsCollected: Math.max(Number(oldTaskState.totalCoinsCollected) || 0, total),
-          lastCoinSyncAt: Date.now()
-        }
-      },
       hist: hist.slice(0, 30)
     };
+    patchData['gameTasks/' + taskId] = claimedList;
 
     const patchRes = await fetch(userUrl, {
       method: "PATCH",
