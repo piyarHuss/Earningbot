@@ -344,6 +344,7 @@ svg{width:100%;height:100%;display:block}
 #df{width:66px;height:66px;display:grid;place-items:center;border-radius:19px;background:linear-gradient(145deg,#ffffff26,#ffffff0a);border:1px solid var(--edge);backdrop-filter:blur(8px);cursor:pointer;margin-top:-14px;box-shadow:0 10px 26px #0008}
 #df.rdy{animation:rdy 1.1s infinite;border-color:var(--gold)}
 #df.no{animation:no .4s}
+#df.task-locked{opacity:.42;filter:grayscale(1);cursor:not-allowed;animation:none!important;box-shadow:none}
 @keyframes rdy{50%{transform:translateY(-5px) scale(1.05);box-shadow:0 14px 30px #f0bf4f55}}
 @keyframes no{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 .scene{width:42px;height:42px;perspective:360px}
@@ -356,17 +357,27 @@ svg{width:100%;height:100%;display:block}
 #fx{position:fixed;inset:0;pointer-events:none;z-index:90}
 
 /* ================== REAL ADSGRAM NATIVE TASK BANNER CONTAINER ================== */
+.task-dock{
+  display:none;
+  flex:0 0 auto;
+  width:100%;
+  padding:4px 8px 6px;
+  background:#07111a;
+  z-index:22;
+}
+.task-dock.active{display:block}
 .task-ad-overlay{
-  position:absolute;
-  left:50%;
-  bottom:10px;
-  transform:translateX(-50%);
+  position:relative;
+  left:auto;
+  bottom:auto;
+  transform:none;
+  margin:0 auto;
   width:min(340px,94vw);
   background:linear-gradient(145deg,rgba(22,17,38,0.98),rgba(14,10,24,0.98));
   border:2px solid #facc15;
   box-shadow:0 10px 30px rgba(0,0,0,0.85),0 0 20px rgba(250,204,21,0.35);
   border-radius:18px;
-  padding:10px 12px;
+  padding:7px 9px;
   z-index:75;
   display:flex;
   flex-direction:column;
@@ -614,18 +625,18 @@ svg{width:100%;height:100%;display:block}
     <canvas id="cv"></canvas>
     <div id="fl"></div>
 
-    <!-- ===== NATIVE ADSGRAM TASK BANNER (task-57510) ===== -->
+  </div>
+
+  <!-- Dedicated task row: keeps the game board clear. -->
+  <div id="task-dock" class="task-dock">
     <div id="task-ad-overlay" class="task-ad-overlay off">
       <div class="task-ad-header">
         <span class="task-ad-tag">⚡ SPECIAL MISSION</span>
-        <span class="task-ad-sub">Tap Task &amp; Wait 8s for +100 Coins!</span>
+        <span class="task-ad-sub">Complete task &amp; stay 6s for +100 Coins!</span>
       </div>
-      
-      <!-- Adsgram Official Web Component -->
       <adsgram-task id="adsgram-task-comp" data-block-id="task-57510" class="adsgram-task-box"></adsgram-task>
-      
       <div id="task-countdown-box" class="task-countdown-box" style="display:none;">
-        ⏳ Stay in task: <span id="task-sec-val">8</span>s remaining...
+        ⏳ Stay in task: <span id="task-sec-val">6</span>s remaining...
       </div>
     </div>
   </div>
@@ -1593,15 +1604,104 @@ $('#btn-win-lobby').onclick = ()=>{
   showScreen('scr-lobby');
 };
 
-/* ================== NATIVE ADSGRAM TASK AD SYSTEM (task-57510) ================== */
+/* ================== ADSGRAM TASK SYSTEM (task-57510) ================== */
+const TASK_REQUIRED_MS = 6000;
 let inGameTaskTimer = null;
 let taskCountdownTimer = null;
 let isTaskActive = false;
 let hasTaskBeenClicked = false;
+let taskRewardGranted = false;
+let hasAdsgramRewardEvent = false;
+let taskRemainingMs = TASK_REQUIRED_MS;
+let taskLastResumeAt = 0;
+let taskStartAt = 0;
+
+function setTaskDockVisible(visible){
+  const dock = $('#task-dock');
+  if(dock) dock.classList.toggle('active', !!visible);
+}
+
+function setDiceTaskLock(locked){
+  const diceButton = $('#df');
+  if(!diceButton) return;
+  diceButton.classList.toggle('task-locked', !!locked);
+  diceButton.setAttribute('aria-disabled', locked ? 'true' : 'false');
+  diceButton.title = locked ? 'Complete the task to unlock the dice' : 'Roll dice';
+}
+
+function updateTaskCountdownUI(){
+  const secVal = $('#task-sec-val');
+  if(secVal) secVal.textContent = String(Math.ceil(taskRemainingMs / 1000));
+}
+
+function pauseTaskCountdown(){
+  if(taskLastResumeAt){
+    taskRemainingMs = Math.max(0, taskRemainingMs - (Date.now() - taskLastResumeAt));
+    taskLastResumeAt = 0;
+  }
+  if(taskCountdownTimer){
+    clearInterval(taskCountdownTimer);
+    taskCountdownTimer = null;
+  }
+  updateTaskCountdownUI();
+}
+
+function finishNativeTask(){
+  if(!isTaskActive || !hasTaskBeenClicked || taskRewardGranted || !hasAdsgramRewardEvent || taskRemainingMs > 0) return;
+  taskRewardGranted = true;
+  if(taskCountdownTimer){
+    clearInterval(taskCountdownTimer);
+    taskCountdownTimer = null;
+  }
+
+  coins += 100;
+  updateHUD();
+  store();
+  SFX.coinCascade();
+  showMegaTonToast('🎉 Task Completed! +100 Coins Added');
+
+  const overlay = $('#task-ad-overlay');
+  if(overlay) overlay.classList.add('off');
+  setTaskDockVisible(false);
+  isTaskActive = false;
+  hasTaskBeenClicked = false;
+  taskRewardGranted = false;
+  hasAdsgramRewardEvent = false;
+  taskRemainingMs = TASK_REQUIRED_MS;
+  taskLastResumeAt = 0;
+  taskStartAt = 0;
+  setDiceTaskLock(false);
+}
+
+function resumeTaskCountdown(){
+  if(!isTaskActive || !hasTaskBeenClicked || taskRewardGranted || taskLastResumeAt || document.hidden) return;
+  taskLastResumeAt = Date.now();
+  taskStartAt = Date.now() - (TASK_REQUIRED_MS - taskRemainingMs);
+
+  if(taskCountdownTimer) clearInterval(taskCountdownTimer);
+  taskCountdownTimer = setInterval(()=>{
+    if(document.hidden){
+      pauseTaskCountdown();
+      return;
+    }
+    taskRemainingMs = Math.max(0, TASK_REQUIRED_MS - (Date.now() - taskStartAt));
+    updateTaskCountdownUI();
+    if(taskRemainingMs <= 0){
+      clearInterval(taskCountdownTimer);
+      taskCountdownTimer = null;
+      taskLastResumeAt = 0;
+      if(hasAdsgramRewardEvent){
+        finishNativeTask();
+      }else{
+        const box = $('#task-countdown-box');
+        if(box) box.textContent = '⏳ Waiting for Adsgram task verification...';
+      }
+    }
+  }, 100);
+}
 
 function startInGameTaskLoop(){
   stopInGameTaskLoop();
-  // Gameplay ke dauran har 1 minute (60s) baad task banner aayega
   inGameTaskTimer = setInterval(()=>{
     if(live && !isTaskActive && $('#scr-game').classList.contains('active')){
       showNativeTaskBanner();
@@ -1620,63 +1720,64 @@ function stopInGameTaskLoop(){
   }
   const overlay = $('#task-ad-overlay');
   if(overlay) overlay.classList.add('off');
+  setTaskDockVisible(false);
   isTaskActive = false;
   hasTaskBeenClicked = false;
+  taskRewardGranted = false;
+  taskRemainingMs = TASK_REQUIRED_MS;
+  taskLastResumeAt = 0;
+  taskStartAt = 0;
+  setDiceTaskLock(false);
 }
 
 function showNativeTaskBanner(){
   isTaskActive = true;
   hasTaskBeenClicked = false;
+  taskRewardGranted = false;
+  hasAdsgramRewardEvent = false;
+  taskRemainingMs = TASK_REQUIRED_MS;
+  taskLastResumeAt = 0;
+  taskStartAt = 0;
+
   const overlay = $('#task-ad-overlay');
   const countBox = $('#task-countdown-box');
-  
   if(countBox) countBox.style.display = 'none';
   if(overlay) overlay.classList.remove('off');
+  setTaskDockVisible(true);
+  setDiceTaskLock(true);
 }
 
-// User task banner par tap karega -> Minimum 8 Seconds Timer Start
 const taskComp = $('#adsgram-task-comp');
 if(taskComp){
   taskComp.addEventListener('click', ()=>{
-    if(hasTaskBeenClicked) return;
+    if(!isTaskActive || hasTaskBeenClicked || taskRewardGranted) return;
     hasTaskBeenClicked = true;
+    taskRemainingMs = TASK_REQUIRED_MS;
+    taskLastResumeAt = 0;
+    taskStartAt = 0;
 
     const countBox = $('#task-countdown-box');
-    const secVal = $('#task-sec-val');
-    countBox.style.display = 'block';
-
-    let remaining = 8;
-    secVal.textContent = remaining;
-
-    if(taskCountdownTimer) clearInterval(taskCountdownTimer);
-    taskCountdownTimer = setInterval(()=>{
-      remaining--;
-      secVal.textContent = remaining;
-
-      if(remaining <= 0){
-        clearInterval(taskCountdownTimer);
-        taskCountdownTimer = null;
-
-        // 8 Seconds Pure -> Reward Added + Game se Task Hat Gaya
-        coins += 100;
-        updateHUD();
-        store();
-        SFX.coinCascade();
-        showMegaTonToast('🎉 Task Completed! +100 Coins Added');
-
-        const overlay = $('#task-ad-overlay');
-        if(overlay) overlay.classList.add('off');
-        isTaskActive = false;
-        hasTaskBeenClicked = false;
-      }
-    }, 1000);
+    if(countBox) countBox.style.display = 'block';
+    updateTaskCountdownUI();
+    resumeTaskCountdown();
   });
 
-  // Official Adsgram reward event listener
   taskComp.addEventListener('reward', (e)=>{
     console.log('[Adsgram Task Reward Received]', e.detail);
+    if(!isTaskActive || !hasTaskBeenClicked || taskRewardGranted) return;
+    hasAdsgramRewardEvent = true;
+    if(taskRemainingMs <= 0) finishNativeTask();
   });
 }
+
+document.addEventListener('visibilitychange', ()=>{
+  if(!isTaskActive || !hasTaskBeenClicked || taskRewardGranted) return;
+  if(document.hidden){
+    pauseTaskCountdown();
+  }else{
+    resumeTaskCountdown();
+  }
+});
 
 /* ================== CINEMATIC VS MATCHMAKING & SOUNDS ================== */
 const vsCv = $('#vs-coin-canvas'), vsCx = vsCv.getContext('2d');
@@ -2065,7 +2166,7 @@ async function dice(){
 }
 
 async function turn(){
-  if(busy||!live)return;busy=1;panel();const p=P[cur],v=await dice();p.t++;await wait(250);p.mv=1;
+  if(busy||!live||isTaskActive)return;busy=1;panel();const p=P[cur],v=await dice();p.t++;await wait(250);p.mv=1;
   let t=p.pos+v;const mine=cur===0;
   if(t>100){
     const d=$('#df');d.classList.remove('no');void d.offsetWidth;d.classList.add('no');
@@ -2149,7 +2250,7 @@ $('#again').onclick=()=>{
   $('#win').classList.add('off');
   selectRoom(curRoomIdx);
 };
-$('#df').onclick=()=>{if(live&&!busy&&cur===0)turn()};
+$('#df').onclick=()=>{if(live&&!busy&&cur===0&&!isTaskActive)turn()};
 $('#mt').onclick=()=>{
   mute=!mute;
   $('#mt').innerHTML=IC[mute?'off':'on'];
